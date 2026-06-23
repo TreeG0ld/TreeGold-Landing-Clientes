@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Canales RGB para soportar opacidad (rgb(var(--x) / <alpha-value>)) */
+  --color-primary: 28 25 23;
+  --color-on-primary: 255 255 255;
+  --color-secondary: 68 64 60;
+  --color-accent: 161 98 7;
+  --color-accent-soft: 202 138 4;
+  --color-background: 250 249 247;
+  --color-foreground: 12 10 9;
+  --color-muted: 236 232 227;
+  --color-border: 221 214 205;
+  --color-destructive: 220 38 38;
+}
+
+@layer base {
+  * {
+    border-color: rgb(var(--color-border));
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+    font-family: var(--font-montserrat), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-cormorant), serif;
+    font-weight: 500;
+    line-height: 1.05;
+  }
+
+  ::selection {
+    background-color: rgb(var(--color-accent));
+    color: #fff;
+  }
+}
+
+@layer components {
+  /* Eyebrow / kicker label */
+  .eyebrow {
+    @apply text-[0.7rem] uppercase tracking-luxe text-accent font-medium;
+  }
+
+  /* Fluid serif display */
+  .display {
+    font-family: var(--font-cormorant), serif;
+    font-weight: 500;
+    line-height: 1.02;
+    font-size: clamp(2.6rem, 11vw, 6.5rem);
+  }
+
+  /* Glass surface */
+  .glass {
+    background-color: rgba(250, 249, 247, 0.7);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+  .glass-dark {
+    background-color: rgba(12, 10, 9, 0.55);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+  }
+
+  /* Primary luxe button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-medium tracking-wide text-on-primary transition-all duration-300 ease-luxe hover:bg-accent active:scale-[0.98] cursor-pointer;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-primary/30 bg-transparent px-7 py-3.5 text-sm font-medium tracking-wide text-primary transition-all duration-300 ease-luxe hover:border-accent hover:text-accent active:scale-[0.98] cursor-pointer;
+  }
+
+  /* Gold gradient text */
+  .text-gold {
+    background: linear-gradient(120deg, #a16207, #e0b84a, #a16207);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .hairline {
+    @apply h-px w-full bg-border;
+  }
+}
+
+/* Burbuja "volar al carrito" */
+.fly-bubble {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 9999px;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  will-change: transform;
+}
+
+/* Hide elements until GSAP reveals them (prevents flash). Disabled if reduced motion. */
+.reveal-init {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal-init {
+    opacity: 1 !important;
+  }
+}
+
+/* Thin elegant scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+}
+::-webkit-scrollbar-track {
+  background: rgb(var(--color-background));
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--color-border));
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--color-accent));
+}
