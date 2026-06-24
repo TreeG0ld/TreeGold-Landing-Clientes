@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==============================
+// 1. USUARIOS (Admin y Clientes)
+// ==============================
+enum Role {
+  ADMIN
+  CLIENT
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role      @default(CLIENT)
+  
+  // Si usa contraseña tradicional
+  password      String?   
+  
+  orders        Order[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// ==============================
+// 2. PRODUCTOS (Catálogo Multi-Tienda)
+// ==============================
+model Product {
+  id            String   @id @default(cuid())
+  slug          String   @unique // Ej: anillo-oro-18k
+  name          String
+  description   String   @db.Text
+  
+  // Manejo de visibilidad (Arquitectura Multi-Tienda)
+  isRetail      Boolean  @default(true)  // ¿Se ve en la tienda pública?
+  isWholesale   Boolean  @default(false) // ¿Se ve en el enlace secreto?
+  
+  // Precios
+  retailPrice   Float
+  wholesalePrice Float?
+  
+  // Inventario y Características
+  stock         Int      @default(0)
+  material      String?  // Ej: Oro 18k, Plata 925
+  weight        Float?   // Peso en gramos
+  
+  // Imágenes (Cloudinary) - Guardamos un array de URLs
+  images        String[] // ["https://res.cloudinary.com/...", "..."]
+  
+  // Relaciones
+  categoryId    String
+  category      Category @relation(fields: [categoryId], references: [id])
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ==============================
+// 3. CATEGORÍAS
+// ==============================
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  products    Product[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ==============================
+// 4. HISTORIAL DE ÓRDENES (Para WhatsApp / Perfil Cliente)
+// ==============================
+model Order {
+  id          String   @id @default(cuid())
+  userId      String?  // Opcional por si compra sin iniciar sesión
+  user        User?    @relation(fields: [userId], references: [id])
+  
+  totalAmount Float
+  status      String   @default("PENDING") // PENDING, SENT_TO_WHATSAPP, COMPLETED
+  
+  // Detalles del carrito en formato JSON
+  items       Json     
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

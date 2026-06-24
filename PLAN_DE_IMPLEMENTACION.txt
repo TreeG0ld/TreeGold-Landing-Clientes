@@ -1,0 +1,54 @@
+# Arquitectura Definitiva: TreeGold 💎
+
+Basado en tus respuestas, esta es la arquitectura óptima, justificada paso a paso para que tengas una web rápida, segura y lista para picos masivos de tráfico.
+
+## 1. Estructura de Rutas y Páginas (Frontends)
+En lugar de tener dos proyectos de código separados (lo que duplica tu trabajo de mantenimiento), usaremos el mismo proyecto de Next.js (`main`) dividiendo las rutas:
+* **Tienda Pública (`/`):** La vista para clientes finales con precios normales.
+* **Tienda Mayoristas secreta (`/mayoristas-[código-secreto]` o un subdominio):** Una ruta paralela que leerá de la misma base de datos, pero aplicará un filtro diferente de precios y productos. Solo entra quien tenga el link.
+* **Panel Administrador (`/admin`):** Tu centro de mando protegido por contraseña. 
+
+> **¿Por qué hacerlo así?** Al compartir el mismo código, si mañana decides cambiar el color de un botón o corregir un texto, se actualiza automáticamente en la tienda pública, en la de mayoristas y en el panel al mismo tiempo.
+
+## 2. Base de Datos Centralizada (Supabase + Prisma)
+Toda la información vivirá en una base de datos PostgreSQL en Supabase.
+En la tabla de **Joyas (Products)**, agregaremos dos interruptores (casillas de verificación):
+* `mostrar_en_retail` (Verdadero/Falso)
+* `mostrar_en_mayoristas` (Verdadero/Falso)
+
+> **¿Por qué hacerlo así?** Cuando estés en el `/admin` subiendo un nuevo anillo, simplemente marcas las casillas correspondientes. Si marcas ambas, se publica en ambas tiendas. Si el inventario se acaba, lo desmarcas y desaparece de todos lados al instante.
+
+## 3. Optimización de las 130+ Imágenes (Cloudinary)
+**El problema:** Subir 130 imágenes de alta calidad a un servidor normal colapsaría la página y arruinaría el SEO (Google penaliza páginas lentas).
+**La solución con Cloudinary:**
+1. En tu `/admin`, integraremos el "Cloudinary Upload Widget". 
+2. Cuando subas fotos, irán directamente desde tu computadora a los servidores globales de Cloudinary (sin pasar por nuestra base de datos, ahorrando ancho de banda).
+3. Cloudinary nos devolverá un simple enlace de texto (ej. `cloudinary.com/treegold/anillo1.jpg`). Eso es lo que guardaremos en Supabase.
+4. En la página web, usaremos Next.js `<Image>` para decirle a Cloudinary: *"Entrégame esta foto, pero conviértela a formato WEBP ultraligero y ajústala al tamaño de un celular"*.
+
+> **¿Por qué hacerlo así?** Cloudinary transforma y comprime las imágenes "al vuelo" en milisegundos, haciendo que la página cargue instantáneamente sin importar qué tan pesada era la foto original.
+
+## 4. Usuarios y Carrito (WhatsApp)
+Integraremos **NextAuth**. 
+* **Para Clientes:** Es totalmente opcional. Si inician sesión, guardamos sus datos en Supabase para que la próxima vez no tengan que llenar formularios. Si no quieren iniciar sesión, igual pueden agregar al carrito y el botón "Comprar" recopilará todos los productos y abrirá WhatsApp con el mensaje pre-armado.
+* **Para el Admin:** Inicio de sesión estricto. Nadie puede entrar a `/admin` sin tu correo y contraseña.
+
+## 5. El Tema del Hosting (Hostinger vs Vercel)
+Para páginas tradicionales (WordPress/PHP), Hostinger es excelente. Pero esta página está construida con **Next.js** (tecnología moderna de React). 
+Next.js pertenece a la empresa **Vercel**. Desplegar esta página en Vercel te da beneficios automáticos que Hostinger no te puede dar de forma nativa:
+* **Edge Caching (Anti-Picos de Tráfico):** Si haces una campaña en San Valentín y entran 10,000 personas de golpe, Vercel atiende a los usuarios desde servidores en caché sin consultar la base de datos cada vez, evitando que la página se caiga.
+* **Es Gratis al principio:** El plan "Hobby" de Vercel es 100% gratuito e incluye SSL y conexión a dominios personalizados.
+
+> **Mi recomendación y pregunta:** Te sugiero fuertemente desplegar el frontend en **Vercel** (gratis) en vez de pagar Hostinger, ya que la base de datos estará en Supabase (gratis) y las imágenes en Cloudinary (gratis). **¿Estás de acuerdo en usar Vercel para garantizar que la página no se caiga en fechas especiales, o por temas administrativos estás obligado a usar Hostinger?**
+
+---
+
+## Plan de Implementación (Fases de Trabajo)
+
+1. **Fase 1: Base de Datos y Prisma:** Crear el esquema en `schema.prisma` para separar `Retail` y `Wholesaler`, y las tablas de Usuarios.
+2. **Fase 2: Cloudinary:** Crear cuenta en Cloudinary y configurar el entorno.
+3. **Fase 3: Autenticación (NextAuth):** Implementar login de Admin y login opcional de clientes.
+4. **Fase 4: Panel de Administrador (`/admin`):** Crear la interfaz para subir/editar joyas (conectada a Cloudinary y Supabase).
+5. **Fase 5: Vistas de Tienda:** Dividir el catálogo público y crear la ruta secreta para mayoristas.
+
+**Por favor aprueba esta arquitectura confirmándome si estás de acuerdo con usar Vercel como te recomiendo, y con eso empiezo a escribir el código de la Fase 1.**
