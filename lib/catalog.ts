@@ -2,9 +2,13 @@
 // productos/categorías en la MISMA forma que ya usan los componentes,
 // para no tener que reescribir ProductCard, ProductDetail, etc.
 
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { site } from "@/lib/site";
 import type { Product, Category } from "@/lib/products";
+
+// Productos por página en el catálogo.
+export const PER_PAGE = 24;
 
 type DbProduct = {
   slug: string;
@@ -77,6 +81,65 @@ export async function getAllProducts(): Promise<Product[]> {
   return rows.map(toListProduct);
 }
 
+export type CatalogSort = "destacados" | "precio-asc" | "precio-desc";
+
+export type CatalogPage = {
+  products: Product[];
+  total: number;
+  page: number;
+  totalPages: number;
+};
+
+// Página del catálogo: filtra por categoría, ordena y pagina EN EL SERVIDOR.
+// Cacheada 1h (revalida con la tag "catalogo") para que la página dinámica
+// responda rápido sin golpear la base de datos en cada visita.
+export const getCatalogPage = unstable_cache(
+  async (
+    category: string,
+    sort: CatalogSort,
+    page: number
+  ): Promise<CatalogPage> => {
+    const safePage = Math.max(1, page || 1);
+    const where = {
+      isRetail: true,
+      ...(category && category !== "todos" ? { category: { slug: category } } : {}),
+    };
+    const orderBy =
+      sort === "precio-asc"
+        ? { retailPrice: "asc" as const }
+        : sort === "precio-desc"
+          ? { retailPrice: "desc" as const }
+          : { createdAt: "asc" as const };
+
+    const [rows, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        select: {
+          slug: true,
+          name: true,
+          retailPrice: true,
+          material: true,
+          images: true,
+          category: { select: { slug: true } },
+        },
+        orderBy,
+        skip: (safePage - 1) * PER_PAGE,
+        take: PER_PAGE,
+      }),
+      prisma.product.count({ where }),
+    ]);
+
+    return {
+      products: rows.map(toListProduct),
+      total,
+      page: safePage,
+      totalPages: Math.max(1, Math.ceil(total / PER_PAGE)),
+    };
+  },
+  ["catalog-page"],
+  { revalidate: 3600, tags: ["catalogo"] }
+);
+
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const p = await prisma.product.findUnique({ where: { slug }, ...withCategory });
   return p ? toUiProduct(p) : null;
@@ -105,22 +168,26 @@ export async function getFeatured(take = 8): Promise<Product[]> {
   return rows.map(toUiProduct);
 }
 
-export async function getAllCategories(): Promise<Category[]> {
-  const cats = await prisma.category.findMany({ orderBy: { name: "asc" } });
-  // Imagen de portada = primera foto de un producto de esa categoría.
-  return Promise.all(
-    cats.map(async (c) => {
-      const first = await prisma.product.findFirst({
-        where: { categoryId: c.id, isRetail: true },
-        select: { images: true },
-        orderBy: { createdAt: "asc" },
-      });
-      return {
-        slug: c.slug,
-        name: c.name,
-        description: "",
-        image: first?.images[0] ?? "",
-      } satisfies Category;
-    })
-  );
-}
+export const getAllCategories = unstable_cache(
+  async (): Promise<Category[]> => {
+    const cats = await prisma.category.findMany({ orderBy: { name: "asc" } });
+    // Imagen de portada = primera foto de un producto de esa categoría.
+    return Promise.all(
+      cats.map(async (c) => {
+        const first = await prisma.product.findFirst({
+          where: { categoryId: c.id, isRetail: true },
+          select: { images: true },
+          orderBy: { createdAt: "asc" },
+        });
+        return {
+          slug: c.slug,
+          name: c.name,
+          description: "",
+          image: first?.images[0] ?? "",
+        } satisfies Category;
+      })
+    );
+  },
+  ["all-categories"],
+  { revalidate: 3600, tags: ["catalogo"] }
+);
