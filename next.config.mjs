@@ -1,9 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "images.unsplash.com" },
-    ],
+    // Loader propio: optimiza cada imagen (formato, calidad y tamaño)
+    // a partir de su URL. Ver lib/imageLoader.ts.
+    loader: "custom",
+    loaderFile: "./lib/imageLoader.ts",
   },
 };
 
