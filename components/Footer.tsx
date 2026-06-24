@@ -52,8 +52,10 @@ export default function Footer() {
                   <Instagram className="h-4 w-4" strokeWidth={1.6} /> Instagram
                 </a>
               </li>
-              <li className="inline-flex items-center gap-2">
-                <MapPin className="h-4 w-4" strokeWidth={1.6} /> {site.city}
+              <li>
+                <a href={site.mapsUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-accent-soft">
+                  <MapPin className="h-4 w-4" strokeWidth={1.6} /> {site.address}
+                </a>
               </li>
             </ul>
           </div>

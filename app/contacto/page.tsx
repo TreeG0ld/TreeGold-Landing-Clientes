@@ -64,13 +64,18 @@ export default function ContactoPage() {
             </div>
           </a>
 
-          <div className="rv flex items-start gap-4 rounded-2xl border border-border p-6">
+          <a
+            href={site.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rv group flex items-start gap-4 rounded-2xl border border-border p-6 transition-colors hover:border-accent"
+          >
             <MapPin className="mt-0.5 h-6 w-6 text-accent" strokeWidth={1.6} />
             <div>
               <h3 className="text-xl">Ubicación</h3>
-              <p className="mt-1 text-sm text-secondary">{site.city} · Envíos a todo el país</p>
+              <p className="mt-1 text-sm text-secondary">{site.address}</p>
             </div>
-          </div>
+          </a>
 
           <div className="rv flex items-start gap-4 rounded-2xl border border-border p-6">
             <Clock className="mt-0.5 h-6 w-6 text-accent" strokeWidth={1.6} />
