@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { MessageCircle, Mail, Instagram, MapPin, Clock } from "lucide-react";
+import { MessageCircle, Mail, MapPin, Clock } from "lucide-react";
 import Reveal from "@/components/anim/Reveal";
 import { site } from "@/lib/site";
 import { buildGeneralLink } from "@/lib/whatsapp";
@@ -57,7 +57,7 @@ export default function ContactoPage() {
             rel="noopener noreferrer"
             className="rv group flex items-start gap-4 rounded-2xl border border-border p-6 transition-colors hover:border-accent"
           >
-            <Instagram className="mt-0.5 h-6 w-6 text-accent" strokeWidth={1.6} />
+            <svg className="mt-0.5 h-6 w-6 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
             <div>
               <h3 className="text-xl">Instagram</h3>
               <p className="mt-1 text-sm text-secondary">Síguenos y mira nuestras piezas</p>
