@@ -43,7 +43,7 @@ export default function ProductDetail({ product }: { product: Product }) {
       <div className="grid gap-10 lg:grid-cols-2">
         {/* Galería */}
         <div>
-          <div className="relative aspect-square overflow-hidden rounded-3xl bg-muted">
+          <div className="relative aspect-square overflow-hidden rounded-3xl bg-white">
             <AnimatePresence mode="wait">
               <motion.div
                 key={active}
@@ -59,7 +59,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                   fill
                   priority
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
+                  className="object-contain p-6"
                 />
               </motion.div>
             </AnimatePresence>

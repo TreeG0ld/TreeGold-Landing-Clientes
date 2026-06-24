@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Mail, MapPin } from "lucide-react";
 import { site } from "@/lib/site";
@@ -9,11 +10,14 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-20">
         <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <Link
-              href="/"
-              className="font-serif text-3xl font-semibold tracking-wide"
-            >
-              Tree<span className="text-gold">Gold</span>
+            <Link href="/" aria-label={site.fullName} className="inline-block">
+              <Image
+                src="/logo.png"
+                alt={site.fullName}
+                width={820}
+                height={876}
+                className="h-24 w-auto"
+              />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-on-primary/70">
               {site.tagline}. Piezas hechas a mano en oro 18k y plata 925.

@@ -3,38 +3,44 @@ import { notFound } from "next/navigation";
 import Reveal from "@/components/anim/Reveal";
 import ProductDetail from "@/components/ProductDetail";
 import ProductCard from "@/components/ProductCard";
-import { products, getProduct, getByCategory } from "@/lib/products";
+import { getProductBySlug, getRelated } from "@/lib/catalog";
 import { formatCOP } from "@/lib/format";
 
 type Params = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
+// ISR: la página se genera bajo demanda y queda cacheada (visitas siguientes
+// instantáneas), regenerándose cada hora para reflejar cambios de catálogo.
+export const revalidate = 3600;
+
+// Lista vacía: no pre-generamos las 660 en el build, pero habilita el cacheo
+// ISR por slug (la ruta deja de ser 100% dinámica).
+export async function generateStaticParams() {
+  return [];
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return { title: "Producto no encontrado" };
   return {
     title: product.name,
     description: product.description,
+    alternates: { canonical: `/producto/${product.slug}` },
     openGraph: {
       title: `${product.name} · ${formatCOP(product.price)}`,
       description: product.description,
-      images: [product.images[0]],
+      type: "website",
+      images: [{ url: product.images[0], alt: product.name }],
     },
   };
 }
 
 export default async function ProductPage({ params }: Params) {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const related = getByCategory(product.category)
-    .filter((p) => p.slug !== product.slug)
-    .slice(0, 4);
+  const related = await getRelated(product.category, product.slug, 4);
 
   // JSON-LD para rich results
   const jsonLd = {

@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import ProductCard from "@/components/ProductCard";
 import SortDropdown from "@/components/SortDropdown";
-import { products, categories } from "@/lib/products";
+import type { Product, Category } from "@/lib/products";
 
 const sorts = [
   { id: "destacados", label: "Destacados" },
@@ -13,7 +13,13 @@ const sorts = [
   { id: "precio-desc", label: "Precio: mayor a menor" },
 ];
 
-export default function CatalogClient() {
+export default function CatalogClient({
+  products,
+  categories,
+}: {
+  products: Product[];
+  categories: Category[];
+}) {
   const params = useSearchParams();
   const initialCat = params.get("categoria") ?? "todos";
   const [cat, setCat] = useState(initialCat);
@@ -28,16 +34,17 @@ export default function CatalogClient() {
     if (sort === "destacados")
       list.sort((a, b) => Number(b.featured) - Number(a.featured));
     return list;
-  }, [cat, sort]);
+  }, [products, cat, sort]);
 
   const tabs = [{ slug: "todos", name: "Todo" }, ...categories];
 
   return (
     <div>
       {/* Filtros */}
-      <div className="sticky top-16 z-30 -mx-5 mb-10 border-b border-border glass px-5 py-3 md:top-20 md:mx-0 md:rounded-full md:border md:px-3">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex flex-1 gap-2 overflow-x-auto pb-1 md:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="sticky top-16 z-30 -mx-5 mb-10 border-b border-border glass px-5 py-3 md:top-20 md:mx-0 md:rounded-2xl md:border md:px-5 md:py-3.5">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
+          {/* Categorías: scroll horizontal en móvil, se acomodan en varias líneas en escritorio */}
+          <div className="flex gap-2 overflow-x-auto pb-1 md:flex-1 md:flex-wrap md:overflow-visible md:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {tabs.map((t) => (
               <button
                 key={t.slug}
@@ -60,7 +67,10 @@ export default function CatalogClient() {
             ))}
           </div>
 
-          <SortDropdown options={sorts} value={sort} onChange={setSort} />
+          {/* Ordenar: separado, no pisa las categorías */}
+          <div className="shrink-0 self-end md:self-auto md:border-l md:border-border md:pl-4">
+            <SortDropdown options={sorts} value={sort} onChange={setSort} />
+          </div>
         </div>
       </div>
 

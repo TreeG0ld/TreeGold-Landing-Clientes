@@ -5,7 +5,10 @@ build
 .DS_Store
 *.pem
 npm-debug.log*
-.env*.local
+# Variables de entorno (credenciales) — nunca al repo
+.env
+.env.*
+!.env.example
 .vercel
 next-env.d.ts
 

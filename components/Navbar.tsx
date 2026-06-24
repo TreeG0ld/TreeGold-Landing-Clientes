@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ShoppingBag } from "lucide-react";
@@ -60,14 +61,15 @@ export default function Navbar() {
     >
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:h-20 md:px-8">
         {/* Logo */}
-        <Link
-          href="/"
-          className={`font-serif text-2xl font-semibold tracking-wide transition-colors duration-300 md:text-3xl ${
-            overHero ? "text-white" : "text-primary"
-          }`}
-          aria-label={site.fullName}
-        >
-          Tree<span className="text-gold">Gold</span>
+        <Link href="/" className="flex items-center" aria-label={site.fullName}>
+          <Image
+            src="/logo.png"
+            alt={site.fullName}
+            width={820}
+            height={876}
+            priority
+            className="h-11 w-auto md:h-14"
+          />
         </Link>
 
         {/* Desktop links */}

@@ -17,13 +17,19 @@ type LoaderArgs = {
 
 export default function imageLoader({ src, width }: LoaderArgs): string {
   // --- Cloudinary (almacenamiento definitivo de las fotos) ---
-  // Inserta las transformaciones justo después de "/upload/":
-  //   f_auto      -> mejor formato para el navegador (WebP / AVIF)
-  //   q_auto:good -> calidad inteligente: pesa poco sin perder detalle
-  //   w_<width>   -> ancho que pide el navegador según el "sizes"
-  //   c_limit     -> nunca agranda más allá del original (cuida la calidad)
+  // Limpieza de la foto de catálogo (el original no se toca):
+  //   1) c_crop,g_north,h_0.85 -> quita el 15% inferior, donde el catálogo
+  //      imprime el código y los precios (así el cliente nunca ve el costo).
+  //   2) e_trim -> elimina el marco gris / espacio sobrante alrededor.
+  //   3) c_pad,ar_1:1,b_white -> deja la imagen cuadrada con fondo blanco
+  //      uniforme; el producto queda completo y centrado, sin distorsión.
+  //   4) optimización de entrega:
+  //      f_auto      -> mejor formato para el navegador (WebP / AVIF)
+  //      q_auto:good -> calidad inteligente: pesa poco sin perder detalle
+  //      w_<width>   -> ancho que pide el navegador según el "sizes"
+  //      c_limit     -> nunca agranda más allá del original (cuida la calidad)
   if (src.includes("res.cloudinary.com") && src.includes("/upload/")) {
-    const transforms = `f_auto,q_auto:good,w_${width},c_limit`;
+    const transforms = `c_crop,g_north,h_0.85/e_trim/c_pad,ar_1:1,b_white/f_auto,q_auto:good,w_${width},c_limit`;
     return src.replace("/upload/", `/upload/${transforms}/`);
   }
 

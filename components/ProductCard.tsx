@@ -34,13 +34,13 @@ export default function ProductCard({ product }: { product: Product }) {
       className="group"
     >
       <Link href={`/producto/${product.slug}`} className="block">
-        <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-muted">
+        <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-white">
           <Image
             src={product.images[0]}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover transition-transform duration-700 ease-luxe group-hover:scale-110"
+            className="object-contain p-4 transition-transform duration-700 ease-luxe group-hover:scale-105"
           />
           {/* Overlay gradient on hover */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />

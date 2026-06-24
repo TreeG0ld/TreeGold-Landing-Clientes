@@ -6,10 +6,16 @@ import Reveal from "@/components/anim/Reveal";
 import ProductCard from "@/components/ProductCard";
 import CategoryCard from "@/components/CategoryCard";
 import StatsCounter from "@/components/StatsCounter";
-import { categories, getFeatured } from "@/lib/products";
+import { getAllCategories, getFeatured } from "@/lib/catalog";
 
-export default function Home() {
-  const featured = getFeatured();
+// Regenera la página estática cada hora (catálogo fresco sin sacrificar velocidad).
+export const revalidate = 3600;
+
+export default async function Home() {
+  const [categories, featured] = await Promise.all([
+    getAllCategories(),
+    getFeatured(8),
+  ]);
 
   return (
     <>

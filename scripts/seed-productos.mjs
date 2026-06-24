@@ -29,6 +29,7 @@ import { join, extname } from "node:path";
 import { v2 as cloudinary } from "cloudinary";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { IMG_EXT, slugify, parseFileName } from "./parse-utils.mjs";
 
 // Prisma 7 usa un driver adapter. Conexión directa a Postgres (DIRECT_URL,
 // puerto 5432) que es lo ideal para escrituras masivas como este seed.
@@ -37,7 +38,6 @@ const prisma = new PrismaClient({ adapter });
 
 // --- Configuración ---
 const FOTOS_DIR = "./fotos";           // carpeta con las subcarpetas por categoría
-const IMG_EXT = /\.(jpe?g|png|webp)$/i; // extensiones que se consideran imágenes
 const DEFAULT_STOCK = 0;                // stock inicial (ajústalo si quieres)
 const LIMIT = process.env.SEED_LIMIT ? parseInt(process.env.SEED_LIMIT, 10) : Infinity; // prueba: SEED_LIMIT=3
 
@@ -54,39 +54,6 @@ cloudinary.config({
   api_key: CLOUDINARY_API_KEY,
   api_secret: CLOUDINARY_API_SECRET,
 });
-
-// --- Utilidades ---
-
-// Convierte "Anillos " -> "anillos", "Topos" -> "topos", etc.
-function slugify(text) {
-  return text
-    .normalize("NFD").replace(/[̀-ͯ]/g, "") // quita acentos
-    .trim().toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-// Del nombre del archivo saca el código y los precios.
-// Ejemplos que maneja:
-//   "09120117 _ $74.500 - $120.000.jpg"  -> code 09120117, precios [74500, 120000]
-//   "09120104 / $73800 - $140.000.jpg"   -> code 09120104, precios [73800, 140000]
-//   "09120087 / $114.500 $200.000.jpg"   -> code 09120087, precios [114500, 200000]
-function parseFileName(filename) {
-  const base = filename.replace(IMG_EXT, "");
-
-  // El código es el primer grupo largo de dígitos (los SKU tienen 8).
-  const codeMatch = base.match(/\d{4,}/);
-  const code = codeMatch ? codeMatch[0] : null;
-
-  // Los precios son los grupos que empiezan con "$".
-  // En Colombia el "." es separador de miles -> se quitan todos los no-dígitos.
-  const priceTokens = base.match(/\$\s*[\d.,]+/g) || [];
-  const prices = priceTokens
-    .map((t) => parseInt(t.replace(/\D/g, ""), 10))
-    .filter((n) => Number.isFinite(n) && n > 0);
-
-  return { code, prices };
-}
 
 // --- Recolección de archivos ---
 

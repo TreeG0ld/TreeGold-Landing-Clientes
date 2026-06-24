@@ -23,15 +23,47 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(site.url),
   title: {
     default: `${site.fullName} — ${site.tagline}`,
     template: `%s · ${site.fullName}`,
   },
   description: site.description,
+  keywords: [
+    "joyería",
+    "joyería de oro",
+    "oro 18k",
+    "plata 925",
+    "anillos",
+    "cadenas",
+    "aretes",
+    "dijes",
+    "pulseras",
+    "Medellín",
+    "TreeGold",
+  ],
+  applicationName: site.fullName,
+  authors: [{ name: site.fullName }],
+  alternates: { canonical: "/" },
   openGraph: {
     title: site.fullName,
     description: site.description,
     type: "website",
+    locale: "es_CO",
+    url: site.url,
+    siteName: site.fullName,
+    images: [{ url: "/logo.png", width: 820, height: 876, alt: site.fullName }],
+  },
+  twitter: {
+    card: "summary",
+    title: site.fullName,
+    description: site.description,
+    images: ["/logo.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
 };
 
