@@ -4,7 +4,8 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Minus, Plus, Trash2, MessageCircle } from "lucide-react";
+import { X, Minus, Plus, Trash2 } from "lucide-react";
+import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
 import { buildSelectionLink } from "@/lib/whatsapp";
@@ -149,7 +150,7 @@ export default function SelectionDrawer() {
                     rel="noopener noreferrer"
                     className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-7 py-4 text-sm font-semibold text-white transition-all duration-300 ease-luxe hover:brightness-105 active:scale-[0.98]"
                   >
-                    <MessageCircle className="h-5 w-5" />
+                    <WhatsAppIcon className="h-5 w-5" />
                     Finalizar por WhatsApp
                   </a>
                   <Link

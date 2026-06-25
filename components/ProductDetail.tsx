@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
-import { Check, MessageCircle, ShoppingBag, ChevronLeft } from "lucide-react";
+import { Check, ShoppingBag, ChevronLeft } from "lucide-react";
+import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import Link from "next/link";
 import type { Product } from "@/lib/products";
 import { useSelection } from "@/lib/store";
@@ -144,7 +145,7 @@ export default function ProductDetail({ product }: { product: Product }) {
               rel="noopener noreferrer"
               className="flex flex-1 items-center justify-center gap-2 rounded-full border border-[#25D366] px-7 py-3.5 text-sm font-medium text-[#1c8a47] transition-all duration-300 ease-luxe hover:bg-[#25D366]/10 active:scale-[0.98]"
             >
-              <MessageCircle className="h-5 w-5" /> Consultar
+              <WhatsAppIcon className="h-5 w-5" /> Consultar
             </a>
           </div>
 
