@@ -7,13 +7,13 @@ import StatsCounter from "@/components/StatsCounter";
 export const metadata: Metadata = {
   title: "Historia",
   description:
-    "La historia de Joyería TreeGold: oficio, artesanía y piezas hechas a mano en oro 18k.",
+    "La historia de Joyería TreeGold: oficio, artesanía y piezas hechas a mano en oro laminado.",
 };
 
 const values = [
-  { title: "Oro certificado", text: "Trabajamos únicamente oro 18k y plata 925 de origen responsable." },
-  { title: "Hecho a mano", text: "Cada pieza es elaborada por nuestros maestros joyeros, sin producción en serie." },
-  { title: "A tu medida", text: "Diseñamos joyas personalizadas para tus momentos más importantes." },
+  { title: "Materiales", text: "Trabajamos con oro laminado y plata 925." },
+  { title: "Hecho a mano", text: "Cada pieza se elabora a mano, sin producción en serie." },
+  { title: "A tu medida", text: "Diseñamos piezas personalizadas según lo que necesites." },
 ];
 
 export default function HistoriaPage() {
@@ -28,8 +28,8 @@ export default function HistoriaPage() {
           </h1>
           <p className="rv mx-auto mt-6 max-w-2xl text-lg text-secondary leading-relaxed">
             TreeGold nació del amor por el oficio joyero. Desde nuestro taller
-            creamos piezas que combinan técnicas tradicionales con un diseño
-            contemporáneo, para acompañar las historias de quienes las llevan.
+            creamos piezas hechas a mano, en oro laminado y plata 925, con
+            diseños que combinan técnicas tradicionales y un estilo contemporáneo.
           </p>
         </Reveal>
       </section>

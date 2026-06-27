@@ -50,8 +50,9 @@ model Product {
   
   // Inventario y Características
   stock         Int      @default(0)
-  material      String?  // Ej: Oro 18k, Plata 925
+  material      String?  // Ej: Oro laminado, Plata 925
   weight        Float?   // Peso en gramos
+  size          String?  // Medida visible: "40 cm" (cadenas), "Talla 7" (anillos), etc.
   
   // Imágenes (Cloudinary) - Guardamos un array de URLs
   images        String[] // ["https://res.cloudinary.com/...", "..."]

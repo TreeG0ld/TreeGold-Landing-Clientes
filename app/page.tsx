@@ -89,13 +89,13 @@ export default async function Home() {
               El arte detrás de cada joya
             </h2>
             <p className="rv mt-6 text-secondary leading-relaxed">
-              En TreeGold cada pieza nace de las manos de nuestros maestros
-              joyeros. Seleccionamos el oro y las piedras una a una, y trabajamos
-              cada detalle hasta lograr una joya que perdure por generaciones.
+              En TreeGold cada pieza se hace a mano en nuestro taller, en oro
+              laminado y plata 925, cuidando cada detalle del diseño y el
+              acabado.
             </p>
             <p className="rv mt-4 text-secondary leading-relaxed">
-              No producimos en serie: creamos piezas con alma, pensadas para los
-              momentos que quieres recordar para siempre.
+              No producimos en serie: cada pieza pasa por nuestros joyeros antes
+              de llegar a ti.
             </p>
             <div className="rv mt-8">
               <Link href="/historia" className="btn-outline">
@@ -117,7 +117,7 @@ export default async function Home() {
       <section className="relative overflow-hidden bg-primary py-24 text-center text-on-primary md:py-32">
         <div className="mx-auto max-w-3xl px-5">
           <Reveal childSelector=".rv" stagger={0.12}>
-            <p className="rv eyebrow mb-4 text-accent-soft">¿Buscas algo único?</p>
+            <p className="rv eyebrow mb-4 text-accent-soft">¿Tienes una idea en mente?</p>
             <h2 className="rv text-4xl text-white md:text-6xl">
               Diseñamos tu joya a medida
             </h2>

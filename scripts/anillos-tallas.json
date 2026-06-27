@@ -1,0 +1,307 @@
+[
+  {
+    "slug": "09120117",
+    "tallaTexto": "T:6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  },
+  {
+    "slug": "09120002",
+    "tallaTexto": "T:6",
+    "sizeValue": "Talla 6"
+  },
+  {
+    "slug": "09120004",
+    "tallaTexto": "T:5,6,8",
+    "sizeValue": "Talla 5, 6, 8"
+  },
+  {
+    "slug": "09120005",
+    "tallaTexto": "T:7,8,9,10,11",
+    "sizeValue": "Talla 7, 8, 9, 10, 11"
+  },
+  {
+    "slug": "09120083",
+    "tallaTexto": "T:9,10",
+    "sizeValue": "Talla 9, 10"
+  },
+  {
+    "slug": "09120109",
+    "tallaTexto": "T:7,9",
+    "sizeValue": "Talla 7, 9"
+  },
+  {
+    "slug": "09120019",
+    "tallaTexto": "T:7,9",
+    "sizeValue": "Talla 7, 9"
+  },
+  {
+    "slug": "09120110",
+    "tallaTexto": "T:8,9",
+    "sizeValue": "Talla 8, 9"
+  },
+  {
+    "slug": "09120068",
+    "tallaTexto": "T:6,7,8,9,10,11",
+    "sizeValue": "Talla 6, 7, 8, 9, 10, 11"
+  },
+  {
+    "slug": "09120075",
+    "tallaTexto": "T:7,8",
+    "sizeValue": "Talla 7, 8"
+  },
+  {
+    "slug": "09120070",
+    "tallaTexto": "T:6,7,11",
+    "sizeValue": "Talla 6, 7, 11"
+  },
+  {
+    "slug": "09120067",
+    "tallaTexto": "T:6,7,8,9,10,11",
+    "sizeValue": "Talla 6, 7, 8, 9, 10, 11"
+  },
+  {
+    "slug": "09120078",
+    "tallaTexto": "T:8,9",
+    "sizeValue": "Talla 8, 9"
+  },
+  {
+    "slug": "09120103",
+    "tallaTexto": "T:6,7,8,9",
+    "sizeValue": "Talla 6, 7, 8, 9"
+  },
+  {
+    "slug": "09120087",
+    "tallaTexto": null,
+    "sizeValue": null
+  },
+  {
+    "slug": "09120100",
+    "tallaTexto": null,
+    "sizeValue": null
+  },
+  {
+    "slug": "09120098",
+    "tallaTexto": null,
+    "sizeValue": null
+  },
+  {
+    "slug": "09120099",
+    "tallaTexto": null,
+    "sizeValue": null
+  },
+  {
+    "slug": "09120119",
+    "tallaTexto": "T6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  },
+  {
+    "slug": "09120104",
+    "tallaTexto": "T:8",
+    "sizeValue": "Talla 8"
+  },
+  {
+    "slug": "09120108",
+    "tallaTexto": null,
+    "sizeValue": null
+  },
+  {
+    "slug": "09120118",
+    "tallaTexto": "T:6,7",
+    "sizeValue": "Talla 6, 7"
+  },
+  {
+    "slug": "09120115",
+    "tallaTexto": "T:9,10",
+    "sizeValue": "Talla 9, 10"
+  },
+  {
+    "slug": "09120112",
+    "tallaTexto": "T:7,8",
+    "sizeValue": "Talla 7, 8"
+  },
+  {
+    "slug": "09120071",
+    "tallaTexto": "T:8",
+    "sizeValue": "Talla 8"
+  },
+  {
+    "slug": "09120072",
+    "tallaTexto": "T:7",
+    "sizeValue": "Talla 7"
+  },
+  {
+    "slug": "09120206",
+    "tallaTexto": "T:6,7,8,9,10,11",
+    "sizeValue": "Talla 6, 7, 8, 9, 10, 11"
+  },
+  {
+    "slug": "09120212",
+    "tallaTexto": "T:6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  },
+  {
+    "slug": "09120187",
+    "tallaTexto": "T:9,10",
+    "sizeValue": "Talla 9, 10"
+  },
+  {
+    "slug": "09120235",
+    "tallaTexto": "T:6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  },
+  {
+    "slug": "09120236",
+    "tallaTexto": "T:8,9,10",
+    "sizeValue": "Talla 8, 9, 10"
+  },
+  {
+    "slug": "09120232",
+    "tallaTexto": "T:6,7",
+    "sizeValue": "Talla 6, 7"
+  },
+  {
+    "slug": "09120234",
+    "tallaTexto": "T:6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  },
+  {
+    "slug": "09120237",
+    "tallaTexto": "T:6,7,8,9",
+    "sizeValue": "Talla 6, 7, 8, 9"
+  },
+  {
+    "slug": "09120233",
+    "tallaTexto": "T:6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  },
+  {
+    "slug": "09120124",
+    "tallaTexto": "VERDE T:8, NEGRO T:7, BLANCO T9,10",
+    "sizeValue": "Verde Talla 8, Negro Talla 7, Blanco Talla 9, 10"
+  },
+  {
+    "slug": "09120133",
+    "tallaTexto": "T:8,10",
+    "sizeValue": "Talla 8, 10"
+  },
+  {
+    "slug": "09120128",
+    "tallaTexto": "T:7,8",
+    "sizeValue": "Talla 7, 8"
+  },
+  {
+    "slug": "09120130",
+    "tallaTexto": "T:7,8",
+    "sizeValue": "Talla 7, 8"
+  },
+  {
+    "slug": "09120126",
+    "tallaTexto": "T:8",
+    "sizeValue": "Talla 8"
+  },
+  {
+    "slug": "09120134",
+    "tallaTexto": "T:6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  },
+  {
+    "slug": "09120153",
+    "tallaTexto": "T:11",
+    "sizeValue": "Talla 11"
+  },
+  {
+    "slug": "09120152",
+    "tallaTexto": "T:9,10,11",
+    "sizeValue": "Talla 9, 10, 11"
+  },
+  {
+    "slug": "09120151",
+    "tallaTexto": "T:6,7,8,9,10",
+    "sizeValue": "Talla 6, 7, 8, 9, 10"
+  },
+  {
+    "slug": "09120204",
+    "tallaTexto": "T:6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  },
+  {
+    "slug": "09120192",
+    "tallaTexto": "T:7,8,9",
+    "sizeValue": "Talla 7, 8, 9"
+  },
+  {
+    "slug": "09120188",
+    "tallaTexto": "T:6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  },
+  {
+    "slug": "09120202",
+    "tallaTexto": "T:6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  },
+  {
+    "slug": "09120198",
+    "tallaTexto": "T:6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  },
+  {
+    "slug": "09120195",
+    "tallaTexto": "T:6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  },
+  {
+    "slug": "09120194",
+    "tallaTexto": "T:6,7,8,9",
+    "sizeValue": "Talla 6, 7, 8, 9"
+  },
+  {
+    "slug": "09120210",
+    "tallaTexto": "T:6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  },
+  {
+    "slug": "09120205",
+    "tallaTexto": "T:7,8",
+    "sizeValue": "Talla 7, 8"
+  },
+  {
+    "slug": "09120197",
+    "tallaTexto": "T:6,7",
+    "sizeValue": "Talla 6, 7"
+  },
+  {
+    "slug": "09120242",
+    "tallaTexto": "T:6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  },
+  {
+    "slug": "09120238",
+    "tallaTexto": "T:7,8,9",
+    "sizeValue": "Talla 7, 8, 9"
+  },
+  {
+    "slug": "09120240",
+    "tallaTexto": "T:6,7,8,9",
+    "sizeValue": "Talla 6, 7, 8, 9"
+  },
+  {
+    "slug": "09120239",
+    "tallaTexto": "T:6,7,8,9,10",
+    "sizeValue": "Talla 6, 7, 8, 9, 10"
+  },
+  {
+    "slug": "09120241",
+    "tallaTexto": "T:6,7,8,9,10",
+    "sizeValue": "Talla 6, 7, 8, 9, 10"
+  },
+  {
+    "slug": "09120976",
+    "tallaTexto": "T:7,8",
+    "sizeValue": "Talla 7, 8"
+  },
+  {
+    "slug": "09120209",
+    "tallaTexto": "T:6,7,8",
+    "sizeValue": "Talla 6, 7, 8"
+  }
+]

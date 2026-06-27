@@ -17,6 +17,7 @@ export type Product = {
   description: string;
   details: string[];
   sizes?: string[];
+  size?: string; // Medida visible del producto: "40 cm" (cadenas), "Talla 7" (anillos)...
   images: string[];
   featured?: boolean;
 };

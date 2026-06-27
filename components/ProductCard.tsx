@@ -71,7 +71,7 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
           </div>
           <p className="mt-1 text-xs uppercase tracking-wide text-secondary/60">
-            {product.material}
+            {[product.material, product.size].filter(Boolean).join(" · ")}
           </p>
         </div>
       </Link>

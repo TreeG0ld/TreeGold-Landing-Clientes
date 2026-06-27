@@ -5,9 +5,9 @@ export const site = {
   // URL pública del sitio (para SEO: OpenGraph, sitemap, canónicos).
   // En producción define NEXT_PUBLIC_SITE_URL con tu dominio real.
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-  tagline: "Joyería de autor en oro y piedras preciosas",
+  tagline: "Joyería de autor en oro laminado y plata 925",
   description:
-    "Joyería de lujo hecha a mano: anillos, collares, aretes y pulseras en oro 18k y plata 925. Piezas únicas para momentos únicos.",
+    "Joyería de oro laminado hecha por manos colombianas",
   whatsapp: "573017780779",
   whatsappDisplay: "+57 301 778 0779",
   instagram: "https://www.instagram.com/joyeria.treegold18k/",

@@ -20,7 +20,7 @@ export default function Footer() {
               />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-on-primary/70">
-              {site.tagline}. Piezas hechas a mano en oro 18k y plata 925.
+              {site.tagline}. Piezas hechas a mano en oro laminado y plata 925.
             </p>
           </div>
 
@@ -67,7 +67,6 @@ export default function Footer() {
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-on-primary/15 pt-8 text-xs text-on-primary/50 md:flex-row">
           <p>© {new Date().getFullYear()} {site.fullName}. Todos los derechos reservados.</p>
-          <p>Hecho a mano con dedicación.</p>
         </div>
       </div>
     </footer>

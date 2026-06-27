@@ -2,11 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant, Montserrat } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import WhatsAppFAB from "@/components/WhatsAppFAB";
-import SelectionDrawer from "@/components/SelectionDrawer";
-import FlyToCart from "@/components/FlyToCart";
+import SiteChrome from "@/components/SiteChrome";
 
 const cormorant = Cormorant({
   subsets: ["latin"],
@@ -31,8 +27,8 @@ export const metadata: Metadata = {
   description: site.description,
   keywords: [
     "joyería",
-    "joyería de oro",
-    "oro 18k",
+    "joyería de oro laminado",
+    "oro laminado",
     "plata 925",
     "anillos",
     "cadenas",
@@ -85,12 +81,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-dvh" suppressHydrationWarning>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
-        <WhatsAppFAB />
-        <SelectionDrawer />
-        <FlyToCart />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

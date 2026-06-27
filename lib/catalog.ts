@@ -16,6 +16,7 @@ type DbProduct = {
   description: string;
   retailPrice: number;
   material: string | null;
+  size: string | null;
   images: string[];
   category: { slug: string; name: string };
 };
@@ -24,16 +25,18 @@ type DbProduct = {
 function toUiProduct(p: DbProduct): Product {
   const details = [p.category.name];
   if (p.material) details.push(p.material);
+  if (p.size) details.push(p.size);
   // Descripción por defecto (SEO + página) cuando el producto aún no tiene una.
   const description =
     p.description?.trim() ||
-    `${p.name} — ${p.category.name} de ${site.fullName}. Joyería hecha a mano en oro 18k y plata 925. Consulta disponibilidad y precio por WhatsApp.`;
+    `${p.name} — ${p.category.name} de ${site.fullName}. Joyería hecha a mano en oro laminado y plata 925. Consulta disponibilidad y precio por WhatsApp.`;
   return {
     slug: p.slug,
     name: p.name,
     category: p.category.slug,
     price: p.retailPrice,
     material: p.material ?? "",
+    size: p.size ?? undefined,
     description,
     details,
     images: p.images,
@@ -50,6 +53,7 @@ function toListProduct(p: {
   name: string;
   retailPrice: number;
   material: string | null;
+  size: string | null;
   images: string[];
   category: { slug: string };
 }): Product {
@@ -59,6 +63,7 @@ function toListProduct(p: {
     category: p.category.slug,
     price: p.retailPrice,
     material: p.material ?? "",
+    size: p.size ?? undefined,
     description: "",
     details: [],
     images: p.images.slice(0, 1),
@@ -73,6 +78,7 @@ export async function getAllProducts(): Promise<Product[]> {
       name: true,
       retailPrice: true,
       material: true,
+      size: true,
       images: true,
       category: { select: { slug: true } },
     },
@@ -119,6 +125,7 @@ export const getCatalogPage = unstable_cache(
           name: true,
           retailPrice: true,
           material: true,
+          size: true,
           images: true,
           category: { select: { slug: true } },
         },

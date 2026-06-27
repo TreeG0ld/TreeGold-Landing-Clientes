@@ -88,7 +88,9 @@ export default function ProductDetail({ product }: { product: Product }) {
 
         {/* Info */}
         <div className="lg:pt-6">
-          <p className="eyebrow mb-3">{product.material}</p>
+          <p className="eyebrow mb-3">
+            {[product.material, product.size].filter(Boolean).join(" · ")}
+          </p>
           <h1 className="text-4xl md:text-5xl">{product.name}</h1>
           <p className="mt-4 font-serif text-3xl text-accent">
             {formatCOP(product.price)}

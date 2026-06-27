@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Mail, MapPin, Clock } from "lucide-react";
-import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
+import { MessageCircle, Mail, MapPin, Clock } from "lucide-react";
 import Reveal from "@/components/anim/Reveal";
 import { site } from "@/lib/site";
 import { buildGeneralLink } from "@/lib/whatsapp";
@@ -30,7 +29,7 @@ export default function ContactoPage() {
             rel="noopener noreferrer"
             className="flex w-full items-center justify-center gap-3 rounded-full bg-[#25D366] px-8 py-5 text-base font-semibold text-white transition-all duration-300 ease-luxe hover:brightness-105 active:scale-[0.98]"
           >
-            <WhatsAppIcon className="h-6 w-6" />
+            <MessageCircle className="h-6 w-6" />
             Escríbenos por WhatsApp
           </a>
           <p className="mt-3 text-center text-sm text-secondary">
@@ -65,18 +64,13 @@ export default function ContactoPage() {
             </div>
           </a>
 
-          <a
-            href={site.mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rv group flex items-start gap-4 rounded-2xl border border-border p-6 transition-colors hover:border-accent"
-          >
+          <div className="rv flex items-start gap-4 rounded-2xl border border-border p-6">
             <MapPin className="mt-0.5 h-6 w-6 text-accent" strokeWidth={1.6} />
             <div>
               <h3 className="text-xl">Ubicación</h3>
-              <p className="mt-1 text-sm text-secondary">{site.address}</p>
+              <p className="mt-1 text-sm text-secondary">{site.city} · Envíos a todo el país</p>
             </div>
-          </a>
+          </div>
 
           <div className="rv flex items-start gap-4 rounded-2xl border border-border p-6">
             <Clock className="mt-0.5 h-6 w-6 text-accent" strokeWidth={1.6} />

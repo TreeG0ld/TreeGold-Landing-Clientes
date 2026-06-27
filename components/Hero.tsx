@@ -10,7 +10,7 @@ import { ChevronDown } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const titleLines = ["Joyas que", "cuentan tu", "historia"];
+const titleLines = ["Diseños en", "oro laminado", "hechos a mano"];
 
 export default function Hero() {
   const root = useRef<HTMLDivElement>(null);
@@ -59,6 +59,7 @@ export default function Hero() {
           alt="Joyería TreeGold"
           fill
           priority
+          quality={68}
           sizes="100vw"
           className="object-cover"
         />
@@ -67,7 +68,7 @@ export default function Hero() {
 
       <div className="mx-auto max-w-5xl px-5 text-center text-white">
         <p className="hero-fade eyebrow mb-5 text-white/80">
-          Joyería de autor · Oro 18k
+          Joyería de autor · Oro laminado
         </p>
 
         <h1 className="text-[clamp(2.8rem,12vw,7rem)] font-medium leading-[1.04]">
@@ -82,8 +83,7 @@ export default function Hero() {
         </h1>
 
         <p className="hero-fade mx-auto mt-6 max-w-md text-base text-white/85 md:text-lg">
-          Piezas hechas a mano con piedras preciosas, pensadas para acompañarte
-          toda la vida.
+          Piezas hechas a mano, con acabados que cuidan cada detalle.
         </p>
 
         <div className="hero-fade mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
