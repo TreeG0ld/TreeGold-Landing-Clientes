@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
@@ -37,6 +38,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         categoryId: body.categoryId,
       },
     });
+    revalidatePath("/");
+    revalidatePath("/coleccion");
+    revalidatePath(`/producto/${body.slug}`);
     return NextResponse.json({ product });
   } catch (err: any) {
     if (err.code === "P2002") {
@@ -56,6 +60,8 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   const { id } = await params;
   try {
     await prisma.product.delete({ where: { id } });
+    revalidatePath("/");
+    revalidatePath("/coleccion");
     return NextResponse.json({ ok: true });
   } catch (err: any) {
     if (err.code === "P2025") {

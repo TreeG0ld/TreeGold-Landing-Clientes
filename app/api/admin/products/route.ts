@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
@@ -54,6 +55,8 @@ export async function POST(req: Request) {
         categoryId: body.categoryId,
       },
     });
+    revalidatePath("/");
+    revalidatePath("/coleccion");
     return NextResponse.json({ product }, { status: 201 });
   } catch (err: any) {
     if (err.code === "P2002") {

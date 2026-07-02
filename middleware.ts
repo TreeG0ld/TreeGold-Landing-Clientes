@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { ADMIN_COOKIE, verifySessionToken } from "@/lib/auth";
+import { AUTH_COOKIE, verifySessionToken } from "@/lib/auth";
 
 // Protege todo /admin/* (excepto /admin/login) verificando la sesión firmada
 // y exigiendo explícitamente rol ADMIN. Es la primera barrera; cada ruta API
@@ -12,7 +12,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = req.cookies.get(ADMIN_COOKIE)?.value;
+  const token = req.cookies.get(AUTH_COOKIE)?.value;
   const session = await verifySessionToken(token);
 
   if (!session || session.role !== "ADMIN") {

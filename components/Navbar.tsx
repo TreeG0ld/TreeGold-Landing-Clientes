@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ShoppingBag } from "lucide-react";
+import { Menu, X, ShoppingBag, User } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useSelection } from "@/lib/store";
 import { site } from "@/lib/site";
@@ -102,6 +102,15 @@ export default function Navbar() {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
+          <Link
+            href="/perfil"
+            aria-label="Mi Cuenta"
+            className={`relative flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:text-accent ${
+              overHero ? "text-white" : "text-primary"
+            }`}
+          >
+            <User className="h-5 w-5" strokeWidth={1.6} />
+          </Link>
           <button
             onClick={openDrawer}
             aria-label="Ver mi selección"

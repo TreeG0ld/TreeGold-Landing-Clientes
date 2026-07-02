@@ -2,10 +2,10 @@
 // Funciona tanto en el middleware (Edge) como en las rutas API (Node),
 // porque solo usa APIs estándar (crypto.subtle, TextEncoder, btoa/atob).
 
-export const ADMIN_COOKIE = "tg_admin_session";
+export const AUTH_COOKIE = "tg_session";
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 8; // 8 horas
 
-export type AdminSession = { role: "ADMIN"; user: string; exp: number };
+export type UserSession = { role: "ADMIN" | "CLIENT"; userId: string; exp: number };
 
 function getSecret(): string {
   const secret = process.env.ADMIN_SESSION_SECRET;
@@ -48,11 +48,11 @@ async function hmacVerify(secret: string, data: string, signature: Uint8Array): 
   return crypto.subtle.verify("HMAC", key, signature, new TextEncoder().encode(data));
 }
 
-// Crea el token de sesión de admin (siempre rol ADMIN: es el único rol de este panel).
-export async function createSessionToken(user: string): Promise<string> {
-  const payload: AdminSession = {
-    role: "ADMIN",
-    user,
+// Crea el token de sesión
+export async function createSessionToken(userId: string, role: "ADMIN" | "CLIENT"): Promise<string> {
+  const payload: UserSession = {
+    role,
+    userId,
     exp: Date.now() + SESSION_MAX_AGE_SECONDS * 1000,
   };
   const payloadB64 = toBase64Url(new TextEncoder().encode(JSON.stringify(payload)));
@@ -60,8 +60,8 @@ export async function createSessionToken(user: string): Promise<string> {
   return `${payloadB64}.${toBase64Url(sig)}`;
 }
 
-// Verifica el token: firma válida, rol ADMIN y no expirado.
-export async function verifySessionToken(token: string | undefined | null): Promise<AdminSession | null> {
+// Verifica el token
+export async function verifySessionToken(token: string | undefined | null): Promise<UserSession | null> {
   if (!token) return null;
   const [payloadB64, sigB64] = token.split(".");
   if (!payloadB64 || !sigB64) return null;
@@ -72,9 +72,8 @@ export async function verifySessionToken(token: string | undefined | null): Prom
 
     const payload = JSON.parse(
       new TextDecoder().decode(fromBase64Url(payloadB64))
-    ) as AdminSession;
+    ) as UserSession;
 
-    if (payload.role !== "ADMIN") return null;
     if (Date.now() > payload.exp) return null;
     return payload;
   } catch {
@@ -82,4 +81,4 @@ export async function verifySessionToken(token: string | undefined | null): Prom
   }
 }
 
-export const ADMIN_SESSION_MAX_AGE_SECONDS = SESSION_MAX_AGE_SECONDS;
+export const AUTH_SESSION_MAX_AGE_SECONDS = SESSION_MAX_AGE_SECONDS;

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [user, setUser] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,10 +15,10 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user, password }),
+        body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -45,11 +45,11 @@ export default function AdminLoginPage() {
 
         <div className="mt-6 space-y-4">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-primary">Usuario</label>
+            <label className="mb-1.5 block text-sm font-medium text-primary">Correo / Usuario</label>
             <input
               type="text"
-              value={user}
-              onChange={(e) => setUser(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               autoComplete="username"
               required
               className="w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
