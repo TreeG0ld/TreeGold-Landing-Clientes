@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
+import { validateProductPayload } from "@/lib/validate-product";
 
 export async function GET(req: Request) {
   const session = await requireAdminApi();
@@ -35,30 +36,21 @@ export async function POST(req: Request) {
   const session = await requireAdminApi();
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-  const body = await req.json();
+  const body = await req.json().catch(() => null);
+  const result = validateProductPayload(body);
+  if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 });
 
   try {
-    const product = await prisma.product.create({
-      data: {
-        slug: body.slug,
-        name: body.name,
-        description: body.description ?? "",
-        retailPrice: Number(body.retailPrice),
-        wholesalePrice: body.wholesalePrice !== "" && body.wholesalePrice != null ? Number(body.wholesalePrice) : null,
-        stock: Number(body.stock) || 0,
-        material: body.material || null,
-        size: body.size || null,
-        images: Array.isArray(body.images) ? body.images : [],
-        isRetail: Boolean(body.isRetail),
-        isWholesale: Boolean(body.isWholesale),
-        categoryId: body.categoryId,
-      },
-    });
+    const product = await prisma.product.create({ data: result.data });
     return NextResponse.json({ product }, { status: 201 });
   } catch (err: any) {
     if (err.code === "P2002") {
       return NextResponse.json({ error: "Ya existe un producto con ese código (slug)." }, { status: 409 });
     }
-    return NextResponse.json({ error: err.message ?? "Error al crear el producto." }, { status: 400 });
+    if (err.code === "P2003") {
+      return NextResponse.json({ error: "La categoría seleccionada no existe." }, { status: 400 });
+    }
+    // No exponemos err.message al cliente (puede filtrar detalles del esquema).
+    return NextResponse.json({ error: "No se pudo crear el producto." }, { status: 400 });
   }
 }

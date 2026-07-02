@@ -6,15 +6,26 @@ import { requireAdminApi } from "@/lib/admin-auth";
 // (sin pasar por nuestro servidor) usando upload firmado: solo un admin con
 // sesión válida puede pedir una firma, así nadie ajeno puede subir archivos
 // a la cuenta de Cloudinary del negocio.
-export async function POST(req: Request) {
+// Carpeta y formatos FIJOS en el servidor: no se leen del body. Así, aunque
+// una sesión de admin se vea comprometida, la firma solo autoriza subir
+// imágenes (no SVG ni ejecutables) a la carpeta del negocio, nunca a una
+// carpeta arbitraria de la cuenta de Cloudinary.
+const UPLOAD_FOLDER = "treegold/admin";
+const ALLOWED_FORMATS = "jpg,jpeg,png,webp,heic,avif";
+
+export async function POST() {
   const session = await requireAdminApi();
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-  const { folder } = await req.json().catch(() => ({ folder: "treegold/admin" }));
-  const safeFolder = typeof folder === "string" && folder.trim() ? folder.trim() : "treegold/admin";
-
   const timestamp = Math.round(Date.now() / 1000);
-  const paramsToSign = { timestamp, folder: safeFolder };
+  // Cloudinary exige firmar TODOS los parámetros que el cliente enviará (menos
+  // file/api_key); si el navegador manda un formato/carpeta distinto al firmado,
+  // Cloudinary rechaza la subida.
+  const paramsToSign = {
+    timestamp,
+    folder: UPLOAD_FOLDER,
+    allowed_formats: ALLOWED_FORMATS,
+  };
 
   const signature = cloudinary.utils.api_sign_request(
     paramsToSign,
@@ -24,7 +35,8 @@ export async function POST(req: Request) {
   return NextResponse.json({
     timestamp,
     signature,
-    folder: safeFolder,
+    folder: UPLOAD_FOLDER,
+    allowedFormats: ALLOWED_FORMATS,
     apiKey: process.env.CLOUDINARY_API_KEY,
     cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   });

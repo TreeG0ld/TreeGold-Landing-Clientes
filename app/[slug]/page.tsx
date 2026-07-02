@@ -9,11 +9,14 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getWholesaleProducts, getWholesaleCategories } from "@/lib/wholesale";
+import {
+  WHOLESALE_PREFIX as PREFIX,
+  extractWholesaleCode,
+  isValidWholesaleCode,
+} from "@/lib/wholesale-auth";
 import WholesaleProductCard from "@/components/WholesaleProductCard";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
-
-const PREFIX = "mayoristas-";
 
 export default async function CatchAllPage({
   params,
@@ -24,11 +27,8 @@ export default async function CatchAllPage({
 }) {
   const { slug } = await params;
 
-  if (!slug.startsWith(PREFIX)) notFound();
-  const codigo = slug.slice(PREFIX.length);
-
-  const secret = process.env.WHOLESALE_SECRET;
-  if (!secret || codigo !== secret) notFound();
+  const codigo = extractWholesaleCode(slug);
+  if (!isValidWholesaleCode(codigo)) notFound();
 
   const { categoria } = await searchParams;
   const category = categoria ?? "todos";

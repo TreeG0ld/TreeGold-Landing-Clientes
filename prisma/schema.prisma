@@ -60,9 +60,15 @@ model Product {
   // Relaciones
   categoryId    String
   category      Category @relation(fields: [categoryId], references: [id])
-  
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  // Índices para las consultas más frecuentes del catálogo: filtrado por
+  // tienda (isRetail/isWholesale) + categoría, ordenado por fecha de alta.
+  @@index([isRetail, categoryId, createdAt])
+  @@index([isWholesale, categoryId, createdAt])
+  @@index([categoryId])
 }
 
 // ==============================

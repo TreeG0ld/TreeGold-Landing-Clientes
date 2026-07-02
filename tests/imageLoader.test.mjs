@@ -9,13 +9,13 @@ test("Cloudinary: encadena recorte de precio + e_trim + cuadrado blanco + optimi
   const url = loader({ src: CLD, width: 400 });
   assert.match(
     url,
-    /\/upload\/c_crop,g_north,h_0\.85\/e_trim\/c_pad,ar_1:1,b_white\/f_auto,q_auto:good,w_400,c_limit\//
+    /\/upload\/c_crop,g_north,h_0\.75\/e_trim\/c_pad,ar_1:1,b_white\/f_auto,q_auto:good,w_400,c_limit\//
   );
 });
 
-test("Cloudinary: oculta el precio (recorte del 15% inferior)", () => {
+test("Cloudinary: oculta el precio (recorte del 25% inferior)", () => {
   const url = loader({ src: CLD, width: 600 });
-  assert.ok(url.includes("c_crop,g_north,h_0.85"), "debe recortar la franja del precio");
+  assert.ok(url.includes("c_crop,g_north,h_0.75"), "debe recortar la franja del precio");
 });
 
 test("Rendimiento: siempre formato y calidad automáticos (WebP/AVIF, q_auto)", () => {

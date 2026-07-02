@@ -7,11 +7,9 @@ import { Loader2, Trash2, Upload } from "lucide-react";
 export default function ImageUploader({
   images,
   onChange,
-  folder = "treegold/admin",
 }: {
   images: string[];
   onChange: (images: string[]) => void;
-  folder?: string;
 }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -23,13 +21,16 @@ export default function ImageUploader({
     setUploading(true);
 
     try {
-      const sigRes = await fetch("/api/admin/cloudinary-signature", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folder }),
-      });
+      const sigRes = await fetch("/api/admin/cloudinary-signature", { method: "POST" });
       if (!sigRes.ok) throw new Error("No se pudo obtener la firma de Cloudinary.");
-      const { timestamp, signature, apiKey, cloudName, folder: signedFolder } = await sigRes.json();
+      const {
+        timestamp,
+        signature,
+        apiKey,
+        cloudName,
+        folder: signedFolder,
+        allowedFormats,
+      } = await sigRes.json();
 
       const uploaded: string[] = [];
       for (const file of Array.from(files)) {
@@ -39,6 +40,8 @@ export default function ImageUploader({
         form.append("timestamp", String(timestamp));
         form.append("signature", signature);
         form.append("folder", signedFolder);
+        // Debe coincidir EXACTAMENTE con lo firmado en el servidor.
+        form.append("allowed_formats", allowedFormats);
 
         const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
           method: "POST",
