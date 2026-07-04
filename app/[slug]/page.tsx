@@ -5,9 +5,13 @@
 // revisa manualmente si empieza con "mayoristas-". Las rutas estáticas
 // (coleccion, historia, contacto, etc.) siempre tienen prioridad sobre este
 // catch-all, así que no hay conflicto.
+//
+// La página es deliberadamente NEUTRA: sin logo, sin nombre de la marca,
+// sin navbar ni footer (ver SiteChrome). Solo el catálogo y los precios.
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { ShieldCheck } from "lucide-react";
 import { getWholesaleProducts, getWholesaleCategories } from "@/lib/wholesale";
 import {
   WHOLESALE_PREFIX as PREFIX,
@@ -16,7 +20,27 @@ import {
 } from "@/lib/wholesale-auth";
 import WholesaleProductCard from "@/components/WholesaleProductCard";
 
-export const metadata: Metadata = { robots: { index: false, follow: false } };
+export const metadata: Metadata = {
+  // "absolute" evita la plantilla global ("%s · Joyería TreeGold"):
+  // la pestaña del navegador tampoco revela la marca.
+  title: { absolute: "Catálogo Privado" },
+  description: "Catálogo privado para distribuidores.",
+  robots: { index: false, follow: false },
+  // Sobrescribe el OpenGraph/Twitter heredado del layout raíz: sin esto, al
+  // compartir el enlace por WhatsApp la vista previa mostraría el nombre y el
+  // logo de la marca. Aquí la tarjeta queda neutra.
+  openGraph: {
+    title: "Catálogo Privado",
+    description: "Acceso exclusivo para distribuidores.",
+    images: [],
+  },
+  twitter: {
+    card: "summary",
+    title: "Catálogo Privado",
+    description: "Acceso exclusivo para distribuidores.",
+    images: [],
+  },
+};
 
 export default async function CatchAllPage({
   params,
@@ -39,46 +63,72 @@ export default async function CatchAllPage({
   ]);
 
   const tabs = [{ slug: "todos", name: "Todo" }, ...categories];
+  const base = `/${PREFIX}${codigo}`;
 
   return (
-    <div className="mx-auto max-w-7xl px-5 pb-24 pt-12 md:px-8">
-      <header className="mb-8">
-        <p className="eyebrow mb-3">Acceso privado</p>
-        <h1 className="text-4xl md:text-5xl">Catálogo mayoristas</h1>
-        <p className="mt-3 max-w-xl text-secondary">
-          Precios de costo, solo para distribuidores. No compartas este enlace.
-        </p>
+    <div className="min-h-dvh bg-background">
+      {/* Cabecera oscura, elegante y anónima */}
+      <header className="bg-primary text-on-primary">
+        <div className="mx-auto max-w-7xl px-5 py-14 md:px-8 md:py-20">
+          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-1.5 text-[0.7rem] font-semibold uppercase tracking-luxe text-accent-soft">
+            <ShieldCheck className="h-3.5 w-3.5" /> Acceso privado
+          </p>
+          <h1 className="font-serif text-4xl text-white md:text-6xl">
+            Catálogo Mayorista
+          </h1>
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/65 md:text-base">
+            Precios exclusivos para distribuidores. Este enlace es personal:
+            no lo compartas ni lo publiques.
+          </p>
+        </div>
       </header>
 
-      <div className="mb-8 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {tabs.map((t) => {
-          const active = category === t.slug;
-          return (
-            <Link
-              key={t.slug}
-              href={`/${PREFIX}${codigo}${t.slug === "todos" ? "" : `?categoria=${t.slug}`}`}
-              className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                active ? "bg-primary text-white" : "text-secondary hover:text-primary"
-              }`}
-            >
-              {t.name}
-            </Link>
-          );
-        })}
-      </div>
-
-      {products.length > 0 ? (
-        <div className="grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4">
-          {products.map((p) => (
-            <WholesaleProductCard key={p.slug} product={p} />
-          ))}
+      <div className="mx-auto max-w-7xl px-5 pb-20 md:px-8">
+        {/* Filtros por categoría (sticky) */}
+        <div className="sticky top-0 z-30 -mx-5 mb-10 border-b border-border glass px-5 py-3 md:mx-0 md:mt-6 md:rounded-full md:border md:px-4">
+          <div className="flex items-center gap-3">
+            <div className="flex flex-1 gap-2 overflow-x-auto pb-1 md:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {tabs.map((t) => {
+                const active = category === t.slug;
+                return (
+                  <Link
+                    key={t.slug}
+                    href={t.slug === "todos" ? base : `${base}?categoria=${t.slug}`}
+                    className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 ${
+                      active
+                        ? "bg-primary text-white"
+                        : "text-secondary hover:text-primary"
+                    }`}
+                  >
+                    {t.name}
+                  </Link>
+                );
+              })}
+            </div>
+            <span className="hidden shrink-0 pr-2 text-xs text-secondary/70 sm:block">
+              {products.length} {products.length === 1 ? "pieza" : "piezas"}
+            </span>
+          </div>
         </div>
-      ) : (
-        <p className="py-20 text-center text-secondary">
-          Todavía no hay productos marcados como "Visible en mayoristas". Actívalos desde
-          el panel /admin en cada producto.
-        </p>
-      )}
+
+        {/* Grid */}
+        {products.length > 0 ? (
+          <div className="grid grid-cols-2 gap-x-4 gap-y-10 pt-2 lg:grid-cols-4">
+            {products.map((p) => (
+              <WholesaleProductCard key={p.slug} product={p} />
+            ))}
+          </div>
+        ) : (
+          <p className="py-24 text-center text-secondary">
+            No hay piezas disponibles en esta categoría por ahora.
+          </p>
+        )}
+
+        {/* Pie neutro, sin marca */}
+        <footer className="mt-20 border-t border-border pt-8 text-center text-xs text-secondary/60">
+          Catálogo privado · Los precios pueden cambiar sin aviso · Pedidos por WhatsApp
+        </footer>
+      </div>
     </div>
   );
 }

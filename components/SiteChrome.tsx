@@ -8,12 +8,14 @@ import SelectionDrawer from "@/components/SelectionDrawer";
 import FlyToCart from "@/components/FlyToCart";
 
 // El panel /admin tiene su propia navegación (AdminNav) y no debe mostrar
-// el navbar/footer/FAB de la tienda pública.
+// el navbar/footer/FAB de la tienda pública. La tienda mayorista
+// (/mayoristas-<código>) es una página discreta sin marca: tampoco los lleva.
 export default function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith("/admin");
+  const isChromeless =
+    pathname?.startsWith("/admin") || pathname?.startsWith("/mayoristas-");
 
-  if (isAdmin) return <>{children}</>;
+  if (isChromeless) return <>{children}</>;
 
   return (
     <>

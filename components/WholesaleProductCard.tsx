@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { formatCOP } from "@/lib/format";
-import { buildProductLink } from "@/lib/whatsapp";
+import { buildWholesaleProductLink } from "@/lib/whatsapp";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import type { WholesaleProduct } from "@/lib/wholesale";
 
@@ -31,7 +31,7 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
           {[product.categoryName, product.material].filter(Boolean).join(" · ")}
         </p>
         <a
-          href={buildProductLink(product.name, product.price)}
+          href={buildWholesaleProductLink(product.name, product.price)}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#25D366] px-4 py-2 text-xs font-medium text-[#1c8a47] transition-all duration-300 hover:bg-[#25D366]/10"
