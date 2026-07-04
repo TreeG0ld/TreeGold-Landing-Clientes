@@ -38,11 +38,11 @@ async function forgeToken(payload, secret = SECRET) {
 // --- casos felices ---
 
 test("unitario: token creado por createSessionToken se verifica y trae rol ADMIN", async () => {
-  const token = await createSessionToken("santiago");
+  const token = await createSessionToken("santiago", "ADMIN");
   const session = await verifySessionToken(token);
   assert.ok(session, "el token recién creado debe ser válido");
   assert.equal(session.role, "ADMIN");
-  assert.equal(session.user, "santiago");
+  assert.equal(session.userId, "santiago");
   assert.ok(session.exp > Date.now(), "exp debe estar en el futuro");
   assert.ok(
     session.exp <= Date.now() + ADMIN_SESSION_MAX_AGE_SECONDS * 1000 + 1000,
@@ -51,7 +51,7 @@ test("unitario: token creado por createSessionToken se verifica y trae rol ADMIN
 });
 
 test("unitario: el nombre de la cookie es estable (middleware y rutas dependen de él)", () => {
-  assert.equal(ADMIN_COOKIE, "tg_admin_session");
+  assert.equal(ADMIN_COOKIE, "tg_session");
 });
 
 // --- cookie ausente / malformada ---
@@ -103,11 +103,13 @@ test("unitario: token expirado (firma válida, exp en el pasado) -> null", async
   assert.equal(await verifySessionToken(expired), null);
 });
 
-test("unitario: rol distinto de ADMIN con firma válida -> null", async () => {
-  const client = await forgeToken({ role: "CLIENT", user: "cliente", exp: Date.now() + 60_000 });
-  assert.equal(await verifySessionToken(client), null);
-  const empty = await forgeToken({ user: "sin-rol", exp: Date.now() + 60_000 });
-  assert.equal(await verifySessionToken(empty), null);
+test("unitario: verifySessionToken es genérico: acepta CLIENT válido (el gate ADMIN vive en admin-auth)", async () => {
+  // Tras unificar cliente+admin, la verificación de firma/exp NO filtra por rol;
+  // el acceso ADMIN se comprueba aparte en lib/admin-auth (requireAdminPage/Api).
+  const client = await forgeToken({ role: "CLIENT", userId: "cliente", exp: Date.now() + 60_000 });
+  const session = await verifySessionToken(client);
+  assert.ok(session, "un token de cliente con firma válida debe verificarse");
+  assert.equal(session.role, "CLIENT");
 });
 
 test("unitario: payload SIN exp (o exp no numérico) con firma válida -> null", async () => {
@@ -124,10 +126,10 @@ test("unitario: payload con firma válida pero que no es JSON -> null", async ()
 });
 
 test("unitario: unicode/emojis en el nombre de usuario sobreviven el roundtrip", async () => {
-  const token = await createSessionToken("adminÑ-🚀-ütf8");
+  const token = await createSessionToken("adminÑ-🚀-ütf8", "ADMIN");
   const session = await verifySessionToken(token);
   assert.ok(session);
-  assert.equal(session.user, "adminÑ-🚀-ütf8");
+  assert.equal(session.userId, "adminÑ-🚀-ütf8");
 });
 
 // --- timingSafeEqual (comparación de credenciales en tiempo constante) ---

@@ -59,7 +59,7 @@ export async function POST(req: Request) {
   // Login correcto: limpiamos el contador para no penalizar al admin legítimo.
   resetRateLimit(key);
 
-  const token = await createSessionToken(validUser);
+  const token = await createSessionToken(validUser, "ADMIN");
   const res = NextResponse.json({ ok: true });
   res.cookies.set(ADMIN_COOKIE, token, {
     httpOnly: true,

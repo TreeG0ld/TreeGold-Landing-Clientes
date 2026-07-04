@@ -89,7 +89,7 @@ test("integración: /api/admin/login sin sesión -> se permite (para poder logue
 // --- con sesión ---
 
 test("integración: sesión ADMIN válida -> pasa a /admin y /api/admin", async () => {
-  const token = await createSessionToken("admin");
+  const token = await createSessionToken("admin", "ADMIN");
   assert.ok(isPassThrough(await middleware(makeRequest("/admin/productos", token))));
   assert.ok(isPassThrough(await middleware(makeRequest("/api/admin/products", token))));
 });
