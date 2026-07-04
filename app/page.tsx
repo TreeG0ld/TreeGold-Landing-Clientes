@@ -61,8 +61,8 @@ export default async function Home() {
           </Reveal>
 
           <div className="grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4">
-            {featured.map((p) => (
-              <ProductCard key={p.slug} product={p} />
+            {featured.map((p, i) => (
+              <ProductCard key={p.slug} product={p} index={i} />
             ))}
           </div>
         </div>

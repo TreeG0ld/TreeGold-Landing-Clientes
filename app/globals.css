@@ -96,6 +96,40 @@
   }
 }
 
+/* Entrada en cascada: los elementos de una lista aparecen escalonados.
+   Cada ítem define su turno con la variable --i (style={{ "--i": n }}). */
+@keyframes cascade-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.cascade {
+  opacity: 0;
+  animation: cascade-in 0.55s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+/* Skeleton de carga con brillo (shimmer), tono cálido acorde al sitio */
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+.skeleton {
+  border-radius: 0.75rem;
+  background: linear-gradient(90deg, #edeae5 25%, #f6f4f0 50%, #edeae5 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s linear infinite;
+}
+
 /* Burbuja "volar al carrito" */
 .fly-bubble {
   position: absolute;

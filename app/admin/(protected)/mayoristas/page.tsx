@@ -87,8 +87,12 @@ export default async function MayoristasAdminPage() {
           <p className="text-sm text-secondary">Todavía no hay productos en la tienda mayorista.</p>
         ) : (
           <ul className="divide-y divide-border">
-            {recent.map((p) => (
-              <li key={p.id} className="flex items-center justify-between gap-4 py-3 text-sm">
+            {recent.map((p, i) => (
+              <li
+                key={p.id}
+                className="cascade flex items-center justify-between gap-4 py-3 text-sm"
+                style={{ "--i": i } as React.CSSProperties}
+              >
                 <div className="min-w-0">
                   <Link
                     href={`/admin/productos/${p.id}`}

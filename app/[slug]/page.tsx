@@ -114,8 +114,14 @@ export default async function CatchAllPage({
         {/* Grid */}
         {products.length > 0 ? (
           <div className="grid grid-cols-2 gap-x-4 gap-y-10 pt-2 lg:grid-cols-4">
-            {products.map((p) => (
-              <WholesaleProductCard key={p.slug} product={p} />
+            {products.map((p, i) => (
+              <div
+                key={p.slug}
+                className="cascade"
+                style={{ "--i": i % 8 } as React.CSSProperties}
+              >
+                <WholesaleProductCard product={p} />
+              </div>
             ))}
           </div>
         ) : (

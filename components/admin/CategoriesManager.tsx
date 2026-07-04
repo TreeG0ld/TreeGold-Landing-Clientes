@@ -96,8 +96,12 @@ export default function CategoriesManager({ categories }: { categories: Category
             </tr>
           </thead>
           <tbody>
-            {categories.map((c) => (
-              <tr key={c.id} className="border-b border-border last:border-0">
+            {categories.map((c, i) => (
+              <tr
+                key={c.id}
+                className="cascade border-b border-border last:border-0"
+                style={{ "--i": Math.min(i, 14) } as React.CSSProperties}
+              >
                 <td className="px-4 py-3">
                   {editingId === c.id ? (
                     <input

@@ -76,8 +76,8 @@ export default async function ProductPage({ params }: Params) {
             </h2>
           </Reveal>
           <div className="grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4">
-            {related.map((p) => (
-              <ProductCard key={p.slug} product={p} />
+            {related.map((p, i) => (
+              <ProductCard key={p.slug} product={p} index={i} />
             ))}
           </div>
         </section>

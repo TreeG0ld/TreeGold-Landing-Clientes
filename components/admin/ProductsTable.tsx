@@ -57,8 +57,12 @@ export default function ProductsTable({ products }: { products: Row[] }) {
           </tr>
         </thead>
         <tbody>
-          {products.map((p) => (
-            <tr key={p.id} className="border-b border-border last:border-0">
+          {products.map((p, i) => (
+            <tr
+              key={p.id}
+              className="cascade border-b border-border last:border-0"
+              style={{ "--i": Math.min(i, 14) } as React.CSSProperties}
+            >
               <td className="flex items-center gap-3 px-4 py-3">
                 <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-muted">
                   {p.images[0] && (

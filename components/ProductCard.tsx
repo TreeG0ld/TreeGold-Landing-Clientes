@@ -9,7 +9,16 @@ import { useSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
 import { flyToCart } from "@/lib/flyToCart";
 
-export default function ProductCard({ product }: { product: Product }) {
+// "index" escalona la entrada (cascada): cada tarjeta espera su turno.
+// Se usa módulo 8 para que las filas de más abajo (que aparecen al hacer
+// scroll) no acumulen esperas eternas.
+export default function ProductCard({
+  product,
+  index = 0,
+}: {
+  product: Product;
+  index?: number;
+}) {
   const add = useSelection((s) => s.add);
 
   const handleAdd = (e: React.MouseEvent) => {
@@ -30,7 +39,7 @@ export default function ProductCard({ product }: { product: Product }) {
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, ease: [0.65, 0, 0.35, 1] }}
+      transition={{ duration: 0.6, ease: [0.65, 0, 0.35, 1], delay: (index % 8) * 0.07 }}
       className="group"
     >
       <Link href={`/producto/${product.slug}`} className="block">
