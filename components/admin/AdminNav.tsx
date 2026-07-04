@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut, Package, Tags } from "lucide-react";
+import { LogOut, Package, Tags, Store } from "lucide-react";
 
 const links = [
   { href: "/admin/productos", label: "Productos", icon: Package },
   { href: "/admin/categorias", label: "Categorías", icon: Tags },
+  { href: "/admin/mayoristas", label: "Mayoristas", icon: Store },
 ];
 
 export default function AdminNav({ user }: { user: string }) {
