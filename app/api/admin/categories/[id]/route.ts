@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
+import { slugify } from "@/lib/slug";
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireAdminApi();
@@ -8,16 +9,25 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   const { id } = await params;
   const { name } = await req.json();
-  if (!name?.trim()) return NextResponse.json({ error: "El nombre es obligatorio." }, { status: 400 });
+  const trimmed = typeof name === "string" ? name.trim() : "";
+  if (!trimmed) return NextResponse.json({ error: "El nombre es obligatorio." }, { status: 400 });
 
   try {
-    const category = await prisma.category.update({ where: { id }, data: { name: name.trim() } });
+    // Regeneramos el slug junto con el nombre para que la URL de la categoría
+    // (/coleccion?categoria=<slug>) siga coincidiendo con su nombre visible.
+    const category = await prisma.category.update({
+      where: { id },
+      data: { name: trimmed, slug: slugify(trimmed) },
+    });
     return NextResponse.json({ category });
   } catch (err: any) {
     if (err.code === "P2002") {
       return NextResponse.json({ error: "Ya existe una categoría con ese nombre." }, { status: 409 });
     }
-    return NextResponse.json({ error: err.message ?? "Error al actualizar." }, { status: 400 });
+    if (err.code === "P2025") {
+      return NextResponse.json({ error: "Categoría no encontrada." }, { status: 404 });
+    }
+    return NextResponse.json({ error: "No se pudo actualizar la categoría." }, { status: 400 });
   }
 }
 

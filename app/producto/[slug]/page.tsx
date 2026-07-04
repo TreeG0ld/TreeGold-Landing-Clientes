@@ -62,7 +62,9 @@ export default async function ProductPage({ params }: Params) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        // Escapamos "<" para que un nombre/descripción de producto con
+        // "</script>" no cierre la etiqueta e inyecte HTML/JS (XSS).
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
       <ProductDetail product={product} />
 

@@ -177,22 +177,29 @@ export async function getFeatured(take = 8): Promise<Product[]> {
 
 export const getAllCategories = unstable_cache(
   async (): Promise<Category[]> => {
-    const cats = await prisma.category.findMany({ orderBy: { name: "asc" } });
-    // Imagen de portada = primera foto de un producto de esa categoría.
-    return Promise.all(
-      cats.map(async (c) => {
-        const first = await prisma.product.findFirst({
-          where: { categoryId: c.id, isRetail: true },
-          select: { images: true },
-          orderBy: { createdAt: "asc" },
-        });
-        return {
+    // Dos consultas en total (antes: 1 + N, una por categoría). Con `distinct`
+    // + orderBy traemos, de una sola vez, el producto más antiguo de cada
+    // categoría (su primera foto es la portada).
+    const [cats, covers] = await Promise.all([
+      prisma.category.findMany({ orderBy: { name: "asc" } }),
+      prisma.product.findMany({
+        where: { isRetail: true },
+        select: { categoryId: true, images: true },
+        orderBy: [{ categoryId: "asc" }, { createdAt: "asc" }],
+        distinct: ["categoryId"],
+      }),
+    ]);
+
+    const coverByCategory = new Map(covers.map((p) => [p.categoryId, p.images[0] ?? ""]));
+
+    return cats.map(
+      (c) =>
+        ({
           slug: c.slug,
           name: c.name,
           description: "",
-          image: first?.images[0] ?? "",
-        } satisfies Category;
-      })
+          image: coverByCategory.get(c.id) ?? "",
+        }) satisfies Category
     );
   },
   ["all-categories"],

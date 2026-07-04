@@ -212,7 +212,6 @@ export default function ProductForm({
         <ImageUploader
           images={values.images}
           onChange={(images) => set("images", images)}
-          folder="treegold/admin"
         />
       </div>
 

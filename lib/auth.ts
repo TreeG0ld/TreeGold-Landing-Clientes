@@ -19,7 +19,7 @@ function toBase64Url(bytes: Uint8Array): string {
   return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-function fromBase64Url(str: string): Uint8Array {
+function fromBase64Url(str: string): Uint8Array<ArrayBuffer> {
   const b64 = str.replace(/-/g, "+").replace(/_/g, "/");
   const bin = atob(b64);
   const bytes = new Uint8Array(bin.length);
@@ -43,7 +43,7 @@ async function hmacSign(secret: string, data: string): Promise<Uint8Array> {
   return new Uint8Array(sig);
 }
 
-async function hmacVerify(secret: string, data: string, signature: Uint8Array): Promise<boolean> {
+async function hmacVerify(secret: string, data: string, signature: Uint8Array<ArrayBuffer>): Promise<boolean> {
   const key = await importHmacKey(secret, ["verify"]);
   return crypto.subtle.verify(
     "HMAC",
@@ -79,6 +79,11 @@ export async function verifySessionToken(token: string | undefined | null): Prom
       new TextDecoder().decode(fromBase64Url(payloadB64))
     ) as UserSession;
 
+    // exp debe ser un número válido y estar en el futuro. Sin esta comprobación,
+    // un payload sin exp haría `Date.now() > undefined === false` y nunca expiraría.
+    // (No filtramos por rol aquí: esta verificación es genérica y también valida
+    // sesiones de CLIENTE; el rol ADMIN se comprueba aparte en admin-auth.)
+    if (typeof payload.exp !== "number" || Number.isNaN(payload.exp)) return null;
     if (Date.now() > payload.exp) return null;
     return payload;
   } catch {
@@ -86,4 +91,25 @@ export async function verifySessionToken(token: string | undefined | null): Prom
   }
 }
 
+// Se exportan ambos nombres (cliente por BD y admin por env comparten el mismo
+// mecanismo de sesión/cookie), para que compilen los archivos de las dos ramas.
 export const AUTH_SESSION_MAX_AGE_SECONDS = SESSION_MAX_AGE_SECONDS;
+export const ADMIN_SESSION_MAX_AGE_SECONDS = SESSION_MAX_AGE_SECONDS;
+export const ADMIN_COOKIE = AUTH_COOKIE;
+
+// Comparación en tiempo constante para credenciales: primero hashea ambos
+// valores con SHA-256 (mismo largo siempre, no filtra la longitud real) y luego
+// compara byte a byte sin cortar en la primera diferencia. Evita timing attacks
+// sobre ADMIN_USER / ADMIN_PASSWORD.
+export async function timingSafeEqual(a: string, b: string): Promise<boolean> {
+  const enc = new TextEncoder();
+  const [ha, hb] = await Promise.all([
+    crypto.subtle.digest("SHA-256", enc.encode(a)),
+    crypto.subtle.digest("SHA-256", enc.encode(b)),
+  ]);
+  const va = new Uint8Array(ha);
+  const vb = new Uint8Array(hb);
+  let diff = 0;
+  for (let i = 0; i < va.length; i++) diff |= va[i] ^ vb[i];
+  return diff === 0;
+}
