@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { MessageCircle, Mail, MapPin, Clock } from "lucide-react";
+import { Mail, MapPin, Clock } from "lucide-react";
+import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import Reveal from "@/components/anim/Reveal";
 import { site } from "@/lib/site";
 import { buildGeneralLink } from "@/lib/whatsapp";
@@ -29,7 +30,7 @@ export default function ContactoPage() {
             rel="noopener noreferrer"
             className="flex w-full items-center justify-center gap-3 rounded-full bg-[#25D366] px-8 py-5 text-base font-semibold text-white transition-all duration-300 ease-luxe hover:brightness-105 active:scale-[0.98]"
           >
-            <MessageCircle className="h-6 w-6" />
+            <WhatsAppIcon className="h-6 w-6" />
             Escríbenos por WhatsApp
           </a>
           <p className="mt-3 text-center text-sm text-secondary">

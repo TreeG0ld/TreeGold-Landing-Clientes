@@ -10,7 +10,7 @@ export default async function AdminProtectedLayout({
 
   return (
     <div className="min-h-dvh bg-muted/30">
-      <AdminNav user={session.user} />
+      <AdminNav user={session.userId} />
       <main className="mx-auto max-w-6xl px-5 py-8">{children}</main>
     </div>
   );

@@ -45,7 +45,12 @@ async function hmacSign(secret: string, data: string): Promise<Uint8Array> {
 
 async function hmacVerify(secret: string, data: string, signature: Uint8Array): Promise<boolean> {
   const key = await importHmacKey(secret, ["verify"]);
-  return crypto.subtle.verify("HMAC", key, signature, new TextEncoder().encode(data));
+  return crypto.subtle.verify(
+    "HMAC",
+    key,
+    signature as BufferSource,
+    new TextEncoder().encode(data)
+  );
 }
 
 // Crea el token de sesión
