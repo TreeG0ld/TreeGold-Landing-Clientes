@@ -64,7 +64,7 @@ export default function ProductCard({
           <button
             onClick={handleAdd}
             aria-label={`Agregar ${product.name} a mi selección`}
-            className="absolute bottom-3 right-3 flex h-11 w-11 translate-y-3 items-center justify-center rounded-full bg-primary text-on-primary opacity-0 shadow-lg transition-all duration-400 ease-luxe hover:bg-accent group-hover:translate-y-0 group-hover:opacity-100 cursor-pointer"
+            className="absolute bottom-3 right-3 flex h-11 w-11 translate-y-0 items-center justify-center rounded-full bg-primary text-on-primary shadow-lg transition-all duration-400 ease-luxe hover:bg-accent md:translate-y-3 md:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 cursor-pointer"
           >
             <Plus className="h-5 w-5" />
           </button>

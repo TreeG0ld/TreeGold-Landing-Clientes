@@ -23,8 +23,8 @@ export default function AdminNav({ user }: { user: string }) {
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-white">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
-        <div className="flex items-center gap-6">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-y-3 px-5 py-3.5">
+        <div className="flex items-center gap-3 md:gap-6">
           <Link href="/admin/productos" className="flex shrink-0 items-center gap-2" aria-label="TreeGold · Admin">
             <Image src="/logo.png" alt="" width={820} height={876} className="h-8 w-auto" />
             <span className="hidden font-serif text-lg text-primary sm:inline">Admin</span>
@@ -48,7 +48,7 @@ export default function AdminNav({ user }: { user: string }) {
         </div>
 
         <div className="flex items-center gap-3 text-sm text-secondary">
-          <span>{user}</span>
+          <span className="hidden sm:inline-block">{user}</span>
           <button
             onClick={handleLogout}
             className="flex items-center gap-1.5 rounded-full border border-border px-3.5 py-1.5 font-medium text-secondary transition-colors hover:border-accent hover:text-primary cursor-pointer"

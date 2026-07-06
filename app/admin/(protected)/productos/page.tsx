@@ -59,12 +59,12 @@ export default async function ProductosPage({
           name="q"
           defaultValue={q}
           placeholder="Buscar por nombre o código..."
-          className="flex-1 min-w-[220px] rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-accent"
+          className="flex-1 min-w-[220px] rounded-xl border border-border px-4 py-2.5 text-base md:text-sm outline-none focus:border-accent"
         />
         <select
           name="categoria"
           defaultValue={categoryId}
-          className="rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-accent"
+          className="rounded-xl border border-border px-4 py-2.5 text-base md:text-sm outline-none focus:border-accent"
         >
           <option value="">Todas las categorías</option>
           {categories.map((c) => (
