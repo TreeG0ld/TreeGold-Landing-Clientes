@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LogOut, Package, Tags, Store } from "lucide-react";
@@ -24,7 +25,10 @@ export default function AdminNav({ user }: { user: string }) {
     <header className="sticky top-0 z-30 border-b border-border bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
         <div className="flex items-center gap-6">
-          <span className="font-serif text-lg text-primary">TreeGold · Admin</span>
+          <Link href="/admin/productos" className="flex shrink-0 items-center gap-2" aria-label="TreeGold · Admin">
+            <Image src="/logo.png" alt="" width={820} height={876} className="h-8 w-auto" />
+            <span className="hidden font-serif text-lg text-primary sm:inline">Admin</span>
+          </Link>
           <nav className="flex items-center gap-1">
             {links.map(({ href, label, icon: Icon }) => {
               const active = pathname.startsWith(href);
