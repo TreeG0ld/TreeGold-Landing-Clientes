@@ -12,6 +12,7 @@ import { site } from "@/lib/site";
 const links = [
   { href: "/", label: "Inicio" },
   { href: "/coleccion", label: "Colección" },
+  { href: "/#promociones", label: "Promociones" },
   { href: "/historia", label: "Historia" },
   { href: "/contacto", label: "Contacto" },
 ];

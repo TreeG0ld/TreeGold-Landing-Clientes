@@ -165,6 +165,18 @@ export async function getRelated(
   return rows.map(toUiProduct);
 }
 
+// Productos marcados "En promoción" desde /admin (Product.isPromo).
+// La home no renderiza la sección si viene vacío.
+export async function getPromos(take = 8): Promise<Product[]> {
+  const rows = await prisma.product.findMany({
+    where: { isRetail: true, isPromo: true },
+    ...withCategory,
+    orderBy: { updatedAt: "desc" },
+    take,
+  });
+  return rows.map(toUiProduct);
+}
+
 export async function getFeatured(take = 8): Promise<Product[]> {
   const rows = await prisma.product.findMany({
     where: { isRetail: true },
@@ -192,15 +204,19 @@ export const getAllCategories = unstable_cache(
 
     const coverByCategory = new Map(covers.map((p) => [p.categoryId, p.images[0] ?? ""]));
 
-    return cats.map(
-      (c) =>
-        ({
-          slug: c.slug,
-          name: c.name,
-          description: "",
-          image: coverByCategory.get(c.id) ?? "",
-        }) satisfies Category
-    );
+    // Solo categorías con al menos un producto visible en la tienda pública:
+    // las recién creadas (aún sin productos) no deben aparecer con tarjeta vacía.
+    return cats
+      .filter((c) => coverByCategory.has(c.id))
+      .map(
+        (c) =>
+          ({
+            slug: c.slug,
+            name: c.name,
+            description: "",
+            image: coverByCategory.get(c.id) ?? "",
+          }) satisfies Category
+      );
   },
   ["all-categories"],
   { revalidate: 3600, tags: ["catalogo"] }

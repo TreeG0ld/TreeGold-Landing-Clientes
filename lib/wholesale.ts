@@ -10,6 +10,7 @@ export type WholesaleProduct = {
   category: string;
   categoryName: string;
   price: number; // wholesalePrice (o retailPrice si no hay costo cargado)
+  retailPrice: number; // precio sugerido de venta al público
   material: string;
   images: string[];
 };
@@ -29,6 +30,7 @@ function toWholesaleProduct(p: {
     category: p.category.slug,
     categoryName: p.category.name,
     price: p.wholesalePrice ?? p.retailPrice,
+    retailPrice: p.retailPrice,
     material: p.material ?? "",
     images: p.images,
   };

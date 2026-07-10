@@ -29,15 +29,15 @@
   body {
     background-color: rgb(var(--color-background));
     color: rgb(var(--color-foreground));
-    font-family: var(--font-montserrat), system-ui, sans-serif;
+    font-family: var(--font-jost), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
   }
 
   h1, h2, h3, h4 {
-    font-family: var(--font-cormorant), serif;
-    font-weight: 500;
+    font-family: var(--font-marcellus), serif;
+    font-weight: 400;
     line-height: 1.05;
   }
 
@@ -55,8 +55,8 @@
 
   /* Fluid serif display */
   .display {
-    font-family: var(--font-cormorant), serif;
-    font-weight: 500;
+    font-family: var(--font-marcellus), serif;
+    font-weight: 400;
     line-height: 1.02;
     font-size: clamp(2.6rem, 11vw, 6.5rem);
   }

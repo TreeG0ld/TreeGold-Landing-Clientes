@@ -34,6 +34,7 @@ export default async function EditarProductoPage({
           images: product.images,
           isRetail: product.isRetail,
           isWholesale: product.isWholesale,
+          isPromo: product.isPromo,
         }}
       />
     </div>

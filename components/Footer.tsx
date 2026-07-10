@@ -19,7 +19,8 @@ export default function Footer() {
                 className="h-24 w-auto"
               />
             </Link>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-on-primary/70">
+            <p className="mt-4 font-serif text-lg text-accent-soft">{site.slogan}</p>
+            <p className="mt-2 max-w-xs text-sm leading-relaxed text-on-primary/70">
               {site.tagline}. Piezas hechas a mano en oro laminado y plata 925.
             </p>
           </div>

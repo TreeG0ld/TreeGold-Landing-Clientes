@@ -23,9 +23,14 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
       <div className="mt-4 px-1">
         <div className="flex items-baseline justify-between gap-3">
           <h3 className="font-serif text-xl leading-tight">{product.name}</h3>
-          <span className="shrink-0 text-sm font-medium text-secondary">
-            {formatCOP(product.price)}
-          </span>
+          <div className="shrink-0 text-right">
+            <span className="block text-sm font-medium text-secondary">
+              {formatCOP(product.price)}
+            </span>
+            <span className="block text-xs text-secondary/60">
+              Sugerido venta: {formatCOP(product.retailPrice)}
+            </span>
+          </div>
         </div>
         <p className="mt-1 text-xs uppercase tracking-wide text-secondary/60">
           {[product.categoryName, product.material].filter(Boolean).join(" · ")}

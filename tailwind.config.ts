@@ -20,8 +20,8 @@ const config: Config = {
         destructive: "rgb(var(--color-destructive) / <alpha-value>)",
       },
       fontFamily: {
-        serif: ["var(--font-cormorant)", "Cormorant", "serif"],
-        sans: ["var(--font-montserrat)", "Montserrat", "system-ui", "sans-serif"],
+        serif: ["var(--font-marcellus)", "Marcellus", "serif"],
+        sans: ["var(--font-jost)", "Jost", "system-ui", "sans-serif"],
       },
       letterSpacing: {
         luxe: "0.18em",

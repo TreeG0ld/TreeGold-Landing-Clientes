@@ -21,6 +21,7 @@ export type ValidatedProduct = {
   images: string[];
   isRetail: boolean;
   isWholesale: boolean;
+  isPromo: boolean;
   categoryId: string;
 };
 
@@ -71,6 +72,7 @@ export function validateProductPayload(body: unknown): ValidationResult {
 
   const isRetail = Boolean(b.isRetail);
   const isWholesale = Boolean(b.isWholesale);
+  const isPromo = Boolean(b.isPromo);
   if (!isRetail && !isWholesale) {
     return {
       ok: false,
@@ -107,6 +109,7 @@ export function validateProductPayload(body: unknown): ValidationResult {
       images,
       isRetail,
       isWholesale,
+      isPromo,
       categoryId,
     },
   };

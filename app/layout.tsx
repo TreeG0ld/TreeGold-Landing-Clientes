@@ -1,20 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant, Montserrat } from "next/font/google";
+import { Marcellus, Jost } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
 import SiteChrome from "@/components/SiteChrome";
 
-const cormorant = Cormorant({
+// Marcellus solo existe en peso 400: los títulos toman su carácter de la
+// propia fuente, no del peso.
+const marcellus = Marcellus({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-cormorant",
+  weight: "400",
+  variable: "--font-marcellus",
   display: "swap",
 });
 
-const montserrat = Montserrat({
+const jost = Jost({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-montserrat",
+  variable: "--font-jost",
   display: "swap",
 });
 
@@ -77,7 +79,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${cormorant.variable} ${montserrat.variable}`}
+      className={`${marcellus.variable} ${jost.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-dvh" suppressHydrationWarning>

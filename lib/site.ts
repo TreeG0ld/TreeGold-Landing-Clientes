@@ -6,6 +6,8 @@ export const site = {
   // En producción define NEXT_PUBLIC_SITE_URL con tu dominio real.
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
   tagline: "Joyería de autor en oro laminado y plata 925",
+  // Eslogan corto de marca: acompaña al logo (Hero, footer).
+  slogan: "Tú mereces brillar",
   description:
     "Joyería de oro laminado hecha por manos colombianas",
   whatsapp: "573017780779",

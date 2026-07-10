@@ -1,25 +1,45 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import Hero from "@/components/Hero";
 import Reveal from "@/components/anim/Reveal";
 import ProductCard from "@/components/ProductCard";
-import CategoryCard from "@/components/CategoryCard";
-import StatsCounter from "@/components/StatsCounter";
-import { getAllCategories, getFeatured } from "@/lib/catalog";
+import CategoryCarousel from "@/components/CategoryCarousel";
+import ArtisanCarousel from "@/components/ArtisanCarousel";
+import { getAllCategories, getFeatured, getPromos } from "@/lib/catalog";
 
 // Regenera la página estática cada hora (catálogo fresco sin sacrificar velocidad).
 export const revalidate = 3600;
 
 export default async function Home() {
-  const [categories, featured] = await Promise.all([
+  const [categories, featured, promos] = await Promise.all([
     getAllCategories(),
     getFeatured(8),
+    getPromos(8),
   ]);
 
   return (
     <>
       <Hero />
+
+      {/* Promociones (se activan por producto desde /admin) */}
+      {promos.length > 0 && (
+        <section id="promociones" className="scroll-mt-24 bg-accent/10 py-16 md:py-20">
+          <div className="mx-auto max-w-7xl px-5 md:px-8">
+            <Reveal>
+              <div className="mb-10 text-center">
+                <p className="eyebrow mb-3">Por tiempo limitado</p>
+                <h2 className="text-4xl md:text-5xl">Promociones</h2>
+              </div>
+            </Reveal>
+
+            <div className="grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4">
+              {promos.map((p, i) => (
+                <ProductCard key={p.slug} product={p} index={i} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Categorías */}
       <section className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-28">
@@ -38,14 +58,8 @@ export default async function Home() {
             </Link>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {categories.map((c) => (
-              <CategoryCard
-                key={c.slug}
-                category={c}
-                className="rv aspect-[3/4]"
-              />
-            ))}
+          <div className="rv">
+            <CategoryCarousel categories={categories} />
           </div>
         </Reveal>
       </section>
@@ -72,15 +86,7 @@ export default async function Home() {
       <section className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-28">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <Reveal y={50}>
-            <div className="relative aspect-[4/5] overflow-hidden rounded-3xl">
-              <Image
-                src="https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?auto=format&fit=crop&w=1200&q=80"
-                alt="Artesanía TreeGold"
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
-              />
-            </div>
+            <ArtisanCarousel />
           </Reveal>
 
           <Reveal childSelector=".rv" stagger={0.14} y={30}>
@@ -103,13 +109,6 @@ export default async function Home() {
               </Link>
             </div>
           </Reveal>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="border-y border-border bg-background py-16 md:py-20">
-        <div className="mx-auto max-w-6xl px-5 md:px-8">
-          <StatsCounter />
         </div>
       </section>
 

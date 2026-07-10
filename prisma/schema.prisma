@@ -43,6 +43,7 @@ model Product {
   // Manejo de visibilidad (Arquitectura Multi-Tienda)
   isRetail      Boolean  @default(true)  // ¿Se ve en la tienda pública?
   isWholesale   Boolean  @default(false) // ¿Se ve en el enlace secreto?
+  isPromo       Boolean  @default(false) // ¿Aparece en la sección de promociones de la home?
   
   // Precios
   retailPrice   Float

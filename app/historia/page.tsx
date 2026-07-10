@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
+import { Playfair_Display } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/anim/Reveal";
 import StatsCounter from "@/components/StatsCounter";
+
+// Esta página usa su propia serif (distinta del Marcellus global) para darle
+// un aire más editorial a la historia de la marca.
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Historia",
@@ -23,7 +32,7 @@ export default function HistoriaPage() {
       <section className="mx-auto max-w-4xl px-5 py-16 text-center md:px-8">
         <Reveal childSelector=".rv" stagger={0.12}>
           <p className="rv eyebrow mb-4">Nuestra historia</p>
-          <h1 className="rv text-5xl leading-tight md:text-7xl">
+          <h1 className={`rv text-5xl leading-tight md:text-7xl ${playfair.className}`}>
             Tradición convertida en joya
           </h1>
           <p className="rv mx-auto mt-6 max-w-2xl text-lg text-secondary leading-relaxed">
@@ -54,7 +63,7 @@ export default function HistoriaPage() {
             {values.map((v) => (
               <div key={v.title} className="rv">
                 <div className="mb-4 h-px w-12 bg-accent" />
-                <h3 className="text-2xl">{v.title}</h3>
+                <h3 className={`text-2xl ${playfair.className}`}>{v.title}</h3>
                 <p className="mt-3 text-secondary leading-relaxed">{v.text}</p>
               </div>
             ))}
@@ -72,7 +81,7 @@ export default function HistoriaPage() {
       {/* CTA */}
       <section className="mx-auto max-w-3xl px-5 py-24 text-center">
         <Reveal childSelector=".rv" stagger={0.12}>
-          <h2 className="rv text-4xl md:text-5xl">¿Hacemos tu joya juntos?</h2>
+          <h2 className={`rv text-4xl md:text-5xl ${playfair.className}`}>¿Hacemos tu joya juntos?</h2>
           <p className="rv mx-auto mt-5 max-w-lg text-secondary">
             Cuéntanos qué tienes en mente y lo convertimos en una pieza única.
           </p>

@@ -20,6 +20,7 @@ export type ProductFormValues = {
   images: string[];
   isRetail: boolean;
   isWholesale: boolean;
+  isPromo: boolean;
 };
 
 const EMPTY: ProductFormValues = {
@@ -35,6 +36,7 @@ const EMPTY: ProductFormValues = {
   images: [],
   isRetail: true,
   isWholesale: false,
+  isPromo: false,
 };
 
 export default function ProductForm({
@@ -186,7 +188,7 @@ export default function ProductForm({
         </div>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex flex-wrap gap-x-6 gap-y-3">
         <label className="flex items-center gap-2 text-sm font-medium text-primary">
           <input
             type="checkbox"
@@ -204,6 +206,15 @@ export default function ProductForm({
             className="h-4 w-4 cursor-pointer accent-accent"
           />
           Visible en mayoristas
+        </label>
+        <label className="flex items-center gap-2 text-sm font-medium text-primary">
+          <input
+            type="checkbox"
+            checked={values.isPromo}
+            onChange={(e) => set("isPromo", e.target.checked)}
+            className="h-4 w-4 cursor-pointer accent-accent"
+          />
+          En promoción (aparece en la home)
         </label>
       </div>
 

@@ -31,6 +31,13 @@ export default function imageLoader({ src, width, quality }: LoaderArgs): string
   //      w_<width>   -> ancho que pide el navegador según el "sizes"
   //      c_limit     -> nunca agranda más allá del original (cuida la calidad)
   if (src.includes("res.cloudinary.com") && src.includes("/upload/")) {
+    // Fotos editoriales de marca (treegold/marca/): modelos, taller, banners.
+    // No traen franja de precios, así que NO se les aplica la limpieza de
+    // catálogo — solo la optimización de entrega.
+    if (src.includes("/treegold/marca/")) {
+      const transforms = `f_auto,q_auto:good,w_${width},c_limit`;
+      return src.replace("/upload/", `/upload/${transforms}/`);
+    }
     const transforms = `c_crop,g_north,h_0.75/e_trim/c_pad,ar_1:1,b_white/f_auto,q_auto:good,w_${width},c_limit`;
     return src.replace("/upload/", `/upload/${transforms}/`);
   }
