@@ -90,18 +90,15 @@ export default async function Home() {
           </Reveal>
 
           <Reveal childSelector=".rv" stagger={0.14} y={30}>
-            <p className="rv eyebrow mb-4">Hechas a mano</p>
+            <p className="rv eyebrow mb-4">Nuestra historia</p>
             <h2 className="rv text-4xl leading-tight md:text-5xl">
-              El arte detrás de cada joya
+              Lorem ipsum dolor sit amet
             </h2>
             <p className="rv mt-6 text-secondary leading-relaxed">
-              En TreeGold cada pieza se hace a mano en nuestro taller, en oro
-              laminado y plata 925, cuidando cada detalle del diseño y el
-              acabado.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula.
             </p>
             <p className="rv mt-4 text-secondary leading-relaxed">
-              No producimos en serie: cada pieza pasa por nuestros joyeros antes
-              de llegar a ti.
+              Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor.
             </p>
             <div className="rv mt-8">
               <Link href="/historia" className="btn-outline">

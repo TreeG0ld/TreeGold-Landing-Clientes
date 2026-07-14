@@ -21,6 +21,7 @@ export type ProductFormValues = {
   isRetail: boolean;
   isWholesale: boolean;
   isPromo: boolean;
+  originalPrice: string;
 };
 
 const EMPTY: ProductFormValues = {
@@ -37,6 +38,7 @@ const EMPTY: ProductFormValues = {
   isRetail: true,
   isWholesale: false,
   isPromo: false,
+  originalPrice: "",
 };
 
 export default function ProductForm({
@@ -168,6 +170,17 @@ export default function ProductForm({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-primary">
+            Precio anterior (originalPrice - para promos)
+          </label>
+          <input
+            type="number"
+            value={values.originalPrice}
+            onChange={(e) => set("originalPrice", e.target.value)}
+            className="w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-accent"
+          />
+        </div>
         <div>
           <label className="mb-1.5 block text-sm font-medium text-primary">Material</label>
           <input

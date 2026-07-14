@@ -72,15 +72,27 @@ export default function ProductCard({
 
         <div className="mt-4 px-1">
           <div className="flex items-baseline justify-between gap-3">
-            <h3 className="font-serif text-xl leading-tight transition-colors duration-300 group-hover:text-accent">
+            <h3 className="font-serif text-xl leading-tight transition-colors duration-300 group-hover:text-accent truncate pr-2">
               {product.name}
             </h3>
-            <span className="shrink-0 text-sm font-medium text-secondary">
-              {formatCOP(product.price)}
-            </span>
+            <div className="flex flex-col items-end">
+              <span className="shrink-0 text-sm font-medium text-secondary">
+                {formatCOP(product.price)}
+              </span>
+              {product.isPromo && product.originalPrice && product.originalPrice > product.price && (
+                <span className="text-xs text-secondary/50 line-through decoration-destructive/40">
+                  {formatCOP(product.originalPrice)}
+                </span>
+              )}
+            </div>
           </div>
           <p className="mt-1 text-xs uppercase tracking-wide text-secondary/60">
             {[product.material, product.size].filter(Boolean).join(" · ")}
+            {product.isPromo && product.originalPrice && product.originalPrice > product.price && (
+              <span className="ml-2 font-semibold text-destructive">
+                -{Math.round((1 - product.price / product.originalPrice) * 100)}%
+              </span>
+            )}
           </p>
         </div>
       </Link>

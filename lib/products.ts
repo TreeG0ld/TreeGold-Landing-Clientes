@@ -12,6 +12,8 @@ export type Product = {
   name: string;
   category: string; // category slug
   price: number; // COP, referencial
+  originalPrice?: number;
+  isPromo?: boolean;
   material: string;
   gemstone?: string;
   description: string;

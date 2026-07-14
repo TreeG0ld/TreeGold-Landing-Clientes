@@ -47,6 +47,7 @@ model Product {
   
   // Precios
   retailPrice   Float
+  originalPrice Float?   // Precio original antes de la promoción (para calcular % descuento)
   wholesalePrice Float?
   
   // Inventario y Características

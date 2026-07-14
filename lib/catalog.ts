@@ -15,6 +15,8 @@ type DbProduct = {
   name: string;
   description: string;
   retailPrice: number;
+  originalPrice: number | null;
+  isPromo: boolean;
   material: string | null;
   size: string | null;
   images: string[];
@@ -35,6 +37,8 @@ function toUiProduct(p: DbProduct): Product {
     name: p.name,
     category: p.category.slug,
     price: p.retailPrice,
+    originalPrice: p.originalPrice ?? undefined,
+    isPromo: p.isPromo,
     material: p.material ?? "",
     size: p.size ?? undefined,
     description,
@@ -52,6 +56,8 @@ function toListProduct(p: {
   slug: string;
   name: string;
   retailPrice: number;
+  originalPrice: number | null;
+  isPromo: boolean;
   material: string | null;
   size: string | null;
   images: string[];
@@ -62,6 +68,8 @@ function toListProduct(p: {
     name: p.name,
     category: p.category.slug,
     price: p.retailPrice,
+    originalPrice: p.originalPrice ?? undefined,
+    isPromo: p.isPromo,
     material: p.material ?? "",
     size: p.size ?? undefined,
     description: "",
@@ -77,6 +85,8 @@ export async function getAllProducts(): Promise<Product[]> {
       slug: true,
       name: true,
       retailPrice: true,
+      originalPrice: true,
+      isPromo: true,
       material: true,
       size: true,
       images: true,
@@ -124,6 +134,8 @@ export const getCatalogPage = unstable_cache(
           slug: true,
           name: true,
           retailPrice: true,
+          originalPrice: true,
+          isPromo: true,
           material: true,
           size: true,
           images: true,

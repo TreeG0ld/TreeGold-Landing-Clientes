@@ -39,33 +39,33 @@ export default function Hero() {
       ref={root}
       className="relative flex min-h-[70svh] flex-col items-center justify-center gap-10 overflow-hidden bg-black px-5 pb-20 pt-24 md:min-h-[80svh]"
     >
-      {/* El banner trae fondo negro: con object-contain se ve completo en
-          cualquier pantalla y se funde con el fondo de la sección. */}
-      <div className="hero-img relative w-full max-w-6xl">
+      {/* El banner como fondo completo */}
+      <div className="hero-img absolute inset-0 z-0">
         <Image
           src={BANNER}
           alt="TreeGold Joyería — Tú mereces brillar"
-          width={1280}
-          height={547}
+          fill
           priority
-          sizes="(max-width: 1280px) 100vw, 1152px"
-          className="h-auto w-full object-contain"
+          sizes="100vw"
+          className="object-cover"
         />
+        {/* Oscurecemos un poco la parte inferior para asegurar que los botones se lean bien */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
       </div>
 
-      <div className="hero-fade flex w-full max-w-md flex-col items-center justify-center gap-3 sm:flex-row">
+      <div className="hero-fade relative z-10 mt-auto flex w-full max-w-md flex-col items-center justify-center gap-3 sm:flex-row">
         <Link href="/coleccion" className="btn-primary w-full text-center sm:w-auto">
           Explorar colección
         </Link>
         <Link
           href="/historia"
-          className="w-full rounded-full border border-white/40 px-7 py-3.5 text-center text-sm font-medium tracking-wide text-white transition-all duration-300 ease-luxe hover:border-white hover:bg-white/10 sm:w-auto"
+          className="w-full rounded-full border border-white/40 bg-black/40 px-7 py-3.5 text-center text-sm font-medium tracking-wide text-white backdrop-blur-sm transition-all duration-300 ease-luxe hover:border-white hover:bg-white/20 sm:w-auto"
         >
           Nuestra historia
         </Link>
       </div>
 
-      <div className="hero-scroll absolute bottom-6 left-1/2 -translate-x-1/2 text-white/70">
+      <div className="hero-scroll absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-white/80">
         <ChevronDown className="h-7 w-7 animate-float-slow" />
       </div>
     </section>

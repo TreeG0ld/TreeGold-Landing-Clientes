@@ -22,6 +22,7 @@ export type ValidatedProduct = {
   isRetail: boolean;
   isWholesale: boolean;
   isPromo: boolean;
+  originalPrice: number | null;
   categoryId: string;
 };
 
@@ -70,6 +71,15 @@ export function validateProductPayload(body: unknown): ValidationResult {
     }
   }
 
+  // originalPrice opcional para promos
+  let originalPrice: number | null = null;
+  if (b.originalPrice !== "" && b.originalPrice != null) {
+    originalPrice = parsePrice(b.originalPrice);
+    if (originalPrice === null) {
+      return { ok: false, error: "El precio original (antes de promo) debe ser un número válido (≥ 0)." };
+    }
+  }
+
   const isRetail = Boolean(b.isRetail);
   const isWholesale = Boolean(b.isWholesale);
   const isPromo = Boolean(b.isPromo);
@@ -103,6 +113,7 @@ export function validateProductPayload(body: unknown): ValidationResult {
       description,
       retailPrice,
       wholesalePrice,
+      originalPrice,
       stock,
       material,
       size,
