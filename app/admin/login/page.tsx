@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -35,7 +37,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-background px-5">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-5">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-sm rounded-2xl border border-border bg-white p-8 shadow-sm"
@@ -78,6 +80,13 @@ export default function AdminLoginPage() {
           {loading ? "Entrando..." : "Entrar"}
         </button>
       </form>
+
+      <Link
+        href="/"
+        className="mt-6 flex items-center gap-1.5 text-sm text-secondary transition-colors hover:text-primary"
+      >
+        <ArrowLeft className="h-4 w-4" /> Volver a la tienda
+      </Link>
     </div>
   );
 }

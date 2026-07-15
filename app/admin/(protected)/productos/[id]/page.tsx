@@ -35,6 +35,7 @@ export default async function EditarProductoPage({
           isRetail: product.isRetail,
           isWholesale: product.isWholesale,
           isPromo: product.isPromo,
+          originalPrice: product.originalPrice != null ? String(product.originalPrice) : "",
         }}
       />
     </div>

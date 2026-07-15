@@ -14,7 +14,7 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 // treegold/marca/ (carpeta exenta del recorte de catálogo en imageLoader).
 // Como la imagen ya trae el texto, el hero no superpone título: solo botones.
 const BANNER =
-  "https://res.cloudinary.com/dkab59i18/image/upload/v1783709789/treegold/marca/hero-banner.jpg";
+  "https://res.cloudinary.com/dkab59i18/image/upload/v1784118180/treegold/marca/hero-banner-v2.png";
 
 export default function Hero() {
   const root = useRef<HTMLDivElement>(null);

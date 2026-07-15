@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import ProductsTable from "@/components/admin/ProductsTable";
+import GlassSelect from "@/components/admin/GlassSelect";
 
 const PER_PAGE = 30;
 
@@ -61,16 +62,16 @@ export default async function ProductosPage({
           placeholder="Buscar por nombre o código..."
           className="flex-1 min-w-[220px] rounded-xl border border-border px-4 py-2.5 text-base md:text-sm outline-none focus:border-accent"
         />
-        <select
+        <GlassSelect
           name="categoria"
-          defaultValue={categoryId}
-          className="rounded-xl border border-border px-4 py-2.5 text-base md:text-sm outline-none focus:border-accent"
-        >
-          <option value="">Todas las categorías</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
+          value={categoryId}
+          submitOnChange
+          className="w-56"
+          options={[
+            { value: "", label: "Todas las categorías" },
+            ...categories.map((c) => ({ value: c.id, label: c.name })),
+          ]}
+        />
         <button type="submit" className="btn-outline">Filtrar</button>
       </form>
 

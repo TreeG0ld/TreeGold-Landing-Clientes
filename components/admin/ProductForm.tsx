@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUploader from "@/components/admin/ImageUploader";
+import GlassSelect from "@/components/admin/GlassSelect";
 
 export type CategoryOption = { id: string; name: string; slug: string };
 
@@ -41,6 +42,37 @@ const EMPTY: ProductFormValues = {
   originalPrice: "",
 };
 
+// Tallas/medidas estándar según la categoría (por slug). Las categorías que
+// no aparecen aquí (aretes, candongas, topos, dijes, herrajes, set…) son de
+// talla única. La opción "Otra…" abre un campo libre: los productos antiguos
+// tienen valores como "Talla 7, 8, 9" que no están en estas listas y no se
+// deben perder al editarlos.
+const RING_SIZES = [
+  "Talla 4", "Talla 5", "Talla 6", "Talla 7", "Talla 8",
+  "Talla 9", "Talla 10", "Talla 11", "Talla 12",
+  "Talla graduable (ajustable)",
+];
+const BRACELET_SIZES = ["16 cm", "17 cm", "18 cm", "19 cm", "20 cm", "Graduable (ajustable)"];
+
+const SIZE_OPTIONS_BY_CATEGORY: Record<string, string[]> = {
+  "anillos": RING_SIZES,
+  "anillos-tejidos": RING_SIZES,
+  "cadenas-mujer": ["40 cm", "45 cm", "50 cm"],
+  "cadenas-hombre": ["55 cm", "60 cm", "65 cm", "70 cm"],
+  "pulseras": BRACELET_SIZES,
+  "manillas-tejidas": BRACELET_SIZES,
+  "tobilleras": ["22 cm", "24 cm", "25 cm", "Graduable (ajustable)"],
+  "rosarios": ["50 cm", "55 cm", "60 cm"],
+};
+
+const SINGLE_SIZE = "Talla única";
+// Valor centinela del <option> "Otra…" (nunca se guarda como talla).
+const CUSTOM_SIZE = "__otra__";
+
+function sizeOptionsFor(categorySlug: string): string[] {
+  return SIZE_OPTIONS_BY_CATEGORY[categorySlug] ?? [SINGLE_SIZE];
+}
+
 export default function ProductForm({
   categories,
   initialValues,
@@ -58,6 +90,48 @@ export default function ProductForm({
 
   const set = <K extends keyof ProductFormValues>(key: K, value: ProductFormValues[K]) =>
     setValues((v) => ({ ...v, [key]: value }));
+
+  const categorySlug =
+    categories.find((c) => c.id === values.categoryId)?.slug ?? "";
+  const sizeOptions = sizeOptionsFor(categorySlug);
+
+  // "Otra…": modo texto libre para tallas que no están en la lista estándar
+  // (arranca activo si el producto que se edita trae un valor legado).
+  const [customSize, setCustomSize] = useState<boolean>(() => {
+    const init = initialValues ?? EMPTY;
+    const slug =
+      categories.find((c) => c.id === (init.categoryId || categories[0]?.id))?.slug ?? "";
+    return Boolean(init.size) && !sizeOptionsFor(slug).includes(init.size);
+  });
+
+  // Al cambiar de categoría se limpia la talla si ya no aplica: las opciones
+  // son distintas por categoría y una talla de anillo no tiene sentido en
+  // una cadena.
+  const handleCategoryChange = (categoryId: string) => {
+    const slug = categories.find((c) => c.id === categoryId)?.slug ?? "";
+    const opts = sizeOptionsFor(slug);
+    setCustomSize(false);
+    setValues((v) => ({
+      ...v,
+      categoryId,
+      size:
+        opts.length === 1 && opts[0] === SINGLE_SIZE
+          ? SINGLE_SIZE
+          : opts.includes(v.size)
+            ? v.size
+            : "",
+    }));
+  };
+
+  const handleSizeSelect = (value: string) => {
+    if (value === CUSTOM_SIZE) {
+      setCustomSize(true);
+      set("size", "");
+    } else {
+      setCustomSize(false);
+      set("size", value);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,16 +195,11 @@ export default function ProductForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className="mb-1.5 block text-sm font-medium text-primary">Categoría</label>
-          <select
+          <GlassSelect
             value={values.categoryId}
-            onChange={(e) => set("categoryId", e.target.value)}
-            required
-            className="w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-accent"
-          >
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
+            onChange={handleCategoryChange}
+            options={categories.map((c) => ({ value: c.id, label: c.name }))}
+          />
         </div>
         <div>
           <label className="mb-1.5 block text-sm font-medium text-primary">Stock</label>
@@ -146,7 +215,7 @@ export default function ProductForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className="mb-1.5 block text-sm font-medium text-primary">
-            Precio de costo (wholesale)
+            Precio para Mayoristas
           </label>
           <input
             type="number"
@@ -157,7 +226,7 @@ export default function ProductForm({
         </div>
         <div>
           <label className="mb-1.5 block text-sm font-medium text-primary">
-            Precio de venta (retail)
+            Precio de venta (tienda pública)
           </label>
           <input
             type="number"
@@ -171,17 +240,6 @@ export default function ProductForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-primary">
-            Precio anterior (originalPrice - para promos)
-          </label>
-          <input
-            type="number"
-            value={values.originalPrice}
-            onChange={(e) => set("originalPrice", e.target.value)}
-            className="w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-accent"
-          />
-        </div>
-        <div>
           <label className="mb-1.5 block text-sm font-medium text-primary">Material</label>
           <input
             value={values.material}
@@ -192,12 +250,24 @@ export default function ProductForm({
         </div>
         <div>
           <label className="mb-1.5 block text-sm font-medium text-primary">Medida / talla</label>
-          <input
-            value={values.size}
-            onChange={(e) => set("size", e.target.value)}
-            placeholder="Talla 7, 8, 9 / 45 cm..."
-            className="w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-accent"
+          <GlassSelect
+            value={customSize ? CUSTOM_SIZE : values.size}
+            onChange={handleSizeSelect}
+            placeholder="Selecciona una medida…"
+            options={[
+              ...sizeOptions.map((o) => ({ value: o, label: o })),
+              { value: CUSTOM_SIZE, label: "Otra…" },
+            ]}
           />
+          {customSize && (
+            <input
+              value={values.size}
+              onChange={(e) => set("size", e.target.value)}
+              placeholder='Ej: "Talla 7, 8, 9" o "48 cm"'
+              autoFocus
+              className="mt-2 w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-accent"
+            />
+          )}
         </div>
       </div>
 
@@ -224,12 +294,37 @@ export default function ProductForm({
           <input
             type="checkbox"
             checked={values.isPromo}
-            onChange={(e) => set("isPromo", e.target.checked)}
+            onChange={(e) =>
+              // Al quitar la promo se limpia el precio anterior para no
+              // guardar un descuento huérfano.
+              setValues((v) => ({
+                ...v,
+                isPromo: e.target.checked,
+                originalPrice: e.target.checked ? v.originalPrice : "",
+              }))
+            }
             className="h-4 w-4 cursor-pointer accent-accent"
           />
           En promoción (aparece en la home)
         </label>
       </div>
+
+      {values.isPromo && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-primary">
+              Precio anterior (para mostrar el descuento)
+            </label>
+            <input
+              type="number"
+              value={values.originalPrice}
+              onChange={(e) => set("originalPrice", e.target.value)}
+              placeholder="Precio antes de la promoción"
+              className="w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-accent"
+            />
+          </div>
+        </div>
+      )}
 
       <div>
         <label className="mb-1.5 block text-sm font-medium text-primary">Imágenes</label>
