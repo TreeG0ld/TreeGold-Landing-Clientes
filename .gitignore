@@ -17,3 +17,10 @@ next-env.d.ts
 # Imágenes de productos descargadas de Drive (no se suben al repo)
 /fotos
 /scripts/seed-report.json
+
+# Artefactos generados / binarios que no van al repo
+tsconfig.tsbuildinfo
+*.exe
+cloudflared*
+# Imágenes fuente de diseño (se suben a Cloudinary, no al repo)
+treeHero*
