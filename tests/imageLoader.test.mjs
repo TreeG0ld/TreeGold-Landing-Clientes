@@ -64,3 +64,23 @@ test("Cloudinary sin /upload/ no se transforma (caso límite)", () => {
   const weird = "https://res.cloudinary.com/dkab59i18/raw/v1/x.jpg";
   assert.equal(loader({ src: weird, width: 400 }), weird);
 });
+
+test("Fotos nuevas (treegold/admin/): sin recorte de precio ni zoom, solo optimización", () => {
+  const NEW =
+    "https://res.cloudinary.com/dkab59i18/image/upload/v1784000000/treegold/admin/abc123.jpg";
+  const url = loader({ src: NEW, width: 400 });
+  assert.ok(!url.includes("c_crop"), "no debe recortar");
+  assert.ok(!url.includes("e_trim"), "no debe recortar el marco");
+  assert.ok(!url.includes("c_pad"), "no debe forzar cuadrado");
+  assert.equal(url, NEW.replace("/upload/", "/upload/f_auto,q_auto:good,w_400,c_limit/"));
+});
+
+test("Fotos antiguas (cualquier otra carpeta de treegold/): mantienen el recorte de siempre", () => {
+  for (const folder of ["anillos", "cadenas", "rosarios", "cualquier-cosa-nueva"]) {
+    const url = loader({
+      src: `https://res.cloudinary.com/dkab59i18/image/upload/v1/treegold/${folder}/x.jpg`,
+      width: 400,
+    });
+    assert.ok(url.includes("c_crop,g_north,h_0.75"), `${folder} debe seguir recortando`);
+  }
+});

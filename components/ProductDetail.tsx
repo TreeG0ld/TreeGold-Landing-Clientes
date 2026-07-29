@@ -67,13 +67,13 @@ export default function ProductDetail({ product }: { product: Product }) {
           </div>
 
           {product.images.length > 1 && (
-            <div className="mt-4 flex gap-3">
+            <div className="mt-4 flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {product.images.map((img, i) => (
                 <button
                   key={img}
                   onClick={() => setActive(i)}
                   aria-label={`Ver imagen ${i + 1}`}
-                  className={`relative h-20 w-20 overflow-hidden rounded-xl transition-all duration-300 cursor-pointer ${
+                  className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-xl transition-all duration-300 cursor-pointer ${
                     active === i
                       ? "ring-2 ring-accent ring-offset-2 ring-offset-background"
                       : "opacity-60 hover:opacity-100"

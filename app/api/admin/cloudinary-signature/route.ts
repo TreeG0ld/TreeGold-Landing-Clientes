@@ -10,6 +10,10 @@ import { requireAdminApi } from "@/lib/admin-auth";
 // una sesión de admin se vea comprometida, la firma solo autoriza subir
 // imágenes (no SVG ni ejecutables) a la carpeta del negocio, nunca a una
 // carpeta arbitraria de la cuenta de Cloudinary.
+// OJO: lib/imageLoader.ts usa esta MISMA carpeta para saber qué fotos son
+// "nuevas" (ya vienen bien encuadradas, sin recorte de precio) y cuáles son
+// el lote histórico que sí necesita el recorte automático. Si esta carpeta
+// cambia, hay que actualizar también imageLoader.ts.
 const UPLOAD_FOLDER = "treegold/admin";
 const ALLOWED_FORMATS = "jpg,jpeg,png,webp,heic,avif";
 

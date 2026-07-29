@@ -46,7 +46,13 @@ export default function Hero() {
           alt="TreeGold Joyería — Tú mereces brillar"
           fill
           priority
-          sizes="100vw"
+          // El banner es muy panorámico (2.34:1). En celular el hero es alto
+          // y angosto (retrato), así que object-cover recorta casi todo el
+          // ancho para llenar el alto: la porción visible necesita mucha más
+          // resolución que el simple ancho de pantalla, o se ve pixelada.
+          // Le pedimos al navegador una imagen más grande de lo que el
+          // viewport sugiere para compensar ese recorte tan agresivo.
+          sizes="(max-width: 767px) 350vw, 100vw"
           className="object-cover"
         />
         {/* Oscurecemos un poco la parte inferior para asegurar que los botones se lean bien */}

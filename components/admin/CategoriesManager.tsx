@@ -85,7 +85,7 @@ export default function CategoriesManager({ categories }: { categories: Category
 
       {error && <p className="mb-4 text-sm text-destructive">{error}</p>}
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-white">
+      <div className="overflow-x-auto rounded-2xl border border-border bg-white">
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-muted/40 text-left text-xs uppercase tracking-wide text-secondary">
             <tr>

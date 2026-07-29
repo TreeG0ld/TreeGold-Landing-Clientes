@@ -26,14 +26,16 @@ export default async function PerfilPage() {
       <h1 className="font-serif text-3xl text-primary md:text-4xl mb-8">Mi Perfil</h1>
       
       <div className="rounded-2xl border border-border bg-white p-6 md:p-10 shadow-sm">
-        <div className="flex justify-between items-start mb-8 border-b border-border pb-8">
-          <div>
+        <div className="flex flex-col gap-4 mb-8 border-b border-border pb-8 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
             <h2 className="text-xl font-medium text-primary mb-2">Datos Personales</h2>
             <p className="text-secondary"><strong className="text-primary">Nombre:</strong> {user.name}</p>
-            <p className="text-secondary"><strong className="text-primary">Email:</strong> {user.email}</p>
+            <p className="text-secondary break-words"><strong className="text-primary">Email:</strong> {user.email}</p>
             <p className="text-secondary"><strong className="text-primary">Rol:</strong> {user.role === "ADMIN" ? "Administrador" : "Cliente"}</p>
           </div>
-          <LogoutButton />
+          <div className="shrink-0">
+            <LogoutButton />
+          </div>
         </div>
 
         {user.role === "ADMIN" && (

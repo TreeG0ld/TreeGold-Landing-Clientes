@@ -31,10 +31,17 @@ export default function imageLoader({ src, width, quality }: LoaderArgs): string
   //      w_<width>   -> ancho que pide el navegador según el "sizes"
   //      c_limit     -> nunca agranda más allá del original (cuida la calidad)
   if (src.includes("res.cloudinary.com") && src.includes("/upload/")) {
-    // Fotos editoriales de marca (treegold/marca/): modelos, taller, banners.
-    // No traen franja de precios, así que NO se les aplica la limpieza de
-    // catálogo — solo la optimización de entrega.
-    if (src.includes("/treegold/marca/")) {
+    // Fotos que NO necesitan el recorte de catálogo (limpieza de precio):
+    //   - treegold/marca/  -> editoriales de marca (modelos, taller, banners).
+    //   - treegold/admin/  -> productos subidos desde el panel /admin. Toda
+    //     subida nueva pasa por /api/admin/cloudinary-signature, que fija esa
+    //     carpeta de forma fija (ver esa ruta) — así que cualquier foto que
+    //     caiga ahí es, por definición, una foto nueva ya encuadrada
+    //     correctamente. No hace falta marcar nada a mano: es automático.
+    //   Todo lo demás (treegold/anillos, treegold/cadenas, ...) es el lote
+    //   histórico importado del catálogo del proveedor, que sí trae la franja
+    //   de precio y necesita el recorte + cuadrado de siempre.
+    if (src.includes("/treegold/marca/") || src.includes("/treegold/admin/")) {
       const transforms = `f_auto,q_auto:good,w_${width},c_limit`;
       return src.replace("/upload/", `/upload/${transforms}/`);
     }
