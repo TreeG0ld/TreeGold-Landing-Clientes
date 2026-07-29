@@ -21,14 +21,16 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
         />
       </div>
       <div className="mt-4 px-1">
-        <div className="flex items-baseline justify-between gap-3">
-          <h3 className="font-serif text-xl leading-tight">{product.name}</h3>
+        <div className="flex items-baseline justify-between gap-2">
+          <h3 className="min-w-0 truncate font-serif text-sm leading-tight pr-1 sm:text-base">
+            {product.name}
+          </h3>
           <div className="shrink-0 text-right">
-            <span className="block text-sm font-medium text-secondary">
+            <span className="block whitespace-nowrap text-xs font-medium text-secondary sm:text-sm">
               {formatCOP(product.price)}
             </span>
-            <span className="block text-xs text-secondary/60">
-              Sugerido venta: {formatCOP(product.retailPrice)}
+            <span className="block whitespace-nowrap text-[0.65rem] text-secondary/60 sm:text-xs">
+              Sugerido: {formatCOP(product.retailPrice)}
             </span>
           </div>
         </div>
