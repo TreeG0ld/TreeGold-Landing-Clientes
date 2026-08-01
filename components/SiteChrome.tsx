@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import WhatsAppFAB from "@/components/WhatsAppFAB";
 import SelectionDrawer from "@/components/SelectionDrawer";
 import FlyToCart from "@/components/FlyToCart";
@@ -10,7 +9,17 @@ import FlyToCart from "@/components/FlyToCart";
 // El panel /admin tiene su propia navegación (AdminNav) y no debe mostrar
 // el navbar/footer/FAB de la tienda pública. La tienda mayorista
 // (/mayoristas-<código>) es una página discreta sin marca: tampoco los lleva.
-export default function SiteChrome({ children }: { children: React.ReactNode }) {
+//
+// El pie de página llega como prop desde el layout (no se importa aquí) porque
+// no necesita interactividad: así se queda renderizado en el servidor en vez
+// de viajar como JavaScript al navegador en cada página.
+export default function SiteChrome({
+  children,
+  footer,
+}: {
+  children: React.ReactNode;
+  footer: React.ReactNode;
+}) {
   const pathname = usePathname();
   const isChromeless =
     pathname?.startsWith("/admin") || pathname?.startsWith("/mayoristas-");
@@ -21,7 +30,7 @@ export default function SiteChrome({ children }: { children: React.ReactNode }) 
     <>
       <Navbar />
       <main>{children}</main>
-      <Footer />
+      {footer}
       <WhatsAppFAB />
       <SelectionDrawer />
       <FlyToCart />

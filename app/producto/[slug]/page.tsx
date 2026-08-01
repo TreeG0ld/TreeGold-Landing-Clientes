@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Reveal from "@/components/anim/Reveal";
 import ProductDetail from "@/components/ProductDetail";
 import ProductCard from "@/components/ProductCard";
-import { getProductBySlug, getRelated } from "@/lib/catalog";
+import { getProductBySlug, getRelated, getFeatured, getPromos } from "@/lib/catalog";
 import { formatCOP } from "@/lib/format";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -12,10 +13,20 @@ type Params = { params: Promise<{ slug: string }> };
 // instantáneas), regenerándose cada hora para reflejar cambios de catálogo.
 export const revalidate = 3600;
 
-// Lista vacía: no pre-generamos las 660 en el build, pero habilita el cacheo
-// ISR por slug (la ruta deja de ser 100% dinámica).
+// No pre-generamos las 660 fichas en el build (tardaría demasiado), pero sí
+// las que se alcanzan con un clic desde la home —promociones y destacadas—,
+// que son las más visitadas: su PRIMERA visita ya sale de caché en vez de
+// esperar a la base de datos. El resto se genera bajo demanda con ISR.
 export async function generateStaticParams() {
-  return [];
+  try {
+    const [promos, featured] = await Promise.all([getPromos(8), getFeatured(8)]);
+    const slugs = new Set([...promos, ...featured].map((p) => p.slug));
+    return [...slugs].map((slug) => ({ slug }));
+  } catch {
+    // Si la base de datos no responde durante el build, seguimos generando
+    // todo bajo demanda en vez de tumbar el despliegue.
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
@@ -35,12 +46,54 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   };
 }
 
+// Los relacionados se consultan aparte y se transmiten (streaming) cuando
+// estén listos: la ficha del producto —lo que el cliente vino a ver— se pinta
+// sin esperar a esta segunda consulta.
+async function RelatedProducts({ slug }: { slug: string }) {
+  const related = await getRelated(slug, 4);
+  if (related.length === 0) return null;
+
+  return (
+    <section className="mx-auto max-w-7xl px-5 pb-24 md:px-8">
+      <Reveal>
+        <h2 className="mb-10 text-center text-3xl md:text-4xl">
+          También te puede gustar
+        </h2>
+      </Reveal>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4">
+        {related.map((p, i) => (
+          <ProductCard key={p.slug} product={p} index={i} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Reserva el alto de la sección mientras llega, para que el pie de página no
+// dé un salto cuando entren las tarjetas.
+function RelatedSkeleton() {
+  return (
+    <section className="mx-auto max-w-7xl px-5 pb-24 md:px-8">
+      <div className="skeleton mx-auto mb-10 h-9 w-72 max-w-full" />
+      <div className="grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i}>
+            <div className="skeleton aspect-[4/5] w-full rounded-2xl" />
+            <div className="mt-4 space-y-2 px-1">
+              <div className="skeleton h-5 w-3/4" />
+              <div className="skeleton h-3 w-1/3" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default async function ProductPage({ params }: Params) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) notFound();
-
-  const related = await getRelated(product.category, product.slug, 4);
 
   // JSON-LD para rich results
   const jsonLd = {
@@ -68,20 +121,9 @@ export default async function ProductPage({ params }: Params) {
       />
       <ProductDetail product={product} />
 
-      {related.length > 0 && (
-        <section className="mx-auto max-w-7xl px-5 pb-24 md:px-8">
-          <Reveal>
-            <h2 className="mb-10 text-center text-3xl md:text-4xl">
-              También te puede gustar
-            </h2>
-          </Reveal>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4">
-            {related.map((p, i) => (
-              <ProductCard key={p.slug} product={p} index={i} />
-            ))}
-          </div>
-        </section>
-      )}
+      <Suspense fallback={<RelatedSkeleton />}>
+        <RelatedProducts slug={slug} />
+      </Suspense>
     </>
   );
 }

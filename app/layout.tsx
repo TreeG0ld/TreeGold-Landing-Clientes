@@ -3,6 +3,7 @@ import { Marcellus, Jost } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
 import SiteChrome from "@/components/SiteChrome";
+import Footer from "@/components/Footer";
 
 // Marcellus solo existe en peso 400: los títulos toman su carácter de la
 // propia fuente, no del peso.
@@ -83,7 +84,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-dvh" suppressHydrationWarning>
-        <SiteChrome>{children}</SiteChrome>
+        <SiteChrome footer={<Footer />}>{children}</SiteChrome>
       </body>
     </html>
   );

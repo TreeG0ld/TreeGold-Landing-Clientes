@@ -2,6 +2,7 @@
 // productos/categorías en la MISMA forma que ya usan los componentes,
 // para no tener que reescribir ProductCard, ProductDetail, etc.
 
+import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { site } from "@/lib/site";
@@ -47,7 +48,37 @@ function toUiProduct(p: DbProduct): Product {
   };
 }
 
-const withCategory = { include: { category: true } } as const;
+// Columnas mínimas que necesita una TARJETA de producto (ProductCard).
+// Traer solo esto en los listados evita arrastrar la descripción larga y las
+// fotos extra de cada producto desde la base de datos hasta el navegador.
+const listSelect = {
+  slug: true,
+  name: true,
+  retailPrice: true,
+  originalPrice: true,
+  isPromo: true,
+  material: true,
+  size: true,
+  images: true,
+  category: { select: { slug: true } },
+} as const;
+
+// Columnas de la FICHA de producto: aquí sí hacen falta la descripción y todas
+// las fotos de la galería. `categoryId` se usa para buscar los relacionados
+// entrando directo por el índice, sin volver a tocar la tabla Category.
+const detailSelect = {
+  slug: true,
+  name: true,
+  description: true,
+  retailPrice: true,
+  originalPrice: true,
+  isPromo: true,
+  material: true,
+  size: true,
+  images: true,
+  categoryId: true,
+  category: { select: { slug: true, name: true } },
+} as const;
 
 // Versión ligera para el listado del catálogo: solo lo que pinta la tarjeta.
 // Evita enviar al cliente la descripción larga y las imágenes extra de 660
@@ -81,17 +112,7 @@ function toListProduct(p: {
 export async function getAllProducts(): Promise<Product[]> {
   const rows = await prisma.product.findMany({
     where: { isRetail: true },
-    select: {
-      slug: true,
-      name: true,
-      retailPrice: true,
-      originalPrice: true,
-      isPromo: true,
-      material: true,
-      size: true,
-      images: true,
-      category: { select: { slug: true } },
-    },
+    select: listSelect,
     orderBy: { createdAt: "asc" },
   });
   return rows.map(toListProduct);
@@ -130,17 +151,7 @@ export const getCatalogPage = unstable_cache(
     const [rows, total] = await Promise.all([
       prisma.product.findMany({
         where,
-        select: {
-          slug: true,
-          name: true,
-          retailPrice: true,
-          originalPrice: true,
-          isPromo: true,
-          material: true,
-          size: true,
-          images: true,
-          category: { select: { slug: true } },
-        },
+        select: listSelect,
         orderBy,
         skip: (safePage - 1) * PER_PAGE,
         take: PER_PAGE,
@@ -159,22 +170,35 @@ export const getCatalogPage = unstable_cache(
   { revalidate: 3600, tags: ["catalogo"] }
 );
 
+// La ficha del producto se pide DOS veces por visita: una en
+// `generateMetadata` (título, OG) y otra al renderizar la página. `cache` de
+// React memoiza la consulta dentro de la misma petición, así que la base de
+// datos solo la responde una vez.
+const getProductRow = cache(async (slug: string) =>
+  prisma.product.findUnique({ where: { slug }, select: detailSelect })
+);
+
 export async function getProductBySlug(slug: string): Promise<Product | null> {
-  const p = await prisma.product.findUnique({ where: { slug }, ...withCategory });
+  const p = await getProductRow(slug);
   return p ? toUiProduct(p) : null;
 }
 
-export async function getRelated(
-  categorySlug: string,
-  excludeSlug: string,
-  take = 4
-): Promise<Product[]> {
+// "También te puede gustar": otros productos de la misma categoría.
+// Filtra por `categoryId` (no por el slug de la categoría) y ordena por
+// `createdAt` para que la consulta entre justo por el índice
+// [isRetail, categoryId, createdAt], sin join ni ordenamiento extra.
+// Reutiliza la ficha ya cacheada arriba, así que no cuesta una consulta más.
+export async function getRelated(slug: string, take = 4): Promise<Product[]> {
+  const p = await getProductRow(slug);
+  if (!p) return [];
+
   const rows = await prisma.product.findMany({
-    where: { isRetail: true, category: { slug: categorySlug }, slug: { not: excludeSlug } },
-    ...withCategory,
+    where: { isRetail: true, categoryId: p.categoryId, slug: { not: slug } },
+    select: listSelect,
+    orderBy: { createdAt: "asc" },
     take,
   });
-  return rows.map(toUiProduct);
+  return rows.map(toListProduct);
 }
 
 // Productos marcados "En promoción" desde /admin (Product.isPromo).
@@ -182,21 +206,21 @@ export async function getRelated(
 export async function getPromos(take = 8): Promise<Product[]> {
   const rows = await prisma.product.findMany({
     where: { isRetail: true, isPromo: true },
-    ...withCategory,
+    select: listSelect,
     orderBy: { updatedAt: "desc" },
     take,
   });
-  return rows.map(toUiProduct);
+  return rows.map(toListProduct);
 }
 
 export async function getFeatured(take = 8): Promise<Product[]> {
   const rows = await prisma.product.findMany({
     where: { isRetail: true },
-    ...withCategory,
+    select: listSelect,
     orderBy: { createdAt: "asc" },
     take,
   });
-  return rows.map(toUiProduct);
+  return rows.map(toListProduct);
 }
 
 export const getAllCategories = unstable_cache(

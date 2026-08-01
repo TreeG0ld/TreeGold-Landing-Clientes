@@ -24,6 +24,13 @@ const securityHeaders = [
 const nextConfig = {
   // Paquetes que deben quedar fuera del bundle del servidor (driver de Postgres).
   serverExternalPackages: ["@prisma/client", "@prisma/adapter-pg", "pg"],
+  experimental: {
+    // Estas librerías exportan todo desde un solo índice: sin esto, importar
+    // un icono suelto (`import { Plus } from "lucide-react"`) puede arrastrar
+    // el paquete entero al bundle. Next reescribe cada import para traer solo
+    // lo que se usa.
+    optimizePackageImports: ["lucide-react", "motion", "embla-carousel-react"],
+  },
   images: {
     // Loader propio: optimiza cada imagen (formato, calidad y tamaño)
     // a partir de su URL. Ver lib/imageLoader.ts.
