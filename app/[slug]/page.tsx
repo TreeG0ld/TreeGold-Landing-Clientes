@@ -9,6 +9,7 @@
 // La página es deliberadamente NEUTRA: sin logo, sin nombre de la marca,
 // sin navbar ni footer (ver SiteChrome). Solo el catálogo y los precios.
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ShieldCheck } from "lucide-react";
@@ -18,7 +19,18 @@ import {
   extractWholesaleCode,
   isValidWholesaleCode,
 } from "@/lib/wholesale-auth";
+import { clientIpFromHeaders, rateLimitIp } from "@/lib/client-ip";
+import { rateLimit } from "@/lib/rate-limit";
 import WholesaleProductCard from "@/components/WholesaleProductCard";
+
+// El código es corto y fijo (una sola constante, sin BD detrás), así que sin
+// límite se puede recorrer por fuerza bruta a base de peticiones GET
+// normales, sin necesidad de falsificar nada. 30/10 min por IP: generoso
+// para el uso real (un distribuidor guarda el enlace y lo abre pocas veces
+// al día) pero bastante bajo el ritmo que necesitaría un ataque de fuerza
+// bruta para tener alguna chance contra un secreto de longitud razonable.
+const WHOLESALE_MAX_ATTEMPTS = 30;
+const WHOLESALE_WINDOW_MS = 10 * 60 * 1000;
 
 export const metadata: Metadata = {
   // "absolute" evita la plantilla global ("%s · Joyería TreeGold"):
@@ -52,6 +64,17 @@ export default async function CatchAllPage({
   const { slug } = await params;
 
   const codigo = extractWholesaleCode(slug);
+  // Solo se gasta cupo en slugs que de verdad empiezan por "mayoristas-": el
+  // resto del catch-all (cualquier ruta 404 normal del sitio) no debe
+  // consumir esta cubeta.
+  if (codigo !== null) {
+    const ip = clientIpFromHeaders(await headers());
+    // Fail-closed, igual que en login/registro: sin IP de confianza no hay
+    // límite que valga, así que se rechaza en vez de compartir cubeta.
+    if (!ip) notFound();
+    const limit = rateLimit(`wholesale:ip:${rateLimitIp(ip)}`, WHOLESALE_MAX_ATTEMPTS, WHOLESALE_WINDOW_MS);
+    if (!limit.allowed) notFound();
+  }
   if (!(await isValidWholesaleCode(codigo))) notFound();
 
   const { categoria } = await searchParams;

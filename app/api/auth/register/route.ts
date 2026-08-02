@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/password";
 import { createSessionToken, AUTH_COOKIE, AUTH_SESSION_MAX_AGE_SECONDS } from "@/lib/auth";
 import { rateLimit } from "@/lib/rate-limit";
-import { clientIp } from "@/lib/client-ip";
+import { clientIp, rateLimitIp } from "@/lib/client-ip";
 
 // Límite por IP: lo que evita el alta masiva de cuentas basura y, sobre todo,
 // que alguien recorra una lista de correos para ver cuáles ya están dados de
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const ipLimit = rateLimit(`register:ip:${ip}`, REGISTER_MAX, REGISTER_WINDOW_MS);
+    const ipLimit = rateLimit(`register:ip:${rateLimitIp(ip)}`, REGISTER_MAX, REGISTER_WINDOW_MS);
     if (!ipLimit.allowed) {
       const minutes = Math.max(1, Math.ceil(ipLimit.retryAfterSeconds / 60));
       return NextResponse.json(
@@ -114,7 +114,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: NEUTRAL_CONFLICT }, { status: 409 });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await hashPassword(password);
 
     const newUser = await prisma.user.create({
       data: {

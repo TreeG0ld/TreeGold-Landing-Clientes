@@ -14,12 +14,15 @@ type Params = { params: Promise<{ slug: string }> };
 export const revalidate = 3600;
 
 // No pre-generamos las 660 fichas en el build (tardaría demasiado), pero sí
-// las que se alcanzan con un clic desde la home —promociones y destacadas—,
-// que son las más visitadas: su PRIMERA visita ya sale de caché en vez de
-// esperar a la base de datos. El resto se genera bajo demanda con ISR.
+// las más visitadas: las de promociones/destacadas de la home Y la primera
+// página completa del catálogo (orden por defecto), que es de donde sale la
+// gran mayoría de los clics reales. Su PRIMERA visita ya sale de caché en vez
+// de esperar a la base de datos — antes esto cubría 16 productos, ahora hasta
+// ~48 (24 de la primera página de /coleccion + hasta 24 en promoción). El
+// resto se sigue generando bajo demanda con ISR.
 export async function generateStaticParams() {
   try {
-    const [promos, featured] = await Promise.all([getPromos(8), getFeatured(8)]);
+    const [promos, featured] = await Promise.all([getPromos(24), getFeatured(24)]);
     const slugs = new Set([...promos, ...featured].map((p) => p.slug));
     return [...slugs].map((slug) => ({ slug }));
   } catch {

@@ -10,7 +10,11 @@
 // next dev => 'development'; next build / next start => 'production'.
 // Se ramifica con NODE_ENV a propósito, para no depender de una variable nueva
 // que haya que acordarse de configurar en Vercel.
-const isDev = process.env.NODE_ENV !== "production";
+// Comparación positiva contra "development" (no negativa contra "production"):
+// así, si NODE_ENV llega vacío, mal escrito o con un valor que Next no fija
+// (p.ej. "test", o ausente en algún runtime raro), el resultado es isDev=false
+// y se sirve la CSP estricta de producción — falla cerrado, no abierto.
+const isDev = process.env.NODE_ENV === "development";
 
 // --- Content-Security-Policy ---
 //
@@ -84,33 +88,40 @@ const csp = [
   ...(isDev ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
 
-// Despliegue en dos fases para no tumbar producción por una directiva mal
-// calibrada. Fase 1 (la de ahora): se HACE CUMPLIR solo lo que no puede romper
-// nada —ninguna de estas cuatro afecta a cómo se cargan scripts, estilos ni
-// imágenes—, y la política completa viaja en Report-Only para ver en consola
-// qué se violaría. Fase 2: recorrer el sitio (sobre todo /admin -> subir una
-// imagen, que es el punto de rotura más probable) con `npm run build && npm
-// start`, NO con `next dev`, porque la política de dev es más laxa. Fase 3:
-// tras ~1 semana sin violaciones, borrar cspEnforceMinimal y dejar una sola
-// entrada { key: "Content-Security-Policy", value: csp }.
-const cspEnforceMinimal =
-  "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'";
-
+// Fase 3 del despliegue: la política completa (`csp`) pasa de Report-Only a
+// hacerse cumplir. Ninguna directiva nueva de esta fase restringe scripts,
+// estilos o imágenes más de lo que ya permitían script-src/style-src/img-src
+// en Report-Only (siguen con 'unsafe-inline' donde ya lo tenían) — lo único
+// que cambia es que connect-src, frame-src, worker-src, manifest-src y
+// upgrade-insecure-requests dejan de ser meramente informativos. Verificado
+// contra el único fetch cross-origin real del sitio (ImageUploader ->
+// api.cloudinary.com, cubierto por connect-src) y contra que no hay ningún
+// <iframe> ni Service Worker en el proyecto (frame-src/worker-src 'none').
+// Recomendado igual: probar `npm run build && npm start` contra /admin ->
+// subir una imagen, antes de dar por buena la fase 3 en producción real.
 const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-DNS-Prefetch-Control", value: "on" },
-  {
-    key: "Strict-Transport-Security",
-    value: "max-age=63072000; includeSubDomains; preload",
-  },
+  // Solo en producción: con preload activo, un navegador que alguna vez
+  // recibió esta cabecera fuerza HTTPS en el dominio durante hasta 2 años,
+  // también contra subdominios. Mandarla en desarrollo (donde se navega por
+  // http://localhost) no protege nada y sí puede dejar un dominio de prueba
+  // (p.ej. un túnel de Cloudflare reutilizado) atascado en HTTPS-only.
+  ...(isDev
+    ? []
+    : [
+        {
+          key: "Strict-Transport-Security",
+          value: "max-age=63072000; includeSubDomains; preload",
+        },
+      ]),
   {
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
   },
-  { key: "Content-Security-Policy", value: cspEnforceMinimal },
-  { key: "Content-Security-Policy-Report-Only", value: csp },
+  { key: "Content-Security-Policy", value: csp },
 ];
 
 /** @type {import('next').NextConfig} */

@@ -47,11 +47,30 @@ const BANNER_SRCSET = DESKTOP_WIDTHS.map(
   (w) => `${imageLoader({ src: BANNER, width: w })} ${w}w`
 ).join(", ");
 
+// Srcset de celular: mismas transformaciones de recorte/relleno que
+// BANNER_MOBILE (c_crop + c_pad), solo variando el ancho final del último
+// paso (w_N,c_limit). Antes se servía un único archivo de 1200px a todos los
+// teléfonos; con esto un teléfono de gama baja (~480px de viewport) pide un
+// archivo de ~600px en vez de 1200, y uno grande pide hasta 1600.
+const MOBILE_WIDTHS = [600, 900, 1200, 1600];
+const BANNER_MOBILE_SRCSET = MOBILE_WIDTHS.map(
+  (w) =>
+    `https://res.cloudinary.com/dkab59i18/image/upload/c_crop,g_center,w_3600,h_3280/c_pad,g_north,w_3600,h_4500,b_black/f_auto,q_auto:good,w_${w},c_limit/v1784118180/treegold/marca/hero-banner-v2.png ${w}w`
+).join(", ");
+
 export default function Hero() {
   const root = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
+      // Nada de esto debe dejar el banner invisible si algo sale mal: por
+      // eso los elementos NO empiezan ocultos por CSS (nada de opacity:0 por
+      // defecto en el markup) — quedan visibles de fábrica, y es GSAP quien
+      // decide animarlos. Si el usuario prefiere menos movimiento, o si esta
+      // función nunca llega a ejecutarse (JS lento, bloqueado, error), lo
+      // peor que pasa es que no hay animación: el banner SIGUE viéndose.
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
       tl.from(".hero-img", { scale: 1.06, opacity: 0, duration: 1.6, ease: "power2.out" })
@@ -70,6 +89,13 @@ export default function Hero() {
       ref={root}
       className="relative flex min-h-[70svh] flex-col items-center justify-center gap-10 overflow-hidden bg-black px-5 pb-20 pt-24 md:min-h-[80svh]"
     >
+      {/* El banner ya trae el nombre de la marca como texto incrustado en la
+          imagen, pero eso no cuenta como encabezado para lectores de pantalla
+          ni para SEO: sin esto, la home no tenía ningún <h1> y su esquema de
+          encabezados empezaba en <h2>. sr-only lo saca de la vista sin tocar
+          el diseño. */}
+      <h1 className="sr-only">{"TreeGold Joyería — Tú mereces brillar"}</h1>
+
       {/* El banner como fondo completo */}
       <div className="hero-img absolute inset-0 z-0">
         {/* Por qué <picture> y no dos <Image> de next/image:
@@ -105,6 +131,8 @@ export default function Hero() {
               intrínseco nunca decide el layout y no puede haber CLS. */}
           <img
             src={BANNER_MOBILE}
+            srcSet={BANNER_MOBILE_SRCSET}
+            sizes="100vw"
             alt="TreeGold Joyería — Tú mereces brillar"
             width={BANNER_MOBILE_W}
             height={BANNER_MOBILE_H}

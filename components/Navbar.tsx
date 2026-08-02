@@ -66,9 +66,11 @@ export default function Navbar() {
           <Image
             src="/logo.png"
             alt={site.fullName}
-            width={820}
-            height={876}
-            priority
+            width={300}
+            height={320}
+            // Sin `priority`: el LCP real de la home es el banner del Hero.
+            // Este logo mide 56px de alto en pantalla — precargarlo competía
+            // por ancho de banda con la imagen que sí importa medir en LCP.
             className="h-11 w-auto md:h-14"
           />
         </Link>

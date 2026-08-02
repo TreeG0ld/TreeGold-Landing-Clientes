@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { verifyPassword } from "@/lib/password";
 import { createSessionToken, AUTH_COOKIE, AUTH_SESSION_MAX_AGE_SECONDS } from "@/lib/auth";
 import { rateLimit, resetRateLimit, refundRateLimit } from "@/lib/rate-limit";
-import { clientIp } from "@/lib/client-ip";
+import { clientIp, rateLimitIp } from "@/lib/client-ip";
 
 // Este es el ÚNICO login del sitio: también entra por aquí el admin, que no es
 // una variable de entorno sino una fila de la tabla User con role ADMIN y su
@@ -18,7 +18,22 @@ import { clientIp } from "@/lib/client-ip";
 const IP_MAX_ATTEMPTS = 10;
 const IP_WINDOW_MS = 10 * 60 * 1000; // 10 minutos
 const ACCOUNT_MAX_ATTEMPTS = 8;
-const ACCOUNT_WINDOW_MS = 15 * 60 * 1000; // 15 minutos
+// Antes 15 minutos. Un anónimo que sabe (o adivina) un correo puede gastarle
+// el cupo a esa cuenta indefinidamente con muy pocas peticiones cada vez que
+// la ventana expira, sin que el dueño tenga ninguna vía de recuperación (no
+// hay reset de contraseña todavía). Acortar la ventana no elimina el vector
+// —solucionarlo del todo exige verificación por correo, fuera de alcance—
+// pero reduce el bloqueo de "hasta 15 min cada vez" a "hasta 3 min cada vez",
+// y en la práctica el dueño legítimo casi siempre entra en el primer o
+// segundo intento tras esperar un momento.
+const ACCOUNT_WINDOW_MS = 3 * 60 * 1000; // 3 minutos
+// Tope de longitud de la clave del bucket por cuenta: sin esto, un email
+// arbitrariamente largo en el body hace crecer el Map del rate limiter sin
+// límite (memoria bajo control del atacante). El email real ya está acotado
+// a 254 chars en el esquema de registro; aquí se corta la clave, no el
+// email real, para no rechazar por error una cuenta con un email legítimo
+// justo en el límite.
+const ACCOUNT_KEY_MAX_LEN = 254;
 
 // Respuesta 429 única para AMBAS cubetas. Es deliberado que el texto sea
 // idéntico exista o no la cuenta: si el mensaje (o el simple hecho de recibir
@@ -52,7 +67,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const ipKey = `login:ip:${ip}`;
+    const ipKey = `login:ip:${rateLimitIp(ip)}`;
     const ipLimit = rateLimit(ipKey, IP_MAX_ATTEMPTS, IP_WINDOW_MS);
     if (!ipLimit.allowed) return tooManyAttempts(ipLimit.retryAfterSeconds);
 
@@ -62,7 +77,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Faltan credenciales." }, { status: 400 });
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedEmail = email.trim().toLowerCase().slice(0, ACCOUNT_KEY_MAX_LEN);
 
     // El cupo se consume ANTES de validar las credenciales, y se crea aunque el
     // correo no exista en la base de datos: contar solo cuentas reales haría

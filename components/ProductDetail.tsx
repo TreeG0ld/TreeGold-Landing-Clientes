@@ -48,7 +48,15 @@ export default function ProductDetail({ product }: { product: Product }) {
             <AnimatePresence mode="wait">
               <motion.div
                 key={active}
-                initial={{ opacity: 0, scale: 1.04 }}
+                // Sin fundido en la carga inicial (active===0 en el primer
+                // render): esta es la imagen principal de la página, la
+                // primera cosa que el visitante vino a ver. Antes se ocultaba
+                // con opacity:0 y tardaba 0.5s en aparecer aunque ya hubiera
+                // terminado de descargar — un retraso puramente cosmético
+                // justo en la imagen más importante. Al cambiar de foto con
+                // las miniaturas sí se anima, porque ahí el fundido comunica
+                // el cambio en vez de esconder contenido ya listo.
+                initial={active === 0 ? false : { opacity: 0, scale: 1.04 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5, ease: [0.65, 0, 0.35, 1] }}
