@@ -8,7 +8,11 @@ import { AUTH_COOKIE, verifySessionToken } from "@/lib/auth";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  if (pathname === "/admin/login" || pathname === "/api/admin/login") {
+  // Solo la PÁGINA de login queda fuera: el formulario envía a /api/auth/login,
+  // que no cae en este matcher. No hay ninguna API bajo /api/admin que deba ser
+  // accesible sin sesión, así que cualquier excepción aquí sería una puerta
+  // abierta sin motivo.
+  if (pathname === "/admin/login") {
     return NextResponse.next();
   }
 

@@ -65,9 +65,13 @@ export default function ClientRegisterForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          minLength={6}
+          // Debe coincidir con PASSWORD_MIN de /api/auth/register: si el cliente
+          // deja pasar menos, el usuario recibe un error del servidor que podría
+          // haberse evitado antes de enviar.
+          minLength={8}
           className="w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none transition-colors focus:border-accent"
         />
+        <p className="mt-1.5 text-xs text-secondary">Mínimo 8 caracteres</p>
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
       <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-60">

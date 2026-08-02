@@ -44,8 +44,22 @@ export function rateLimit(key: string, limit: number, windowMs: number): RateLim
   return { allowed: true, remaining: limit - existing.count, retryAfterSeconds: 0 };
 }
 
-// Limpia un bucket (p.ej. tras un login correcto, para no penalizar al admin
-// legítimo por intentos previos fallidos).
+// Limpia un bucket entero. SOLO es seguro llamarlo con una clave que la propia
+// petición acaba de demostrar que le pertenece (p.ej. la cubeta POR CUENTA tras
+// autenticarse bien en esa cuenta). Nunca con la cubeta POR IP: quien controla
+// una sola cuenta válida podría vaciar el contador de su IP a voluntad y hacer
+// fuerza bruta/password spraying ilimitado contra cuentas ajenas.
 export function resetRateLimit(key: string): void {
   buckets.delete(key);
+}
+
+// Devuelve UN intento al bucket, sin tocar el final de la ventana. Sirve para
+// no cobrarle al usuario sus peticiones CORRECTAS (el cupo se consume antes de
+// validar las credenciales, para no filtrar si la cuenta existe), manteniendo
+// intacto el recuento de los intentos fallidos. A diferencia de resetRateLimit,
+// no se puede abusar: cada éxito devuelve como mucho lo que él mismo gastó.
+export function refundRateLimit(key: string): void {
+  const bucket = buckets.get(key);
+  if (!bucket || Date.now() >= bucket.resetAt) return;
+  if (bucket.count > 0) bucket.count -= 1;
 }

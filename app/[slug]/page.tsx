@@ -52,7 +52,7 @@ export default async function CatchAllPage({
   const { slug } = await params;
 
   const codigo = extractWholesaleCode(slug);
-  if (!isValidWholesaleCode(codigo)) notFound();
+  if (!(await isValidWholesaleCode(codigo))) notFound();
 
   const { categoria } = await searchParams;
   const category = categoria ?? "todos";

@@ -81,9 +81,14 @@ test("integración: /api/admin/cloudinary-signature sin sesión -> 401", async (
   assert.equal(res.status, 401);
 });
 
-test("integración: /api/admin/login sin sesión -> se permite (para poder loguearse)", async () => {
+test("integración: /api/admin/login sin sesión -> 401 (ya no existe ni tiene bypass)", async () => {
+  // El login por variables de entorno se eliminó: ahora el admin es una fila de
+  // la tabla User y entra por /api/auth/login. Este test fija que el bypass no
+  // vuelva: si alguien lo reintroduce, esta ruta dejaría de estar protegida.
   const res = await middleware(makeRequest("/api/admin/login"));
-  assert.ok(isPassThrough(res));
+  assert.equal(res.status, 401);
+  const body = await res.json();
+  assert.equal(body.error, "No autorizado");
 });
 
 // --- con sesión ---

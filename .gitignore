@@ -22,5 +22,7 @@ next-env.d.ts
 tsconfig.tsbuildinfo
 *.exe
 cloudflared*
+# Log que deja el túnel de cloudflared al correrlo en local
+cloudflare.log
 # Imágenes fuente de diseño (se suben a Cloudinary, no al repo)
 treeHero*

@@ -16,18 +16,33 @@ pago: el "carrito" es una selección que genera un mensaje de WhatsApp. Datos en
   slug empieza con `mayoristas-` y extrae el código; las rutas estáticas siempre tienen
   prioridad sobre él, así que no choca con el resto del sitio.
 
-## Autenticación del admin
+## Autenticación (clientes y admin)
 
-`lib/auth.ts` firma una cookie de sesión con HMAC-SHA256 (Web Crypto, sin dependencias
-nuevas, compatible con el runtime Edge del middleware). No hay tabla de usuarios: un solo
-admin definido por variables de entorno. Verificación en dos capas:
-1. `middleware.ts` — bloquea `/admin/*` y `/api/admin/*` (excepto `/admin/login` y
-   `/api/admin/login`) si no hay sesión válida con rol `ADMIN`.
+Hay **un solo login**: `POST /api/auth/login`, que valida con bcrypt contra la tabla `User`
+de Postgres. El admin **no** es una variable de entorno: es una fila normal de `User` con
+`role = ADMIN`, creada por `scripts/seed-admin.mjs`. Los clientes se registran en
+`/api/auth/register` y salen con `role = CLIENT`. (Existió un segundo login que comparaba
+contra `ADMIN_USER`/`ADMIN_PASSWORD`; era código muerto —la página `/admin/login` nunca lo
+llamaba— y se eliminó para no mantener dos caminos de autenticación divergentes.)
+
+`lib/auth.ts` firma la cookie de sesión (`tg_session`) con HMAC-SHA256 (Web Crypto, sin
+dependencias nuevas, compatible con el runtime Edge del middleware). Verificación en dos
+capas:
+1. `middleware.ts` — bloquea `/admin/*` y `/api/admin/*` (excepto la página `/admin/login`)
+   si no hay sesión válida con rol `ADMIN`.
 2. Cada ruta API de `/api/admin/*` vuelve a llamar `requireAdminApi()` (lib/admin-auth.ts)
    por si se invoca de otra forma.
 
+Defensas de las rutas de autenticación (`lib/rate-limit.ts`, en memoria por instancia):
+login limitado por IP (10/10 min) y por cuenta (8/15 min, se cuenta exista o no el correo,
+para que el 429 no delate qué cuentas existen); registro limitado por IP (5/60 min), con
+política de contraseña en servidor (mín. 8 caracteres) y mensaje neutro si el correo ya
+está dado de alta. La enumeración de cuentas en el registro no está resuelta del todo:
+hace falta verificación por correo, que hoy no existe.
+
 Variables de entorno relevantes (en `.env`, nunca commitear):
-- `ADMIN_USER`, `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET` (string largo random).
+- `ADMIN_SESSION_SECRET` (string largo random) — firma las sesiones. `ADMIN_USER` y
+  `ADMIN_PASSWORD` ya no autentican nada; solo las usa el seed del admin.
 - `WHOLESALE_SECRET` (el código de la URL `/mayoristas-<código>`).
 - `DATABASE_URL` / `DIRECT_URL` (Supabase Postgres, pooler vs conexión directa).
 - `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
@@ -69,3 +84,7 @@ volver a correrlos salvo que se repita ese tipo de corrección.
   configurarlas también ahí cuando se haga).
 - Mover las credenciales generadas automáticamente (`ADMIN_PASSWORD`, etc.) a algo que el
   dueño del negocio elija — por ahora son valores random generados durante el desarrollo.
+  Ojo: cambiarlas en `.env` ya no basta, hay que volver a correr `scripts/seed-admin.mjs`
+  para que se actualice el hash de la fila `User`.
+- Verificación de correo en el registro (y con ella, cierre real de la enumeración de
+  cuentas) y recuperación de contraseña.
