@@ -36,10 +36,10 @@ export default function ProductCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, ease: [0.65, 0, 0.35, 1], delay: (index % 8) * 0.07 }}
+      viewport={{ once: true, margin: "-20px" }}
+      transition={{ duration: 0.35, ease: [0.65, 0, 0.35, 1], delay: (index % 8) * 0.035 }}
       className="group"
     >
       <Link href={`/producto/${product.slug}`} className="block">

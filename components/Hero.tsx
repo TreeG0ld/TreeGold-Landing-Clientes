@@ -16,6 +16,19 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 const BANNER =
   "https://res.cloudinary.com/dkab59i18/image/upload/v1784118180/treegold/marca/hero-banner-v2.png";
 
+// Variante para celular: el banner es muy panorámico (2.34:1); en un viewport
+// retrato, object-cover SIEMPRE muestra el 100% del alto (ahí es donde vive
+// el eslogan "TÚ MERECES BRILLAR", a ~85% hacia abajo), dejándolo pegado justo
+// donde van los botones. Esta variante recorta la columna central (logo +
+// texto, con margen para que el eslogan quepa completo) y le agrega lienzo
+// negro extra abajo (c_pad) para "subir" el texto al ~55% del alto: así
+// siempre queda por encima de los botones, sin importar el tamaño del
+// teléfono. Se sirve tal cual (unoptimized) porque ya trae su propio recorte,
+// formato y ancho — pasarla por el loader genérico duplicaría/desordenaría
+// las transformaciones.
+const BANNER_MOBILE =
+  "https://res.cloudinary.com/dkab59i18/image/upload/c_crop,g_center,w_3600,h_3280/c_pad,g_north,w_3600,h_4500,b_black/f_auto,q_auto:good,w_1200,c_limit/v1784118180/treegold/marca/hero-banner-v2.png";
+
 export default function Hero() {
   const root = useRef<HTMLDivElement>(null);
 
@@ -41,19 +54,24 @@ export default function Hero() {
     >
       {/* El banner como fondo completo */}
       <div className="hero-img absolute inset-0 z-0">
+        {/* Celular: composición recortada + con espacio extra abajo (ver
+            BANNER_MOBILE) para que el eslogan no quede tapado por los botones. */}
+        <Image
+          src={BANNER_MOBILE}
+          alt="TreeGold Joyería — Tú mereces brillar"
+          fill
+          priority
+          unoptimized
+          className="object-contain object-top md:hidden"
+        />
+        {/* Escritorio/tablet: banner completo, sin recortar. */}
         <Image
           src={BANNER}
           alt="TreeGold Joyería — Tú mereces brillar"
           fill
           priority
-          // El banner es muy panorámico (2.34:1). En celular el hero es alto
-          // y angosto (retrato), así que object-cover recorta casi todo el
-          // ancho para llenar el alto: la porción visible necesita mucha más
-          // resolución que el simple ancho de pantalla, o se ve pixelada.
-          // Le pedimos al navegador una imagen más grande de lo que el
-          // viewport sugiere para compensar ese recorte tan agresivo.
-          sizes="(max-width: 767px) 350vw, 100vw"
-          className="object-cover"
+          sizes="100vw"
+          className="hidden object-cover md:block"
         />
         {/* Oscurecemos un poco la parte inferior para asegurar que los botones se lean bien */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />

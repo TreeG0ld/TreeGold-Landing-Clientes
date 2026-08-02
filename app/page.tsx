@@ -109,8 +109,11 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* CTA final */}
-      <section className="relative overflow-hidden bg-primary py-24 text-center text-on-primary md:py-32">
+      {/* CTA final. "-mb-24" cancela el margen del Footer (mt-24) para que no
+          quede una franja del fondo claro de la página entre esta sección
+          oscura y el Footer (también oscuro); el border-b es la línea dorada
+          sutil que separa ambos. */}
+      <section className="relative -mb-24 overflow-hidden border-b border-accent-soft/30 bg-primary py-24 text-center text-on-primary md:py-32">
         <div className="mx-auto max-w-3xl px-5">
           <Reveal childSelector=".rv" stagger={0.12}>
             <p className="rv eyebrow mb-4 text-accent-soft">¿Tienes una idea en mente?</p>
