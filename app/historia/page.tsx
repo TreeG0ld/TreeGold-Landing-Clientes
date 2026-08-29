@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   title: "Historia",
   description:
     "La historia de Joyería TreeGold: oficio, artesanía y piezas hechas a mano en oro laminado.",
+  alternates: { canonical: "/historia" },
 };
 
 const values = [

@@ -8,6 +8,7 @@ import { buildGeneralLink } from "@/lib/whatsapp";
 export const metadata: Metadata = {
   title: "Contacto",
   description: `Escríbenos por WhatsApp al ${site.whatsappDisplay} o por correo. Estamos para ayudarte a encontrar tu joya.`,
+  alternates: { canonical: "/contacto" },
 };
 
 export default function ContactoPage() {

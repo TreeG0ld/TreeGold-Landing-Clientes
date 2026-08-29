@@ -8,8 +8,11 @@ export const site = {
   tagline: "Joyería de autor en oro laminado y plata 925",
   // Eslogan corto de marca: acompaña al logo (Hero, footer).
   slogan: "Tú mereces brillar",
+  // ~155-160 caracteres: el máximo que Google suele mostrar en el resultado
+  // de búsqueda sin truncar. Se usa como meta description global y en
+  // OpenGraph/Twitter (app/layout.tsx).
   description:
-    "Joyería de oro laminado hecha por manos colombianas",
+    "Joyería de autor en oro laminado y plata 925, hecha a mano en Medellín. Anillos, cadenas, aretes, dijes y pulseras. Compra por WhatsApp, envíos a toda Colombia.",
   whatsapp: "573017780779",
   whatsappDisplay: "+57 301 778 0779",
   instagram: "https://www.instagram.com/joyeria.treegold18k/",

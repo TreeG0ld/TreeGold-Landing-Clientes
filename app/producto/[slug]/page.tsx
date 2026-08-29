@@ -6,6 +6,7 @@ import ProductDetail from "@/components/ProductDetail";
 import ProductCard from "@/components/ProductCard";
 import { getProductBySlug, getRelated, getFeatured, getPromos } from "@/lib/catalog";
 import { formatCOP } from "@/lib/format";
+import { site } from "@/lib/site";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -114,6 +115,23 @@ export default async function ProductPage({ params }: Params) {
     },
   };
 
+  const categoryName = product.category.charAt(0).toUpperCase() + product.category.slice(1);
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Inicio", item: site.url },
+      { "@type": "ListItem", position: 2, name: "Colección", item: `${site.url}/coleccion` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: categoryName,
+        item: `${site.url}/coleccion?categoria=${product.category}`,
+      },
+      { "@type": "ListItem", position: 4, name: product.name, item: `${site.url}/producto/${product.slug}` },
+    ],
+  };
+
   return (
     <>
       <script
@@ -121,6 +139,10 @@ export default async function ProductPage({ params }: Params) {
         // Escapamos "<" para que un nombre/descripción de producto con
         // "</script>" no cierre la etiqueta e inyecte HTML/JS (XSS).
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c") }}
       />
       <ProductDetail product={product} />
 

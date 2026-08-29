@@ -72,6 +72,43 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+// Datos de negocio (JewelryStore, subtipo de LocalBusiness) para SEO local:
+// habilita rich results de Google (mapa, horario, teléfono) en búsquedas
+// como "joyería cerca de mí" o el propio nombre de la marca. Se sirve en
+// TODAS las páginas (patrón recomendado por Google para Organization/
+// LocalBusiness). Solo usa datos ya públicos en el sitio (mismo horario y
+// dirección que aparecen en /contacto y en el Footer).
+const businessJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "JewelryStore",
+  name: site.fullName,
+  image: `${site.url}/logo.png`,
+  url: site.url,
+  telephone: `+${site.whatsapp}`,
+  email: site.email,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Calle 49 # 7 - 28, Buenos Aires",
+    addressLocality: "Medellín",
+    addressRegion: "Antioquia",
+    addressCountry: "CO",
+  },
+  sameAs: [site.instagram],
+  openingHoursSpecification: {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ],
+    opens: "09:00",
+    closes: "18:00",
+  },
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -84,6 +121,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-dvh" suppressHydrationWarning>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(businessJsonLd).replace(/</g, "\\u003c") }}
+        />
         <SiteChrome footer={<Footer />}>{children}</SiteChrome>
       </body>
     </html>
