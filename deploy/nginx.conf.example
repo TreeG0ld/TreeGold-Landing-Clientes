@@ -1,0 +1,40 @@
+# Plantilla de Nginx para el VPS. Copiar a /etc/nginx/sites-available/treegold,
+# reemplazar tudominio.com, luego:
+#   sudo ln -s /etc/nginx/sites-available/treegold /etc/nginx/sites-enabled/
+#   sudo nginx -t && sudo systemctl reload nginx
+#
+# Asume Cloudflare delante del VPS con modo SSL "Full (strict)" (recomendado,
+# ver guía de despliegue): el certificado /etc/ssl/cloudflare/* es el
+# "Origin Certificate" que genera Cloudflare gratis (Dashboard del dominio ->
+# SSL/TLS -> Origin Server -> Create Certificate), NO Let's Encrypt.
+#
+# Si NO usas Cloudflare delante, cambia el bloque SSL por uno de Certbot
+# (sudo certbot --nginx -d tudominio.com genera esa parte solo) y agrega
+# TRUST_PROXY_XFF=1 al .env de la app (ver .env.example).
+
+server {
+    listen 80;
+    server_name tudominio.com www.tudominio.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name tudominio.com www.tudominio.com;
+
+    ssl_certificate     /etc/ssl/cloudflare/tudominio.com.pem;
+    ssl_certificate_key /etc/ssl/cloudflare/tudominio.com.key;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        # Cloudflare ya manda cf-connecting-ip (lib/client-ip.ts la usa para el
+        # rate limit); estas dos son solo higiene estándar de proxy reverso.
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
