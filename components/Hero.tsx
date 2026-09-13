@@ -16,24 +16,14 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 const BANNER =
   "https://res.cloudinary.com/dkab59i18/image/upload/v1784118180/treegold/marca/hero-banner-v2.png";
 
-// Variante para celular: el banner es muy panorámico (2.34:1); en un viewport
-// retrato, object-cover SIEMPRE muestra el 100% del alto (ahí es donde vive
-// el eslogan "TÚ MERECES BRILLAR", a ~85% hacia abajo), dejándolo pegado justo
-// donde van los botones. Esta variante recorta la columna central (logo +
-// texto, con margen para que el eslogan quepa completo) y le agrega lienzo
-// negro extra abajo (c_pad) para "subir" el texto al ~55% del alto: así
-// siempre queda por encima de los botones, sin importar el tamaño del
-// teléfono. Se sirve tal cual, sin pasar por el loader ni por srcset, porque
-// ya trae su propio recorte, formato y ancho — pasarla por el loader genérico
-// duplicaría/desordenaría las transformaciones.
+// Variante para celular: foto propia (retrato, 1086x1448), compuesta a mano
+// para ese formato — ya trae el logo/eslogan arriba con espacio de sobra y
+// las piezas más abajo, así que no hace falta ningún recorte ni relleno
+// artificial (a diferencia del banner de escritorio, que es panorámico).
 const BANNER_MOBILE =
-  "https://res.cloudinary.com/dkab59i18/image/upload/c_crop,g_center,w_3600,h_3280/c_pad,g_north,w_3600,h_4500,b_black/f_auto,q_auto:good,w_1200,c_limit/v1784118180/treegold/marca/hero-banner-v2.png";
-
-// Tamaño real del archivo que devuelve BANNER_MOBILE: el c_pad lo deja en
-// 3600x4500 y el w_1200,c_limit final lo reduce a 1200x1500. Lo declaramos en
-// el <img> para que el navegador conozca la relación de aspecto y no haya CLS.
-const BANNER_MOBILE_W = 1200;
-const BANNER_MOBILE_H = 1500;
+  "https://res.cloudinary.com/dkab59i18/image/upload/v1789257686/treegold/marca/hero-banner-movil.png";
+const BANNER_MOBILE_W = 1086;
+const BANNER_MOBILE_H = 1448;
 
 // Anchos del srcset de escritorio (los mismos tramos que generaba next/image).
 // Construimos las URLs con el MISMO loader del sitio (lib/imageLoader.ts) en
@@ -47,15 +37,13 @@ const BANNER_SRCSET = DESKTOP_WIDTHS.map(
   (w) => `${imageLoader({ src: BANNER, width: w })} ${w}w`
 ).join(", ");
 
-// Srcset de celular: mismas transformaciones de recorte/relleno que
-// BANNER_MOBILE (c_crop + c_pad), solo variando el ancho final del último
-// paso (w_N,c_limit). Antes se servía un único archivo de 1200px a todos los
-// teléfonos; con esto un teléfono de gama baja (~480px de viewport) pide un
-// archivo de ~600px en vez de 1200, y uno grande pide hasta 1600.
-const MOBILE_WIDTHS = [600, 900, 1200, 1600];
+// Srcset de celular: mismo loader (esta foto también vive en treegold/marca/,
+// así que sale sin recorte de catálogo, solo f_auto,q_auto:good,w_N,c_limit).
+// c_limit nunca agranda más allá del original (1086px), así que los tramos
+// mayores simplemente sirven el archivo tal cual.
+const MOBILE_WIDTHS = [480, 750, 1086];
 const BANNER_MOBILE_SRCSET = MOBILE_WIDTHS.map(
-  (w) =>
-    `https://res.cloudinary.com/dkab59i18/image/upload/c_crop,g_center,w_3600,h_3280/c_pad,g_north,w_3600,h_4500,b_black/f_auto,q_auto:good,w_${w},c_limit/v1784118180/treegold/marca/hero-banner-v2.png ${w}w`
+  (w) => `${imageLoader({ src: BANNER_MOBILE, width: w })} ${w}w`
 ).join(", ");
 
 export default function Hero() {
@@ -87,7 +75,12 @@ export default function Hero() {
   return (
     <section
       ref={root}
-      className="relative flex min-h-[70svh] flex-col items-center justify-center gap-10 overflow-hidden bg-black px-5 pb-20 pt-24 md:min-h-[80svh]"
+      // El alto NO depende del viewport (min-h): se fija a la proporción
+      // exacta de cada foto (retrato 1086x1448 en celular, panorámica
+      // 7672x3280 en escritorio), así el rectángulo siempre tiene la misma
+      // forma que la imagen y esta lo llena sin recortar nada ni dejar
+      // franjas negras de relleno.
+      className="relative flex aspect-[1086/1448] flex-col items-center justify-center gap-10 overflow-hidden bg-black px-5 pb-20 pt-24 md:aspect-[7672/3280]"
     >
       {/* El banner ya trae el nombre de la marca como texto incrustado en la
           imagen, pero eso no cuenta como encabezado para lectores de pantalla
@@ -121,10 +114,9 @@ export default function Hero() {
           {/* Escritorio/tablet (>=768px = breakpoint `md` de Tailwind): banner
               completo, sin recortar. */}
           <source media="(min-width: 768px)" srcSet={BANNER_SRCSET} sizes="100vw" />
-          {/* Celular (fallback del <picture>): composición recortada + con
-              espacio extra abajo (ver BANNER_MOBILE) para que el eslogan no
-              quede tapado por los botones. Va sin srcset porque la URL ya trae
-              sus propias transformaciones y su ancho fijo.
+          {/* Celular (fallback del <picture>): foto propia en formato retrato
+              (ver BANNER_MOBILE), sin recorte ni relleno — la sección tiene
+              la misma proporción exacta que el archivo.
               width/height son los del archivo de celular; en escritorio la
               proporción real es otra, pero da igual: el CSS fija las dos
               dimensiones (absolute inset-0 h-full w-full), así que el ratio
@@ -138,7 +130,12 @@ export default function Hero() {
             height={BANNER_MOBILE_H}
             fetchPriority="high"
             decoding="async"
-            className="absolute inset-0 h-full w-full object-contain object-top md:object-cover md:object-center"
+            // object-contain en escritorio (no cover): el banner tiene marcos
+            // decorativos pegados casi al borde de la imagen — cualquier
+            // recorte por aspect-ratio los corta. Con contain se ve SIEMPRE
+            // completo; como el fondo de la sección y el de la imagen son el
+            // mismo negro, el espacio sobrante (si lo hay) es invisible.
+            className="absolute inset-0 h-full w-full object-contain object-top md:object-center"
           />
         </picture>
         {/* Oscurecemos un poco la parte inferior para asegurar que los botones se lean bien */}
