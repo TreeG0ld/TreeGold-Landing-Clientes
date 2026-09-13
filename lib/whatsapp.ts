@@ -12,7 +12,7 @@ export function buildSelectionLink(items: SelectionItem[], total: number): strin
   });
 
   const message =
-    `¡Hola ${site.fullName}! 👋 Quiero consultar por estos productos:\n\n` +
+    `¡Hola ${site.fullName}! Quiero consultar por estos productos:\n\n` +
     lines.join("\n") +
     `\n\nTotal estimado: ${formatCOP(total)}\n` +
     `¿Me confirman disponibilidad y forma de pago?`;
@@ -23,7 +23,7 @@ export function buildSelectionLink(items: SelectionItem[], total: number): strin
 // Enlace para consultar un solo producto.
 export function buildProductLink(name: string, price: number): string {
   const message =
-    `¡Hola ${site.fullName}! 👋 Me interesa esta pieza:\n\n` +
+    `¡Hola ${site.fullName}! Me interesa esta pieza:\n\n` +
     `• ${name} — ${formatCOP(price)}\n\n` +
     `¿Me das más información?`;
   return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(message)}`;
@@ -33,13 +33,13 @@ export function buildProductLink(name: string, price: number): string {
 // sin mencionar la marca (la página de mayoristas no lleva branding).
 export function buildWholesaleProductLink(name: string, price: number): string {
   const message =
-    `Hola 👋 Quiero hacer un pedido del catálogo mayorista:\n\n` +
+    `Hola, quiero hacer un pedido del catálogo mayorista:\n\n` +
     `• ${name} — ${formatCOP(price)}\n\n` +
     `¿Me confirmas disponibilidad y cantidad mínima?`;
   return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(message)}`;
 }
 
 export function buildGeneralLink(text?: string): string {
-  const message = text ?? `¡Hola ${site.fullName}! 👋 Quisiera más información.`;
+  const message = text ?? `¡Hola ${site.fullName}! Quisiera más información.`;
   return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(message)}`;
 }

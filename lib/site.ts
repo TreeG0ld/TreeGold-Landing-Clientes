@@ -5,16 +5,22 @@ export const site = {
   // URL pública del sitio (para SEO: OpenGraph, sitemap, canónicos).
   // En producción define NEXT_PUBLIC_SITE_URL con tu dominio real.
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-  tagline: "Joyería de autor en oro laminado y plata 925",
+  // TreeGold es tienda/distribuidora, no taller: vende joyería en oro
+  // laminado y plata 925, no la fabrica ni la diseña a medida. "de autor" y
+  // "hecho a mano" quedan fuera de todo el copy del sitio por esa razón.
+  tagline: "Joyería en oro laminado y plata 925",
   // Eslogan corto de marca: acompaña al logo (Hero, footer).
   slogan: "Tú mereces brillar",
+  // Dato real de marca (8 años en el mercado): se repite en Historia y en
+  // el contador de estadísticas — no lo cambies sin confirmar con el cliente.
+  yearsInMarket: 8,
   // ~155-160 caracteres: el máximo que Google suele mostrar en el resultado
   // de búsqueda sin truncar. Se usa como meta description global y en
   // OpenGraph/Twitter (app/layout.tsx).
   description:
-    "Joyería de autor en oro laminado y plata 925, hecha a mano en Medellín. Anillos, cadenas, aretes, dijes y pulseras. Compra por WhatsApp, envíos a toda Colombia.",
-  whatsapp: "573017780779",
-  whatsappDisplay: "+57 301 778 0779",
+    "Joyería en oro laminado y plata 925, en Medellín desde hace 8 años. Anillos, cadenas, aretes, dijes y pulseras. Compra por WhatsApp, envíos a toda Colombia.",
+  whatsapp: "573016004940",
+  whatsappDisplay: "+57 301 600 4940",
   instagram: "https://www.instagram.com/joyeria.treegold18k/",
   email: "Juangonzalez.treegold@gmail.com",
   address: "Calle 49 # 7 - 28, Buenos Aires, Medellín",

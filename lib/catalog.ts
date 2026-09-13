@@ -32,7 +32,7 @@ function toUiProduct(p: DbProduct): Product {
   // Descripción por defecto (SEO + página) cuando el producto aún no tiene una.
   const description =
     p.description?.trim() ||
-    `${p.name} — ${p.category.name} de ${site.fullName}. Joyería hecha a mano en oro laminado y plata 925. Consulta disponibilidad y precio por WhatsApp.`;
+    `${p.name} — ${p.category.name} de ${site.fullName}, en oro laminado y plata 925. Consulta disponibilidad y precio por WhatsApp.`;
   return {
     slug: p.slug,
     name: p.name,
@@ -255,5 +255,13 @@ export const getAllCategories = unstable_cache(
       );
   },
   ["all-categories"],
+  { revalidate: 3600, tags: ["catalogo"] }
+);
+
+// Cuenta real de productos activos en la tienda pública. Se usa en el
+// contador de /historia (dato verificable, en vez de una cifra inventada).
+export const getActiveProductCount = unstable_cache(
+  async (): Promise<number> => prisma.product.count({ where: { isRetail: true } }),
+  ["active-product-count"],
   { revalidate: 3600, tags: ["catalogo"] }
 );

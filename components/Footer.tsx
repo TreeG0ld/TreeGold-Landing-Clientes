@@ -21,7 +21,7 @@ export default function Footer() {
             </Link>
             <p className="mt-4 font-serif text-lg text-accent-soft">{site.slogan}</p>
             <p className="mt-2 max-w-xs text-sm leading-relaxed text-on-primary/70">
-              {site.tagline}. Piezas hechas a mano en oro laminado y plata 925.
+              {site.yearsInMarket} años acompañando tu brillo en Medellín.
             </p>
           </div>
 

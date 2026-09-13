@@ -60,7 +60,12 @@ export default function Navbar() {
             : "bg-transparent"
       }`}
     >
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:h-20 md:px-8">
+      {/* mt-3/px-6 en celular: el logo y los iconos quedaban justo sobre el
+          marco decorativo diagonal de la esquina de la foto del Hero. Los
+          separamos un poco de la esquina (abajo y hacia adentro); en
+          escritorio el banner es panorámico y el marco queda lejos del
+          navbar, así que ahí se resetea a como estaba. */}
+      <nav className="mx-auto mt-5 flex h-16 max-w-7xl items-center justify-between px-6 md:mt-0 md:h-20 md:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center" aria-label={site.fullName}>
           <Image

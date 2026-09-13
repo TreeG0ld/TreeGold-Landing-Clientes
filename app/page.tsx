@@ -6,6 +6,7 @@ import ProductCard from "@/components/ProductCard";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import ArtisanCarousel from "@/components/ArtisanCarousel";
 import { getAllCategories, getFeatured, getPromos } from "@/lib/catalog";
+import { site } from "@/lib/site";
 
 // Regenera la página estática cada hora (catálogo fresco sin sacrificar velocidad).
 export const revalidate = 3600;
@@ -92,13 +93,16 @@ export default async function Home() {
           <Reveal childSelector=".rv" stagger={0.14} y={30}>
             <p className="rv eyebrow mb-4">Nuestra historia</p>
             <h2 className="rv text-4xl leading-tight md:text-5xl">
-              Lorem ipsum dolor sit amet
+              {site.yearsInMarket} años acompañando tu brillo
             </h2>
             <p className="rv mt-6 text-secondary leading-relaxed">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula.
+              En TreeGold seleccionamos cuidadosamente cada pieza de nuestro
+              catálogo de anillos, cadenas, aretes, dijes y pulseras en oro
+              laminado y plata 925, pensando en la calidad y en que te duren.
             </p>
             <p className="rv mt-4 text-secondary leading-relaxed">
-              Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor.
+              Desde hace {site.yearsInMarket} años acompañamos a nuestros clientes en Medellín y en
+              toda Colombia, con atención cercana y directa por WhatsApp.
             </p>
             <div className="rv mt-8">
               <Link href="/historia" className="btn-outline">
@@ -116,17 +120,17 @@ export default async function Home() {
       <section className="relative -mb-24 overflow-hidden border-b border-accent-soft/30 bg-primary py-24 text-center text-on-primary md:py-32">
         <div className="mx-auto max-w-3xl px-5">
           <Reveal childSelector=".rv" stagger={0.12}>
-            <p className="rv eyebrow mb-4 text-accent-soft">¿Tienes una idea en mente?</p>
+            <p className="rv eyebrow mb-4 text-accent-soft">¿Buscas algo especial?</p>
             <h2 className="rv text-4xl text-white md:text-6xl">
-              Diseñamos tu joya a medida
+              Encuentra tu joya perfecta
             </h2>
             <p className="rv mx-auto mt-6 max-w-xl text-white/75">
-              Cuéntanos qué imaginas y la convertimos en una pieza real. Escríbenos
-              por WhatsApp y empecemos a crear juntos.
+              Explora nuestro catálogo completo o escríbenos por WhatsApp.
+              Te ayudamos a encontrar la pieza ideal, sin compromiso.
             </p>
             <div className="rv mt-9">
               <Link href="/contacto" className="btn-primary bg-accent hover:bg-accent-soft">
-                Hablemos de tu pieza
+                Escríbenos por WhatsApp
               </Link>
             </div>
           </Reveal>

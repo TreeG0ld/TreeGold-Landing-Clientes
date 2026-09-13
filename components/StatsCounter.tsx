@@ -7,16 +7,11 @@ import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-type Stat = { value: number; suffix?: string; label: string };
+export type Stat = { value: number; suffix?: string; label: string };
 
-const stats: Stat[] = [
-  { value: 15, suffix: "+", label: "Años de oficio" },
-  { value: 2400, suffix: "+", label: "Clientes felices" },
-  { value: 100, suffix: "%", label: "Hecho a mano" },
-  { value: 18, suffix: "k", label: "Oro certificado" },
-];
-
-export default function StatsCounter() {
+// Los números se reciben por prop (no hardcodeados aquí): la página que usa
+// este componente (/historia) los arma con datos reales.
+export default function StatsCounter({ stats }: { stats: Stat[] }) {
   const root = useRef<HTMLDivElement>(null);
 
   useGSAP(

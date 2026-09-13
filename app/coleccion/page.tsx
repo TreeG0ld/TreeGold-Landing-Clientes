@@ -35,7 +35,7 @@ export async function generateMetadata({
     const name = categoria.charAt(0).toUpperCase() + categoria.slice(1);
     return {
       title: `${name}${pageSuffix}`,
-      description: `${name} de ${site.fullName}: piezas en oro laminado y plata 925, hechas a mano. Consulta y compra por WhatsApp.`,
+      description: `${name} de ${site.fullName}: piezas en oro laminado y plata 925. Consulta y compra por WhatsApp.`,
       alternates: { canonical: paginatedCanonical(`/coleccion?categoria=${categoria}`, page) },
     };
   }
@@ -103,8 +103,8 @@ export default async function ColeccionPage({
         <p className="eyebrow mb-3">La colección</p>
         <h1 className="text-5xl md:text-6xl">Joyas TreeGold</h1>
         <p className="mx-auto mt-4 max-w-md text-secondary">
-          Piezas únicas hechas a mano. Guarda tus favoritas y finaliza tu pedido
-          por WhatsApp.
+          Piezas seleccionadas en oro laminado y plata 925. Guarda tus favoritas
+          y finaliza tu pedido por WhatsApp.
         </p>
       </header>
 
