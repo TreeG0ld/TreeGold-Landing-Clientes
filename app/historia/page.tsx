@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Playfair_Display } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/anim/Reveal";
@@ -7,17 +6,11 @@ import StatsCounter from "@/components/StatsCounter";
 import { site } from "@/lib/site";
 import { getActiveProductCount } from "@/lib/catalog";
 
-// Esta página usa su propia serif (distinta del Marcellus global) para darle
-// un aire más editorial a la historia de la marca.
-// Solo el grosor 400: los títulos del sitio van todos en 400 (regla global de
-// globals.css) y aquí no hay ninguna clase que pida otro. Cargar 500 y 600 era
-// descargar dos tipografías que nunca se pintan — y se descargan en TODAS las
-// páginas, porque el menú enlaza a Historia y Next precarga sus archivos.
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["400"],
-  display: "swap",
-});
+// Los títulos usan la serif global (Marcellus, aplicada por globals.css a
+// h1/h2/h3). Antes esta página traía su propia serif para un aire editorial,
+// pero costaba 21 KB en TODAS las páginas: el menú enlaza aquí, así que Next
+// precargaba sus archivos desde cualquier lado, y además apagaba la precarga
+// de Marcellus y Jost, que sí se usan en todo el sitio.
 
 // Regenera junto con el resto del catálogo (mismo patrón que la home).
 export const revalidate = 3600;
@@ -55,7 +48,7 @@ export default async function HistoriaPage() {
       <section className="mx-auto max-w-4xl px-5 py-16 text-center md:px-8">
         <Reveal childSelector=".rv" stagger={0.12}>
           <p className="rv eyebrow mb-4">Nuestra historia</p>
-          <h1 className={`rv text-5xl leading-tight md:text-7xl ${playfair.className}`}>
+          <h1 className="rv text-5xl leading-tight md:text-7xl">
             {site.yearsInMarket} años haciéndote brillar
           </h1>
           <p className="rv mx-auto mt-6 max-w-2xl text-lg text-secondary leading-relaxed">
@@ -87,7 +80,7 @@ export default async function HistoriaPage() {
             {values.map((v) => (
               <div key={v.title} className="rv">
                 <div className="mb-4 h-px w-12 bg-accent" />
-                <h3 className={`text-2xl ${playfair.className}`}>{v.title}</h3>
+                <h3 className="text-2xl">{v.title}</h3>
                 <p className="mt-3 text-secondary leading-relaxed">{v.text}</p>
               </div>
             ))}
@@ -105,7 +98,7 @@ export default async function HistoriaPage() {
       {/* CTA */}
       <section className="mx-auto max-w-3xl px-5 py-24 text-center">
         <Reveal childSelector=".rv" stagger={0.12}>
-          <h2 className={`rv text-4xl md:text-5xl ${playfair.className}`}>¿Buscas tu próxima joya?</h2>
+          <h2 className="rv text-4xl md:text-5xl">¿Buscas tu próxima joya?</h2>
           <p className="rv mx-auto mt-5 max-w-lg text-secondary">
             Escríbenos por WhatsApp y te ayudamos a encontrar la pieza perfecta para ti.
           </p>
