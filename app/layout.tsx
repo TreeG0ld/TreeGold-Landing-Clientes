@@ -39,7 +39,7 @@ const GA_MEASUREMENT_ID = "G-2W58WXHQMS";
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.fullName} — ${site.tagline}`,
+    default: `${site.fullName} | ${site.tagline}`,
     template: `%s · ${site.fullName}`,
   },
   description: site.description,

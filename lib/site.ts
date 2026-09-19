@@ -8,7 +8,11 @@ export const site = {
   // TreeGold es tienda/distribuidora, no taller: vende joyería en oro
   // laminado y plata 925, no la fabrica ni la diseña a medida. "de autor" y
   // "hecho a mano" quedan fuera de todo el copy del sitio por esa razón.
-  tagline: "Joyería en oro laminado y plata 925",
+  // Solo se usa para armar el título de la página de inicio (ver
+  // app/layout.tsx). Dice "18k" y no repite "Joyería" —que ya está en
+  // fullName— para no gastar caracteres: Google corta el título alrededor de
+  // los 60 y todo lo que se repite es espacio perdido.
+  tagline: "Oro laminado 18k y plata 925",
   // Eslogan corto de marca: acompaña al logo (Hero, footer).
   slogan: "Tú mereces brillar",
   // Dato real de marca (8 años en el mercado): se repite en Historia y en
