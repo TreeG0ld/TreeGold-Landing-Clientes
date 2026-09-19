@@ -70,7 +70,7 @@ export default function GlassSelect({
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`flex w-full items-center justify-between gap-2 rounded-xl border bg-white px-4 py-2.5 text-base md:text-sm outline-none transition-all duration-300 ease-luxe cursor-pointer ${
+        className={`flex h-full w-full items-center justify-between gap-2 rounded-xl border bg-white px-4 py-2.5 text-base md:text-sm outline-none transition-all duration-300 ease-luxe cursor-pointer ${
           open ? "border-accent text-primary" : "border-border text-primary hover:border-accent"
         }`}
       >

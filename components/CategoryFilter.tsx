@@ -15,10 +15,12 @@ export default function CategoryFilter({
   categories,
   value,
   sort,
+  q,
 }: {
   categories: CategoryOption[];
   value: string;
   sort: string;
+  q?: string;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -66,13 +68,15 @@ export default function CategoryFilter({
 
       <AnimatePresence>
         {open && (
+          // max-h-60 ≈ 5 opciones y media: se ve que la lista sigue, y el scroll
+          // queda DENTRO del desplegable en vez de mover la página entera.
           <motion.ul
             role="listbox"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: [0.65, 0, 0.35, 1] }}
-            className="glass absolute left-0 right-0 z-50 mt-2 max-h-[60vh] origin-top overflow-y-auto rounded-2xl border border-border/70 p-1.5 shadow-xl shadow-black/10 md:w-64"
+            className="glass absolute left-0 right-0 z-50 mt-2 max-h-60 origin-top overflow-y-auto overscroll-contain rounded-2xl border border-border/70 p-1.5 shadow-xl shadow-black/10 md:w-64"
           >
             {categories.map((c) => {
               const active = c.slug === value;
@@ -82,7 +86,7 @@ export default function CategoryFilter({
                     type="button"
                     onClick={() => {
                       setOpen(false);
-                      router.push(coleccionHref({ category: c.slug, sort, page: 1 }));
+                      router.push(coleccionHref({ category: c.slug, sort, page: 1, q }));
                     }}
                     className={`flex w-full items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left text-sm transition-colors duration-200 cursor-pointer ${
                       active

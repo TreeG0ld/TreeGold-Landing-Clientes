@@ -9,16 +9,18 @@ import { coleccionHref, CATALOG_SORTS } from "@/lib/catalog-url";
 export default function CatalogSort({
   category,
   value,
+  q,
 }: {
   category: string;
   value: string;
+  q?: string;
 }) {
   const router = useRouter();
   return (
     <SortDropdown
       options={CATALOG_SORTS}
       value={value}
-      onChange={(v) => router.push(coleccionHref({ category, sort: v, page: 1 }))}
+      onChange={(v) => router.push(coleccionHref({ category, sort: v, page: 1, q }))}
     />
   );
 }

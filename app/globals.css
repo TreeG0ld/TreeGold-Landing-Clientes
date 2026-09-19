@@ -67,6 +67,21 @@
     backdrop-filter: blur(14px) saturate(140%);
     -webkit-backdrop-filter: blur(14px) saturate(140%);
   }
+  /* Vidrio esmerilado del panel del buscador: más transparente que .glass para
+     que se vea el efecto, con un desenfoque alto que igual mantiene legible lo
+     que se escribe encima. */
+  .glass-strong {
+    background-color: rgba(250, 249, 247, 0.35);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+  }
+  /* La X que Chrome/Safari dibujan solos en los input[type=search] no combina
+     con los iconos del sitio (Lucide); se oculta y se usa una propia. */
+  input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
   .glass-dark {
     background-color: rgba(12, 10, 9, 0.55);
     backdrop-filter: blur(16px) saturate(140%);

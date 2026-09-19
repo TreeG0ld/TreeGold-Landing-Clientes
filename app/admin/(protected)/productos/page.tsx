@@ -54,25 +54,27 @@ export default async function ProductosPage({
         </Link>
       </div>
 
-      <form method="GET" className="mb-5 flex flex-wrap gap-3">
+      {/* h-11 en los tres: el botón usa un estilo con más relleno que el input
+          y el selector, así que sin una altura común quedaban desalineados. */}
+      <form method="GET" className="mb-5 flex flex-wrap items-center gap-3">
         <input
           type="text"
           name="q"
           defaultValue={q}
           placeholder="Buscar por nombre o código..."
-          className="flex-1 min-w-[220px] rounded-xl border border-border px-4 py-2.5 text-base md:text-sm outline-none focus:border-accent"
+          className="h-11 flex-1 min-w-[220px] rounded-xl border border-border px-4 py-2.5 text-base md:text-sm outline-none focus:border-accent"
         />
         <GlassSelect
           name="categoria"
           value={categoryId}
           submitOnChange
-          className="w-56"
+          className="h-11 w-56"
           options={[
             { value: "", label: "Todas las categorías" },
             ...categories.map((c) => ({ value: c.id, label: c.name })),
           ]}
         />
-        <button type="submit" className="btn-outline">Filtrar</button>
+        <button type="submit" className="btn-outline h-11">Filtrar</button>
       </form>
 
       <ProductsTable products={products} />

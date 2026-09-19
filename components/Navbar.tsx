@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Menu, X, ShoppingBag, User } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, X, Search, ShoppingBag, User } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useSelection } from "@/lib/store";
+import { coleccionHref } from "@/lib/catalog-url";
 import { site } from "@/lib/site";
 
 const links = [
@@ -19,9 +20,13 @@ const links = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const searchInput = useRef<HTMLInputElement>(null);
   const pathname = usePathname();
+  const router = useRouter();
   const rawCount = useSelection((s) => s.items.reduce((n, i) => n + i.qty, 0));
   const openDrawer = useSelection((s) => s.open);
   // Evita desajuste de hidratación: el conteo de localStorage solo tras montar.
@@ -38,7 +43,22 @@ export default function Navbar() {
 
   useEffect(() => {
     setOpen(false);
+    setSearchOpen(false);
   }, [pathname]);
+
+  // El input se monta con el panel, así que hay que enfocarlo al abrirlo.
+  useEffect(() => {
+    if (searchOpen) searchInput.current?.focus();
+  }, [searchOpen]);
+
+  function submitSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const term = query.trim();
+    if (!term) return;
+    setSearchOpen(false);
+    setQuery("");
+    router.push(coleccionHref({ q: term }));
+  }
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -48,16 +68,18 @@ export default function Navbar() {
   }, [open]);
 
   // Sobre el hero oscuro (solo home, sin scroll y sin menú abierto) usamos texto claro.
-  const overHero = pathname === "/" && !scrolled && !open;
+  const overHero = pathname === "/" && !scrolled && !open && !searchOpen;
 
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-luxe ${
-        scrolled || open
-          ? "glass border-b border-border/60"
-          : overHero
-            ? "bg-gradient-to-b from-black/50 via-black/20 to-transparent"
-            : "bg-transparent"
+        searchOpen
+          ? "glass-strong border-b border-border/40 shadow-lg shadow-black/5"
+          : scrolled || open
+            ? "glass border-b border-border/60"
+            : overHero
+              ? "bg-gradient-to-b from-black/50 via-black/20 to-transparent"
+              : "bg-transparent"
       }`}
     >
       {/* mt-3/px-6 en celular: el logo y los iconos quedaban justo sobre el
@@ -120,6 +142,16 @@ export default function Navbar() {
             <User className="h-5 w-5" strokeWidth={1.6} />
           </Link>
           <button
+            onClick={() => setSearchOpen((v) => !v)}
+            aria-label={searchOpen ? "Cerrar buscador" : "Buscar joyas"}
+            aria-expanded={searchOpen}
+            className={`relative flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:text-accent cursor-pointer ${
+              searchOpen ? "text-accent" : overHero ? "text-white" : "text-primary"
+            }`}
+          >
+            <Search className="h-5 w-5" strokeWidth={1.6} />
+          </button>
+          <button
             onClick={openDrawer}
             aria-label="Ver mi selección"
             data-cart-target
@@ -157,6 +189,54 @@ export default function Navbar() {
           </button>
         </div>
       </nav>
+
+      {/* Buscador */}
+      <AnimatePresence>
+        {searchOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: [0.65, 0, 0.35, 1] }}
+            className="overflow-hidden"
+          >
+            <form
+              onSubmit={submitSearch}
+              className="mx-auto flex max-w-7xl items-center gap-3 px-6 pb-5 md:px-8"
+            >
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary" />
+                <input
+                  ref={searchInput}
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Escape" && setSearchOpen(false)}
+                  placeholder="Buscar joyas por nombre..."
+                  aria-label="Buscar joyas por nombre"
+                  className="w-full rounded-full border border-border bg-white/90 py-3 pl-11 pr-11 text-base text-primary outline-none transition-colors placeholder:text-secondary/70 focus:border-accent md:text-sm"
+                />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuery("");
+                      searchInput.current?.focus();
+                    }}
+                    aria-label="Borrar búsqueda"
+                    className="absolute right-3 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-secondary transition-colors hover:text-primary cursor-pointer"
+                  >
+                    <X className="h-4 w-4" strokeWidth={1.5} />
+                  </button>
+                )}
+              </div>
+              <button type="submit" className="btn-primary shrink-0">
+                Buscar
+              </button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Mobile menu */}
       <AnimatePresence>

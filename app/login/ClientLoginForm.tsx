@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 export default function ClientLoginForm() {
   const router = useRouter();
@@ -65,9 +64,6 @@ export default function ClientLoginForm() {
       <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-60">
         {loading ? "Entrando..." : "Entrar"}
       </button>
-      <p className="text-center text-sm text-secondary mt-4">
-        ¿No tienes cuenta? <Link href="/registro" className="text-accent hover:underline">Regístrate</Link>
-      </p>
     </form>
   );
 }

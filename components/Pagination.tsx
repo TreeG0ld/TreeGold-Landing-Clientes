@@ -21,11 +21,13 @@ export default function Pagination({
   sort,
   page,
   totalPages,
+  q,
 }: {
   category: string;
   sort: string;
   page: number;
   totalPages: number;
+  q?: string;
 }) {
   if (totalPages <= 1) return null;
 
@@ -40,7 +42,7 @@ export default function Pagination({
       {/* Anterior */}
       {page > 1 ? (
         <Link
-          href={coleccionHref({ category, sort, page: page - 1 })}
+          href={coleccionHref({ category, sort, page: page - 1, q })}
           aria-label="Página anterior"
           className={`${base} border border-border text-primary hover:border-accent hover:text-accent`}
         >
@@ -65,7 +67,7 @@ export default function Pagination({
         ) : (
           <Link
             key={it}
-            href={coleccionHref({ category, sort, page: it })}
+            href={coleccionHref({ category, sort, page: it, q })}
             className={`${base} border border-border text-primary hover:border-accent hover:text-accent`}
           >
             {it}
@@ -76,7 +78,7 @@ export default function Pagination({
       {/* Siguiente */}
       {page < totalPages ? (
         <Link
-          href={coleccionHref({ category, sort, page: page + 1 })}
+          href={coleccionHref({ category, sort, page: page + 1, q })}
           aria-label="Página siguiente"
           className={`${base} border border-border text-primary hover:border-accent hover:text-accent`}
         >

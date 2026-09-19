@@ -1,13 +1,19 @@
 // Construye las URLs del catálogo a partir de los filtros.
 // Pura (sin dependencias de servidor): la usan tanto la página como el cliente.
 
-export type CatalogQuery = { category?: string; sort?: string; page?: number };
+export type CatalogQuery = {
+  category?: string;
+  sort?: string;
+  page?: number;
+  q?: string;
+};
 
-export function coleccionHref({ category, sort, page }: CatalogQuery): string {
+export function coleccionHref({ category, sort, page, q }: CatalogQuery): string {
   const sp = new URLSearchParams();
   if (category && category !== "todos") sp.set("categoria", category);
   if (sort && sort !== "destacados") sp.set("orden", sort);
   if (page && page > 1) sp.set("page", String(page));
+  if (q?.trim()) sp.set("q", q.trim());
   const qs = sp.toString();
   return `/coleccion${qs ? `?${qs}` : ""}`;
 }

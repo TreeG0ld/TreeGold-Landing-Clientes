@@ -127,48 +127,115 @@ export type CatalogPage = {
   totalPages: number;
 };
 
-// Página del catálogo: filtra por categoría, ordena y pagina EN EL SERVIDOR.
-// Cacheada 1h (revalida con la tag "catalogo") para que la página dinámica
-// responda rápido sin golpear la base de datos en cada visita.
-export const getCatalogPage = unstable_cache(
-  async (
-    category: string,
-    sort: CatalogSort,
-    page: number
-  ): Promise<CatalogPage> => {
-    const safePage = Math.max(1, page || 1);
-    const where = {
-      isRetail: true,
-      ...(category && category !== "todos" ? { category: { slug: category } } : {}),
-    };
-    const orderBy =
-      sort === "precio-asc"
-        ? { retailPrice: "asc" as const }
-        : sort === "precio-desc"
-          ? { retailPrice: "desc" as const }
-          : { createdAt: "asc" as const };
+// Deja el texto comparable: sin tildes y en minúscula.
+function normalize(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase();
+}
 
-    const [rows, total] = await Promise.all([
-      prisma.product.findMany({
-        where,
-        select: listSelect,
-        orderBy,
-        skip: (safePage - 1) * PER_PAGE,
-        take: PER_PAGE,
-      }),
-      prisma.product.count({ where }),
-    ]);
+// Palabras del término de búsqueda. Se recorta la "s" final porque el cliente
+// escribe el plural ("anillos") y los productos están en singular ("Anillo …").
+function searchWords(q: string): string[] {
+  return normalize(q)
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => (w.length > 3 && w.endsWith("s") ? w.slice(0, -1) : w));
+}
 
-    return {
-      products: rows.map(toListProduct),
-      total,
-      page: safePage,
-      totalPages: Math.max(1, Math.ceil(total / PER_PAGE)),
-    };
-  },
-  ["catalog-page"],
+// Índice de búsqueda: solo slug y nombre de lo visible en tienda (~700 filas de
+// texto corto). Cacheado con la misma tag que el catálogo, así que se rehace
+// solo cuando se crea o edita un producto.
+const getSearchIndex = unstable_cache(
+  async () =>
+    prisma.product.findMany({
+      where: { isRetail: true },
+      select: { slug: true, name: true },
+    }),
+  ["product-search-index"],
   { revalidate: 3600, tags: ["catalogo"] }
 );
+
+// El filtro por nombre se resuelve en Node y no en SQL porque Postgres no
+// ignora las tildes sin la extensión `unaccent`: "trebol" debe encontrar
+// "Topo trébol". Exige TODAS las palabras, así "anillo aura" encuentra
+// "Anillo Aura" aunque esa frase exacta no esté en el nombre.
+async function slugsMatching(q: string): Promise<string[]> {
+  const words = searchWords(q);
+  if (!words.length) return [];
+  const rows = await getSearchIndex();
+  return rows
+    .filter((r) => {
+      const name = normalize(r.name);
+      return words.every((w) => name.includes(w));
+    })
+    .map((r) => r.slug);
+}
+
+// Página del catálogo: filtra por categoría y por nombre, ordena y pagina EN EL
+// SERVIDOR.
+async function queryCatalogPage(
+  category: string,
+  sort: CatalogSort,
+  page: number,
+  q: string
+): Promise<CatalogPage> {
+  const safePage = Math.max(1, page || 1);
+  const matches = q ? await slugsMatching(q) : null;
+  if (matches && matches.length === 0) {
+    return { products: [], total: 0, page: safePage, totalPages: 1 };
+  }
+  const where = {
+    isRetail: true,
+    ...(category && category !== "todos" ? { category: { slug: category } } : {}),
+    ...(matches ? { slug: { in: matches } } : {}),
+  };
+  const orderBy =
+    sort === "precio-asc"
+      ? { retailPrice: "asc" as const }
+      : sort === "precio-desc"
+        ? { retailPrice: "desc" as const }
+        : { createdAt: "desc" as const };
+
+  const [rows, total] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      select: listSelect,
+      orderBy,
+      skip: (safePage - 1) * PER_PAGE,
+      take: PER_PAGE,
+    }),
+    prisma.product.count({ where }),
+  ]);
+
+  return {
+    products: rows.map(toListProduct),
+    total,
+    page: safePage,
+    totalPages: Math.max(1, Math.ceil(total / PER_PAGE)),
+  };
+}
+
+// Navegación normal (sin búsqueda): cacheada 1h, revalida con la tag "catalogo".
+const getCachedCatalogPage = unstable_cache(queryCatalogPage, ["catalog-page"], {
+  revalidate: 3600,
+  tags: ["catalogo"],
+});
+
+export function getCatalogPage(
+  category: string,
+  sort: CatalogSort,
+  page: number,
+  q = ""
+): Promise<CatalogPage> {
+  // Las búsquedas NO pasan por la caché: la clave sería texto libre del
+  // visitante, así que un bot pidiendo términos al azar llenaría la caché de
+  // entradas de un solo uso.
+  return q
+    ? queryCatalogPage(category, sort, page, q)
+    : getCachedCatalogPage(category, sort, page, "");
+}
 
 // La ficha del producto se pide DOS veces por visita: una en
 // `generateMetadata` (título, OG) y otra al renderizar la página. `cache` de
@@ -217,7 +284,7 @@ export async function getFeatured(take = 8): Promise<Product[]> {
   const rows = await prisma.product.findMany({
     where: { isRetail: true },
     select: listSelect,
-    orderBy: { createdAt: "asc" },
+    orderBy: { createdAt: "desc" },
     take,
   });
   return rows.map(toListProduct);
