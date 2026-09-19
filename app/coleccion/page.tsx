@@ -179,7 +179,10 @@ export default async function ColeccionPage({
       </header>
 
       {/* Filtros */}
-      <div className="sticky top-16 z-30 -mx-5 mb-10 border-b border-border glass px-5 py-3 md:top-20 md:mx-0 md:rounded-2xl md:border md:px-5 md:py-3.5">
+      {/* top-[84px] en celular = alto real del navbar ahí (mt-5 + h-16). Con
+          top-16 la barra se quedaba 20px por debajo y los filtros se metían
+          bajo el menú. En escritorio el navbar mide 80px (md:h-20). */}
+      <div className="sticky top-[84px] z-30 -mx-5 mb-10 border-b border-border glass px-5 py-3 md:top-20 md:mx-0 md:rounded-2xl md:border md:px-5 md:py-3.5">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
           <div className="md:flex-1">
             <CategoryFilter categories={tabs} value={category} sort={sort} q={q} />
