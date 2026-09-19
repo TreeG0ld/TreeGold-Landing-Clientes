@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 :root {
+  /* La tienda está diseñada solo en claro (crema y dorado). Sin declararlo, el
+     modo oscuro automático del navegador (Chrome: "Auto Dark Mode for Web
+     Contents") invierte por su cuenta los fondos claros y la tienda se ve
+     café, con las fotos intactas. Esta línea se lo prohíbe. */
+  color-scheme: light;
+
   /* Canales RGB para soportar opacidad (rgb(var(--x) / <alpha-value>)) */
   --color-primary: 28 25 23;
   --color-on-primary: 255 255 255;

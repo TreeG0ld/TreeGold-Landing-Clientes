@@ -29,13 +29,24 @@ export function buildProductLink(name: string, price: number): string {
   return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(message)}`;
 }
 
-// Enlace para pedidos desde el catálogo mayorista: mensaje neutro,
-// sin mencionar la marca (la página de mayoristas no lleva branding).
-export function buildWholesaleProductLink(name: string, price: number): string {
+// Pedido completo desde el catálogo mayorista. Mismo criterio que el enlace de
+// producto suelto: mensaje neutro, sin mencionar la marca, porque esa página no
+// lleva branding a propósito.
+export function buildWholesaleSelectionLink(
+  items: SelectionItem[],
+  total: number
+): string {
+  const lines = items.map(
+    (i, idx) =>
+      `${idx + 1}. ${i.name} — x${i.qty} — ${formatCOP(i.price * i.qty)}`
+  );
+
   const message =
-    `Hola, quiero hacer un pedido del catálogo mayorista:\n\n` +
-    `• ${name} — ${formatCOP(price)}\n\n` +
-    `¿Me confirmas disponibilidad y cantidad mínima?`;
+    `Hola, quiero hacer este pedido del catálogo mayorista:\n\n` +
+    lines.join("\n") +
+    `\n\nTotal: ${formatCOP(total)}\n` +
+    `¿Me confirmas disponibilidad y cantidades mínimas?`;
+
   return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(message)}`;
 }
 

@@ -1,14 +1,31 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
+import { Check, Plus } from "lucide-react";
 import { formatCOP } from "@/lib/format";
-import { buildWholesaleProductLink } from "@/lib/whatsapp";
-import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
+import { useWholesaleSelection } from "@/lib/store";
 import type { WholesaleProduct } from "@/lib/wholesale";
 
 // Tarjeta simple para el catálogo de mayoristas: NO enlaza a /producto/[slug]
 // (esa ruta pública muestra el precio de venta al detal, no el de costo).
 export default function WholesaleProductCard({ product }: { product: WholesaleProduct }) {
+  const add = useWholesaleSelection((s) => s.add);
+  const [added, setAdded] = useState(false);
+
+  // Sin tope de clics seguidos, al revés que en la tienda pública: un
+  // distribuidor pide por cantidad y necesita sumar unidades rápido.
+  const handleAdd = () => {
+    add({
+      slug: product.slug,
+      name: product.name,
+      price: product.price,
+      image: product.images[0],
+    });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1200);
+  };
+
   return (
     <div className="group">
       <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-white">
@@ -37,14 +54,25 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
         <p className="mt-1 text-xs uppercase tracking-wide text-secondary/60">
           {[product.categoryName, product.material].filter(Boolean).join(" · ")}
         </p>
-        <a
-          href={buildWholesaleProductLink(product.name, product.price)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-3 inline-flex items-center gap-2 rounded-full border border-[#25D366] px-4 py-2 text-xs font-medium text-[#1c8a47] transition-all duration-300 hover:bg-[#25D366]/10"
+        <button
+          onClick={handleAdd}
+          aria-label={`Agregar ${product.name} al pedido`}
+          className={`mt-3 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-all duration-300 cursor-pointer ${
+            added
+              ? "border-accent bg-accent/10 text-accent"
+              : "border-border text-primary hover:border-accent hover:text-accent"
+          }`}
         >
-          <WhatsAppIcon className="h-4 w-4" /> Pedir por WhatsApp
-        </a>
+          {added ? (
+            <>
+              <Check className="h-4 w-4" /> Agregado
+            </>
+          ) : (
+            <>
+              <Plus className="h-4 w-4" /> Agregar al pedido
+            </>
+          )}
+        </button>
       </div>
     </div>
   );

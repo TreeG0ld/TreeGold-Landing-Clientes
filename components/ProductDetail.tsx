@@ -11,14 +11,17 @@ import { useSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
 import { buildProductLink } from "@/lib/whatsapp";
 import { flyToCart } from "@/lib/flyToCart";
+import { useAddCooldown, ADD_COOLDOWN_SECONDS } from "@/lib/useAddCooldown";
 
 export default function ProductDetail({ product }: { product: Product }) {
   const add = useSelection((s) => s.add);
   const [active, setActive] = useState(0);
   const [size, setSize] = useState(product.sizes?.[0]);
   const [added, setAdded] = useState(false);
+  const { waiting, claim } = useAddCooldown();
 
   const handleAdd = (e: React.MouseEvent) => {
+    if (!claim()) return;
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
     flyToCart(r.left + r.width / 2, r.top + r.height / 2, product.images[active]);
     add({
@@ -158,6 +161,13 @@ export default function ProductDetail({ product }: { product: Product }) {
               <WhatsAppIcon className="h-5 w-5" /> Consultar
             </a>
           </div>
+
+          {waiting && (
+            <p role="status" className="mt-3 text-center text-sm text-secondary sm:text-left">
+              Espera {ADD_COOLDOWN_SECONDS} segundos antes de seguir agregando
+              esta joya.
+            </p>
+          )}
 
           {/* Detalles */}
           <div className="mt-10 border-t border-border pt-8">

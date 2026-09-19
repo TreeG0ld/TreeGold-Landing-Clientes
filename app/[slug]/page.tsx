@@ -22,6 +22,7 @@ import {
 import { clientIpFromHeaders, rateLimitIp } from "@/lib/client-ip";
 import { rateLimit } from "@/lib/rate-limit";
 import WholesaleProductCard from "@/components/WholesaleProductCard";
+import WholesaleOrder from "@/components/WholesaleOrder";
 
 // El código es corto y fijo (una sola constante, sin BD detrás), así que sin
 // límite se puede recorrer por fuerza bruta a base de peticiones GET
@@ -153,11 +154,14 @@ export default async function CatchAllPage({
           </p>
         )}
 
-        {/* Pie neutro, sin marca */}
-        <footer className="mt-20 border-t border-border pt-8 text-center text-xs text-secondary/60">
+        {/* Pie neutro, sin marca. pb extra: la barra del pedido es fija y
+            taparía las últimas líneas. */}
+        <footer className="mt-20 border-t border-border pb-16 pt-8 text-center text-xs text-secondary/60">
           Catálogo privado · Los precios pueden cambiar sin aviso · Pedidos por WhatsApp
         </footer>
       </div>
+
+      <WholesaleOrder />
     </div>
   );
 }
