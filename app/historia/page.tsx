@@ -9,9 +9,13 @@ import { getActiveProductCount } from "@/lib/catalog";
 
 // Esta página usa su propia serif (distinta del Marcellus global) para darle
 // un aire más editorial a la historia de la marca.
+// Solo el grosor 400: los títulos del sitio van todos en 400 (regla global de
+// globals.css) y aquí no hay ninguna clase que pida otro. Cargar 500 y 600 era
+// descargar dos tipografías que nunca se pintan — y se descargan en TODAS las
+// páginas, porque el menú enlaza a Historia y Next precarga sus archivos.
 const playfair = Playfair_Display({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400"],
   display: "swap",
 });
 
