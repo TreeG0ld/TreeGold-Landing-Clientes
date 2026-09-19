@@ -94,7 +94,10 @@ export default function PaymentMethodsModal() {
               alt="Addi, Sistecrédito y tarjetas débito y crédito"
               fill
               priority
-              sizes="(max-width: 768px) 100vw, 448px"
+              // Anchos reales de la tarjeta (max-w-sm = 384px, md:max-w-md =
+              // 448px), no "100vw": con 100vw una tablet de 768px pedía una
+              // imagen del doble de ancho del que de verdad se pinta.
+              sizes="(max-width: 768px) 384px, 448px"
               className="object-contain"
             />
             {/* Funde la foto con la tarjeta: sin esto queda una línea dura
