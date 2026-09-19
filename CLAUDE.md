@@ -78,10 +78,40 @@ son el rastro de una corrección masiva de precios y tallas hecha a partir de fo
 Google Drive (ya aplicada a la base de datos) — quedan como referencia, no hace falta
 volver a correrlos salvo que se repita ese tipo de corrección.
 
+## Despliegue (producción)
+
+La tienda está EN VIVO en **https://treegold.shop**, sobre un VPS de Hostinger
+(Ubuntu, `/var/www/treegold`). No es Vercel.
+
+**Para publicar cambios**, una vez subidos a GitHub, dentro del VPS:
+
+```bash
+cd /var/www/treegold
+./deploy.sh
+```
+
+`deploy.sh` hace `git pull` + `npm install` + `prisma generate` + `npm run build`
++ `pm2 restart treegold`, y se detiene en el primer error. No toca Nginx ni el
+`.env`. Mientras compila, la tienda sigue sirviendo la versión anterior: el
+cambio ocurre en el `pm2 restart`, que tarda un par de segundos.
+
+Piezas del servidor, por si hay que diagnosticar:
+
+- **PM2** corre la app (proceso `treegold`) en `127.0.0.1:3000` y arranca sola
+  si el servidor se reinicia (`systemctl is-enabled pm2-root` → `enabled`).
+- **Nginx** es el proxy reverso (`/etc/nginx/sites-available/treegold`). Manda
+  `X-Forwarded-For` con la IP real al final, que es lo que `lib/client-ip.ts`
+  necesita junto con `TRUST_PROXY_XFF=1` en el `.env` de producción.
+- **TLS**: Let's Encrypt vía Certbot, con renovación automática. NO es el
+  "Origin Certificate" de Cloudflare que describe `deploy/nginx.conf.example`:
+  no hay Cloudflare delante, el DNS apunta directo al VPS.
+- **Rate limit de Nginx**: 30 req/s por IP con picos de 60
+  (`/etc/nginx/conf.d/ratelimit.conf`). Si aparecen 429 inesperados en
+  producción, mirar ahí ANTES que en la app. Respaldo de la config previa en
+  `/root/nginx-treegold-backup.conf`.
+
 ## Cosas que NO están hechas todavía
 
-- Deploy a Vercel / dominio propio (las variables de entorno de arriba hay que
-  configurarlas también ahí cuando se haga).
 - Mover las credenciales generadas automáticamente (`ADMIN_PASSWORD`, etc.) a algo que el
   dueño del negocio elija — por ahora son valores random generados durante el desarrollo.
   Ojo: cambiarlas en `.env` ya no basta, hay que volver a correr `scripts/seed-admin.mjs`
