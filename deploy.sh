@@ -8,8 +8,13 @@ set -e
 echo "==> git pull"
 git pull
 
-echo "==> npm install"
-npm install
+# `npm ci` y no `npm install`: instala EXACTAMENTE las versiones de
+# package-lock.json sin reescribirlo. Con `npm install` el servidor modificaba
+# ese archivo por su cuenta y el siguiente `git pull` abortaba por conflicto
+# ("Your local changes would be overwritten by merge"). Además garantiza que
+# en producción quedan las mismas versiones que se probaron antes de subir.
+echo "==> npm ci"
+npm ci
 
 echo "==> prisma generate"
 npx prisma generate
