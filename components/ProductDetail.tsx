@@ -11,14 +11,14 @@ import { useSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
 import { buildProductLink } from "@/lib/whatsapp";
 import { flyToCart } from "@/lib/flyToCart";
-import { useAddCooldown, ADD_COOLDOWN_SECONDS } from "@/lib/useAddCooldown";
+import { useAddCooldown } from "@/lib/useAddCooldown";
 
 export default function ProductDetail({ product }: { product: Product }) {
   const add = useSelection((s) => s.add);
   const [active, setActive] = useState(0);
   const [size, setSize] = useState(product.sizes?.[0]);
   const [added, setAdded] = useState(false);
-  const { waiting, claim } = useAddCooldown();
+  const { remaining, claim } = useAddCooldown();
 
   const handleAdd = (e: React.MouseEvent) => {
     if (!claim()) return;
@@ -162,9 +162,9 @@ export default function ProductDetail({ product }: { product: Product }) {
             </a>
           </div>
 
-          {waiting && (
+          {remaining > 0 && (
             <p role="status" className="mt-3 text-center text-sm text-secondary sm:text-left">
-              Espera {ADD_COOLDOWN_SECONDS} segundos antes de seguir agregando
+              Espera {remaining} {remaining === 1 ? "segundo" : "segundos"} antes de seguir agregando
               esta joya.
             </p>
           )}

@@ -8,7 +8,7 @@ import type { Product } from "@/lib/products";
 import { useSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
 import { flyToCart } from "@/lib/flyToCart";
-import { useAddCooldown, ADD_COOLDOWN_SECONDS } from "@/lib/useAddCooldown";
+import { useAddCooldown } from "@/lib/useAddCooldown";
 
 // "index" escalona la entrada (cascada): cada tarjeta espera su turno.
 // Se usa módulo 8 para que las filas de más abajo (que aparecen al hacer
@@ -21,7 +21,7 @@ export default function ProductCard({
   index?: number;
 }) {
   const add = useSelection((s) => s.add);
-  const { waiting, claim } = useAddCooldown();
+  const { remaining, claim } = useAddCooldown();
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -72,7 +72,7 @@ export default function ProductCard({
             <Plus className="h-5 w-5" />
           </button>
 
-          {waiting && (
+          {remaining > 0 && (
             <motion.span
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
@@ -80,7 +80,7 @@ export default function ProductCard({
               role="status"
               className="absolute bottom-4 left-3 right-16 truncate rounded-full bg-primary/90 px-3 py-1.5 text-center text-[0.68rem] font-medium text-on-primary"
             >
-              Espera {ADD_COOLDOWN_SECONDS} segundos
+              Espera {remaining} {remaining === 1 ? "segundo" : "segundos"}
             </motion.span>
           )}
         </div>

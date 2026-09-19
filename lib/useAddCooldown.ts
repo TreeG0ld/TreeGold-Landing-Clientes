@@ -8,7 +8,6 @@ import { useEffect, useRef, useState } from "react";
 // animación de vuelo por clic hasta tapar la pantalla.
 export const ADD_BURST = 3;
 export const ADD_COOLDOWN_MS = 3000;
-export const ADD_COOLDOWN_SECONDS = Math.round(ADD_COOLDOWN_MS / 1000);
 
 export function useAddCooldown() {
   // Racha y relojes viven en refs, no en estado: dos clics muy seguidos
@@ -17,19 +16,33 @@ export function useAddCooldown() {
   const streak = useRef(0);
   const lastAddAt = useRef(0);
   const blockedUntil = useRef(0);
-  const [waiting, setWaiting] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Segundos que faltan; 0 = no hay espera. El componente lo pinta tal cual.
+  const [remaining, setRemaining] = useState(0);
+  const tick = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => {
-    return () => {
-      if (timer.current) clearTimeout(timer.current);
+  function stopTick() {
+    if (tick.current) clearInterval(tick.current);
+    tick.current = null;
+  }
+
+  useEffect(() => stopTick, []);
+
+  // Cuenta regresiva hasta `until`. Se refresca cada 250 ms y no cada segundo
+  // para que el número cambie justo cuando toca: con un intervalo de 1 s, el
+  // primer salto se veía tarde si el clic caía a mitad de segundo.
+  function countdownTo(until: number) {
+    stopTick();
+    const update = () => {
+      const left = Math.ceil((until - Date.now()) / 1000);
+      if (left <= 0) {
+        setRemaining(0);
+        stopTick();
+        return;
+      }
+      setRemaining(left);
     };
-  }, []);
-
-  function showNotice(ms: number) {
-    setWaiting(true);
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => setWaiting(false), ms);
+    update();
+    tick.current = setInterval(update, 250);
   }
 
   // true = el clic se atiende; false = está en espera.
@@ -37,7 +50,7 @@ export function useAddCooldown() {
     const now = Date.now();
 
     if (now < blockedUntil.current) {
-      showNotice(blockedUntil.current - now);
+      countdownTo(blockedUntil.current);
       return false;
     }
 
@@ -51,12 +64,12 @@ export function useAddCooldown() {
     if (streak.current > ADD_BURST) {
       blockedUntil.current = now + ADD_COOLDOWN_MS;
       streak.current = 0;
-      showNotice(ADD_COOLDOWN_MS);
+      countdownTo(blockedUntil.current);
       return false;
     }
 
     return true;
   }
 
-  return { waiting, claim };
+  return { remaining, claim };
 }
