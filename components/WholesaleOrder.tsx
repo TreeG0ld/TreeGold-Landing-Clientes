@@ -125,7 +125,25 @@ export default function WholesaleOrder() {
                             >
                               <Minus className="h-4 w-4" />
                             </button>
-                            <span className="w-6 text-center text-sm">{i.qty}</span>
+                            {/* Escribible: un distribuidor que pide 45 unidades
+                                no puede darle 45 veces al "+". Al enfocar se
+                                selecciona todo, así teclear la cifra la
+                                reemplaza en vez de agregarse a la actual. */}
+                            <input
+                              type="number"
+                              min={1}
+                              max={999}
+                              value={i.qty}
+                              onFocus={(e) => e.currentTarget.select()}
+                              onChange={(e) => {
+                                const n = parseInt(e.target.value, 10);
+                                if (Number.isFinite(n) && n > 0) {
+                                  setQty(i.slug, i.size, Math.min(n, 999));
+                                }
+                              }}
+                              aria-label={`Cantidad de ${i.name}`}
+                              className="w-12 [appearance:textfield] bg-transparent text-center text-sm outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                            />
                             <button
                               onClick={() => setQty(i.slug, i.size, i.qty + 1)}
                               aria-label="Aumentar"
