@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion } from "motion/react";
 import { CreditCard } from "lucide-react";
 
 // Aviso de medios de pago. Aparece en CADA carga de la página, a propósito: no
@@ -13,36 +12,39 @@ const IMAGE = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_C
 
 const METHODS = ["Addi", "Sistecrédito", "Débito y crédito"];
 
-const EASE_IN = [0.16, 1, 0.3, 1] as const;
-const EASE_OUT = [0.4, 0, 0.2, 1] as const;
+// Debe sobrevivir a la transición más larga (la del fondo, 700ms).
+const EXIT_MS = 750;
 
 export default function PaymentMethodsModal() {
-  // Abierto desde el primer render (también en el del servidor): así el aviso
-  // ya viene en el HTML y no se ve la tienda un instante antes de que aparezca.
-  const [open, setOpen] = useState(true);
-  // El elemento se queda en el DOM hasta que la animación de salida TERMINA.
-  // Se hace a mano en vez de con <AnimatePresence> porque ahí la salida no
-  // llegaba a ejecutarse: React quitaba el nodo antes y el aviso desaparecía
-  // de golpe.
+  // `visible` maneja la transición (entrar y salir); `inDom` retira el nodo
+  // solo cuando la salida ya terminó. Las animaciones son transiciones de CSS
+  // y no de la librería de animación: con esta última la salida no llegaba a
+  // ejecutarse nunca —el aviso desaparecía de golpe— mientras que una
+  // transición de CSS la dispara el propio navegador al cambiar la clase.
+  const [visible, setVisible] = useState(false);
   const [inDom, setInDom] = useState(true);
   const acceptRef = useRef<HTMLButtonElement>(null);
 
-  // Retirarlo por tiempo fijo y no con el aviso de fin de animación de la
-  // librería: ese aviso también se dispara cuando una animación es sustituida
-  // por otra, y entonces el nodo desaparecía antes de que la salida se viera.
-  function accept() {
-    setOpen(false);
-    setTimeout(() => setInDom(false), 750);
-  }
+  // Arranca oculto y se muestra en el siguiente fotograma: una transición de
+  // CSS solo corre si el navegador alcanza a pintar el estado inicial antes
+  // del cambio. Sin este salto de fotograma, aparecería de golpe.
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   useEffect(() => {
-    if (!open) return;
     document.body.style.overflow = "hidden";
     acceptRef.current?.focus();
     return () => {
       document.body.style.overflow = "";
     };
-  }, [open]);
+  }, []);
+
+  function accept() {
+    setVisible(false);
+    setTimeout(() => setInDom(false), EXIT_MS);
+  }
 
   // El aviso es de aceptación obligatoria: no se cierra con Escape, ni al
   // tocar el fondo, ni tabulando hacia la página de atrás.
@@ -53,42 +55,24 @@ export default function PaymentMethodsModal() {
   if (!inDom) return null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: open ? 1 : 0 }}
-      // Al irse tarda más que la tarjeta: primero se disuelve el aviso y
-      // después se despeja el fondo, así la tienda "vuelve a enfocarse".
-      transition={{ duration: open ? 0.4 : 0.65, ease: EASE_IN }}
+    <div
       onKeyDown={trapKeys}
-      // Libera los clics apenas empieza la salida: la tienda queda utilizable
-      // sin esperar a que termine la animación.
-      style={{ pointerEvents: open ? "auto" : "none" }}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-primary/55 px-5 py-8 backdrop-blur-md"
+      className={`fixed inset-0 z-[100] flex items-center justify-center bg-primary/55 px-5 py-8 backdrop-blur-md transition-opacity duration-700 ease-out ${
+        visible ? "opacity-100" : "pointer-events-none opacity-0"
+      }`}
     >
-      <motion.div
+      <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="medios-pago-titulo"
-        // Solo opacidad, escala y desplazamiento: nada de `filter: blur`, que
-        // sobre esta tarjeta (que ya lleva desenfoque de fondo) hacía que la
-        // salida saltara en vez de animarse.
-        initial={{ opacity: 0, y: 32, scale: 0.92 }}
-        animate={
-          open
-            ? {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                transition: { duration: 0.7, delay: 0.12, ease: EASE_IN },
-              }
-            : {
-                opacity: 0,
-                y: 12,
-                scale: 0.9,
-                transition: { duration: 0.5, ease: EASE_OUT },
-              }
-        }
-        className="flex max-h-full w-full max-w-sm flex-col overflow-hidden rounded-[1.125rem] border border-white/25 bg-white/15 p-[3px] shadow-2xl shadow-black/40 ring-1 ring-inset ring-white/10 backdrop-blur-xl md:max-w-md"
+        // Sale más rápido que el fondo (500ms contra 700ms): primero se
+        // disuelve la tarjeta y después se despeja la tienda. Al entrar lleva
+        // un retraso para que el fondo se oscurezca primero.
+        className={`flex max-h-full w-full max-w-sm flex-col overflow-hidden rounded-[1.125rem] border border-white/25 bg-white/15 p-[3px] shadow-2xl shadow-black/40 ring-1 ring-inset ring-white/10 backdrop-blur-xl transition-[opacity,transform] duration-500 ease-out md:max-w-md ${
+          visible
+            ? "translate-y-0 scale-100 opacity-100 delay-150"
+            : "translate-y-3 scale-90 opacity-0"
+        }`}
       >
         {/* Dos capas: el marco de arriba es el vidrio translúcido (deja ver la
             tienda borrosa por detrás) y este de adentro es la tarjeta sólida
@@ -153,7 +137,7 @@ export default function PaymentMethodsModal() {
             </button>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
