@@ -63,25 +63,32 @@ const csp = [
   // dev: 'unsafe-eval' es obligatorio por el devtool 'eval-source-map' que usa
   // webpack en desarrollo (HMR / react-refresh). En producción NUNCA: ni gsap
   // ni motion usan eval/new Function.
+  // googletagmanager.com es de donde baja gtag.js (Google Analytics). Es el
+  // único host externo con permiso de ejecutar scripts aquí.
   isDev
-    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-    : "script-src 'self' 'unsafe-inline'",
+    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com"
+    : "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
   // Compensa parcialmente el 'unsafe-inline' de arriba: corta los manejadores
   // inline tipo onclick="..." (React 19 nunca emite atributos on*="").
   ...(isDev ? [] : ["script-src-attr 'none'"]),
   "style-src 'self' 'unsafe-inline'",
   // Sin data: ni blob: en producción: hoy ningún <Image> usa placeholder="blur",
   // que es lo único que generaría un data:image/svg+xml.
+  // google-analytics.com en img-src: cuando el navegador bloquea las peticiones
+  // normales, gtag manda la medición como un pixel de 1x1.
   isDev
-    ? "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com"
-    : "img-src 'self' https://res.cloudinary.com https://images.unsplash.com",
+    ? "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://*.google-analytics.com https://www.googletagmanager.com"
+    : "img-src 'self' https://res.cloudinary.com https://images.unsplash.com https://*.google-analytics.com https://www.googletagmanager.com",
   // next/font auto-hospeda los .woff2 en /_next/static/media: no hace falta
   // fonts.gstatic.com ni fonts.googleapis.com.
   isDev ? "font-src 'self' data:" : "font-src 'self'",
   // dev: ws/wss para el socket de HMR.
+  // Los dos comodines de Google son necesarios: la medición no siempre sale a
+  // www.google-analytics.com, también usa endpoints por región
+  // (region1.google-analytics.com) y analytics.google.com.
   isDev
-    ? "connect-src 'self' ws: wss: https://api.cloudinary.com"
-    : "connect-src 'self' https://api.cloudinary.com",
+    ? "connect-src 'self' ws: wss: https://api.cloudinary.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com"
+    : "connect-src 'self' https://api.cloudinary.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
   "media-src 'none'",
   ...(isDev ? [] : ["worker-src 'none'"]),
   "manifest-src 'none'",

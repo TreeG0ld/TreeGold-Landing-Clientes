@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Marcellus, Jost } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
@@ -29,6 +30,11 @@ const jost = Jost({
 // no se nota) en vez de recortar: con recorte se perderían los globos de los
 // extremos.
 const OG_IMAGE = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_pad,b_black,ar_1.91,w_1200,f_jpg,q_auto/treegold/marca/medios-de-pago.png`;
+
+// Identificador público de Google Analytics (viaja en el HTML de todas las
+// páginas, no es un secreto). Va en el código y no en el .env a propósito: si
+// faltara la variable en el servidor, la medición se caería sin avisar.
+const GA_MEASUREMENT_ID = "G-2W58WXHQMS";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -156,6 +162,22 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(businessJsonLd).replace(/</g, "\\u003c") }}
         />
+
+        {/* Google Analytics. `afterInteractive` lo carga DESPUÉS de que la
+            página ya responde al usuario: medir no debe retrasar la tienda.
+            Los hosts de Google están permitidos uno a uno en la política de
+            seguridad de next.config.mjs (script-src, connect-src e img-src);
+            sin eso el navegador bloquearía la medición en silencio. */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga-init" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_MEASUREMENT_ID}');`}
+        </Script>
         <SiteChrome footer={<Footer />}>{children}</SiteChrome>
       </body>
     </html>
