@@ -21,6 +21,15 @@ const jost = Jost({
   display: "swap",
 });
 
+// Imagen de la vista previa al compartir el enlace (WhatsApp, Facebook…).
+// Es la misma de los medios de pago del aviso de inicio: el dueño prefiere que
+// al compartir se vea que hay crédito con Addi y Sistecrédito antes que el
+// logo. Cloudinary la entrega en 1200x630, la proporción que esperan esas
+// plataformas, rellenando con negro (el fondo de la foto ya es negro, así que
+// no se nota) en vez de recortar: con recorte se perderían los globos de los
+// extremos.
+const OG_IMAGE = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_pad,b_black,ar_1.91,w_1200,f_jpg,q_auto/treegold/marca/medios-de-pago.png`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
@@ -51,13 +60,22 @@ export const metadata: Metadata = {
     locale: "es_CO",
     url: site.url,
     siteName: site.fullName,
-    images: [{ url: "/logo.png", width: 820, height: 876, alt: site.fullName }],
+    images: [
+      {
+        url: OG_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: "Paga con Addi, Sistecrédito o tarjetas débito y crédito",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    // "summary_large_image" y no "summary": con el segundo la vista previa
+    // sale como una miniatura cuadrada y se perdería media imagen.
+    card: "summary_large_image",
     title: site.fullName,
     description: site.description,
-    images: ["/logo.png"],
+    images: [OG_IMAGE],
   },
   robots: {
     index: true,

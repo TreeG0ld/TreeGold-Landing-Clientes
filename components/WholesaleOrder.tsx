@@ -9,6 +9,51 @@ import { useWholesaleSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
 import { buildWholesaleSelectionLink } from "@/lib/whatsapp";
 
+const MAX_QTY = 999;
+
+// Cantidad escribible: un distribuidor que pide 45 unidades no puede darle 45
+// veces al "+". Guarda lo tecleado en su propio estado para que el campo pueda
+// quedar VACÍO mientras se escribe; si se atara directo a la cantidad del
+// pedido, al borrarlo reaparecería el número anterior y sería imposible
+// reemplazarlo.
+function QtyInput({
+  value,
+  label,
+  onCommit,
+}: {
+  value: number;
+  label: string;
+  onCommit: (qty: number) => void;
+}) {
+  const [draft, setDraft] = useState(String(value));
+
+  // Los botones + y − cambian la cantidad por fuera: hay que reflejarla.
+  useEffect(() => setDraft(String(value)), [value]);
+
+  return (
+    <input
+      // `text` + teclado numérico en vez de `number`: evita las flechitas del
+      // navegador y que la rueda del mouse cambie la cantidad sin querer.
+      type="text"
+      inputMode="numeric"
+      value={draft}
+      aria-label={label}
+      onFocus={(e) => e.currentTarget.select()}
+      onChange={(e) => {
+        const digits = e.target.value.replace(/\D/g, "").slice(0, 3);
+        setDraft(digits);
+        const n = parseInt(digits, 10);
+        if (n > 0) onCommit(Math.min(n, MAX_QTY));
+      }}
+      onBlur={() => {
+        // Si lo dejó vacío o en cero, se vuelve a la cantidad real del pedido.
+        if (!draft || parseInt(draft, 10) < 1) setDraft(String(value));
+      }}
+      className="w-12 bg-transparent text-center text-sm outline-none"
+    />
+  );
+}
+
 // Pedido del catálogo mayorista: barra flotante + panel para ajustar
 // cantidades y enviarlo completo por WhatsApp. Deliberadamente NO enlaza a
 // /producto/[slug] (esa ruta muestra el precio de venta al detal) ni menciona
@@ -125,24 +170,10 @@ export default function WholesaleOrder() {
                             >
                               <Minus className="h-4 w-4" />
                             </button>
-                            {/* Escribible: un distribuidor que pide 45 unidades
-                                no puede darle 45 veces al "+". Al enfocar se
-                                selecciona todo, así teclear la cifra la
-                                reemplaza en vez de agregarse a la actual. */}
-                            <input
-                              type="number"
-                              min={1}
-                              max={999}
+                            <QtyInput
                               value={i.qty}
-                              onFocus={(e) => e.currentTarget.select()}
-                              onChange={(e) => {
-                                const n = parseInt(e.target.value, 10);
-                                if (Number.isFinite(n) && n > 0) {
-                                  setQty(i.slug, i.size, Math.min(n, 999));
-                                }
-                              }}
-                              aria-label={`Cantidad de ${i.name}`}
-                              className="w-12 [appearance:textfield] bg-transparent text-center text-sm outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                              label={`Cantidad de ${i.name}`}
+                              onCommit={(n) => setQty(i.slug, i.size, n)}
                             />
                             <button
                               onClick={() => setQty(i.slug, i.size, i.qty + 1)}

@@ -33,13 +33,19 @@ export default function PaymentMethodsModal() {
     return () => cancelAnimationFrame(id);
   }, []);
 
+  // El bloqueo del scroll va atado a que el aviso esté VISIBLE, no a que el
+  // componente exista. Si se bloqueara al montar y el aviso no llegara a
+  // aparecer (JavaScript lento, una extensión que rompe la hidratación), el
+  // cliente quedaría con la página trabada y sin nada que tocar para
+  // desbloquearla. También libera el scroll apenas empieza la salida.
   useEffect(() => {
+    if (!visible) return;
     document.body.style.overflow = "hidden";
     acceptRef.current?.focus();
     return () => {
       document.body.style.overflow = "";
     };
-  }, []);
+  }, [visible]);
 
   function accept() {
     setVisible(false);
