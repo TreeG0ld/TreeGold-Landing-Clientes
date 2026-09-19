@@ -96,11 +96,24 @@ export const viewport: Viewport = {
 // TODAS las páginas (patrón recomendado por Google para Organization/
 // LocalBusiness). Solo usa datos ya públicos en el sitio (mismo horario y
 // dirección que aparecen en /contacto y en el Footer).
+// Fotos editoriales (las mismas del carrusel de la home) en vez del logo.
+// `image` es de donde Google saca la miniatura del resultado de búsqueda, y una
+// persona usando las joyas llama mucho más que un logotipo — que es justo la
+// diferencia con la competencia que sí sale con foto. El logo no se pierde:
+// va en `logo`, que es su campo propio.
+const BRAND_PHOTOS = [
+  // Modelo con collar de plata (la principal).
+  "https://res.cloudinary.com/dkab59i18/image/upload/w_1200,f_jpg,q_auto/v1783708925/treegold/marca/WhatsApp_Image_2026-07-06_at_10.47.47_2.jpg",
+  // Modelo con el estuche de regalo del conjunto dorado.
+  "https://res.cloudinary.com/dkab59i18/image/upload/w_1200,f_jpg,q_auto/v1783708927/treegold/marca/WhatsApp_Image_2026-07-06_at_10.47.46_1.jpg",
+];
+
 const businessJsonLd = {
   "@context": "https://schema.org",
   "@type": "JewelryStore",
   name: site.fullName,
-  image: `${site.url}/logo.png`,
+  image: BRAND_PHOTOS,
+  logo: `${site.url}/logo.png`,
   url: site.url,
   telephone: `+${site.whatsapp}`,
   email: site.email,
