@@ -46,6 +46,15 @@ const BANNER_MOBILE_SRCSET = MOBILE_WIDTHS.map(
   (w) => `${imageLoader({ src: BANNER_MOBILE, width: w })} ${w}w`
 ).join(", ");
 
+// Respaldo del <img> para quien ignore el srcset (rastreadores, generadores de
+// vista previa, navegadores viejos). Apunta a la variante optimizada y no al
+// archivo original: ese PNG crudo pesa 1 MB, contra 91 KB en WebP al mismo
+// ancho. Los navegadores actuales usan el srcset y nunca llegan aquí.
+const BANNER_MOBILE_FALLBACK = imageLoader({
+  src: BANNER_MOBILE,
+  width: MOBILE_WIDTHS[MOBILE_WIDTHS.length - 1],
+});
+
 export default function Hero() {
   const root = useRef<HTMLDivElement>(null);
 
@@ -122,7 +131,7 @@ export default function Hero() {
               dimensiones (absolute inset-0 h-full w-full), así que el ratio
               intrínseco nunca decide el layout y no puede haber CLS. */}
           <img
-            src={BANNER_MOBILE}
+            src={BANNER_MOBILE_FALLBACK}
             srcSet={BANNER_MOBILE_SRCSET}
             sizes="100vw"
             alt="TreeGold Joyería — Tú mereces brillar"
