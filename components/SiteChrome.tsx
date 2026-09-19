@@ -6,6 +6,7 @@ import WhatsAppFAB from "@/components/WhatsAppFAB";
 import SelectionDrawer from "@/components/SelectionDrawer";
 import FlyToCart from "@/components/FlyToCart";
 import PaymentMethodsModal from "@/components/PaymentMethodsModal";
+import CookieNotice from "@/components/CookieNotice";
 
 // El panel /admin tiene su propia navegación (AdminNav) y no debe mostrar
 // el navbar/footer/FAB de la tienda pública. La tienda mayorista
@@ -38,6 +39,7 @@ export default function SiteChrome({
       {/* Solo en la tienda pública: el panel /admin y el catálogo mayorista
           quedan fuera por el `isChromeless` de arriba. */}
       <PaymentMethodsModal />
+      <CookieNotice />
     </>
   );
 }
