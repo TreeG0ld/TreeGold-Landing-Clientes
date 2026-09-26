@@ -23,6 +23,7 @@ import { clientIpFromHeaders, rateLimitIp } from "@/lib/client-ip";
 import { rateLimit } from "@/lib/rate-limit";
 import WholesaleProductCard from "@/components/WholesaleProductCard";
 import WholesaleOrder from "@/components/WholesaleOrder";
+import WholesaleSearch from "@/components/WholesaleSearch";
 
 // El código es corto y fijo (una sola constante, sin BD detrás), así que sin
 // límite se puede recorrer por fuerza bruta a base de peticiones GET
@@ -60,7 +61,7 @@ export default async function CatchAllPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ categoria?: string }>;
+  searchParams: Promise<{ categoria?: string; q?: string }>;
 }) {
   const { slug } = await params;
 
@@ -78,11 +79,12 @@ export default async function CatchAllPage({
   }
   if (!(await isValidWholesaleCode(codigo))) notFound();
 
-  const { categoria } = await searchParams;
+  const { categoria, q } = await searchParams;
   const category = categoria ?? "todos";
+  const query = q?.trim() ?? "";
 
   const [products, categories] = await Promise.all([
-    getWholesaleProducts(category),
+    getWholesaleProducts(category, query),
     getWholesaleCategories(),
   ]);
 
@@ -117,7 +119,14 @@ export default async function CatchAllPage({
                 return (
                   <Link
                     key={t.slug}
-                    href={t.slug === "todos" ? base : `${base}?categoria=${t.slug}`}
+                    href={`${base}${
+                      [
+                        t.slug === "todos" ? "" : `categoria=${t.slug}`,
+                        query ? `q=${encodeURIComponent(query)}` : "",
+                      ]
+                        .filter(Boolean)
+                        .reduce((acc, p, i) => (i === 0 ? `?${p}` : `${acc}&${p}`), "")
+                    }`}
                     className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 ${
                       active
                         ? "bg-primary text-white"
@@ -132,6 +141,7 @@ export default async function CatchAllPage({
             <span className="hidden shrink-0 pr-2 text-xs text-secondary/70 sm:block">
               {products.length} {products.length === 1 ? "pieza" : "piezas"}
             </span>
+            <WholesaleSearch base={base} categoria={category} initialQuery={query} />
           </div>
         </div>
 
@@ -150,7 +160,9 @@ export default async function CatchAllPage({
           </div>
         ) : (
           <p className="py-24 text-center text-secondary">
-            No hay piezas disponibles en esta categoría por ahora.
+            {query
+              ? `No encontramos piezas con “${query}”. Prueba con otra palabra.`
+              : "No hay piezas disponibles en esta categoría por ahora."}
           </p>
         )}
 

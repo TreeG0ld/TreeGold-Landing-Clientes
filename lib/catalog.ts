@@ -6,6 +6,7 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { site } from "@/lib/site";
+import { matchesSearch, searchWords } from "@/lib/search-text";
 import type { Product, Category } from "@/lib/products";
 
 // Productos por página en el catálogo.
@@ -127,23 +128,6 @@ export type CatalogPage = {
   totalPages: number;
 };
 
-// Deja el texto comparable: sin tildes y en minúscula.
-function normalize(text: string): string {
-  return text
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase();
-}
-
-// Palabras del término de búsqueda. Se recorta la "s" final porque el cliente
-// escribe el plural ("anillos") y los productos están en singular ("Anillo …").
-function searchWords(q: string): string[] {
-  return normalize(q)
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((w) => (w.length > 3 && w.endsWith("s") ? w.slice(0, -1) : w));
-}
-
 // Índice de búsqueda: solo slug y nombre de lo visible en tienda (~700 filas de
 // texto corto). Cacheado con la misma tag que el catálogo, así que se rehace
 // solo cuando se crea o edita un producto.
@@ -165,12 +149,7 @@ async function slugsMatching(q: string): Promise<string[]> {
   const words = searchWords(q);
   if (!words.length) return [];
   const rows = await getSearchIndex();
-  return rows
-    .filter((r) => {
-      const name = normalize(r.name);
-      return words.every((w) => name.includes(w));
-    })
-    .map((r) => r.slug);
+  return rows.filter((r) => matchesSearch(r.name, words)).map((r) => r.slug);
 }
 
 // Página del catálogo: filtra por categoría y por nombre, ordena y pagina EN EL

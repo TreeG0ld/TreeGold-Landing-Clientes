@@ -3,6 +3,7 @@
 // costo deben verse siempre frescos, recién corregidos en el panel /admin.
 
 import { prisma } from "@/lib/prisma";
+import { matchesSearch, searchWords } from "@/lib/search-text";
 
 export type WholesaleProduct = {
   slug: string;
@@ -45,7 +46,14 @@ function toWholesaleProduct(p: {
   };
 }
 
-export async function getWholesaleProducts(categorySlug?: string): Promise<WholesaleProduct[]> {
+// `q` se filtra en Node y no en SQL, igual que en la tienda pública: Postgres
+// no ignora las tildes sin la extensión `unaccent`, así que "trebol" no
+// encontraría "Topo trébol". La consulta ya trae la categoría completa (unos
+// cientos de filas), así que descartar por nombre encima no cuesta nada.
+export async function getWholesaleProducts(
+  categorySlug?: string,
+  q = ""
+): Promise<WholesaleProduct[]> {
   const rows = await prisma.product.findMany({
     where: {
       isWholesale: true,
@@ -64,7 +72,13 @@ export async function getWholesaleProducts(categorySlug?: string): Promise<Whole
     },
     orderBy: { createdAt: "desc" },
   });
-  return rows.map(toWholesaleProduct);
+
+  const words = searchWords(q);
+  const filtradas = words.length
+    ? rows.filter((r) => matchesSearch(r.name, words))
+    : rows;
+
+  return filtradas.map(toWholesaleProduct);
 }
 
 export async function getWholesaleCategories(): Promise<{ slug: string; name: string }[]> {
