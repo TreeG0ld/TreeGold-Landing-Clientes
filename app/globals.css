@@ -30,6 +30,13 @@
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    /* Reserva siempre el espacio de la barra de desplazamiento. Al abrir el
+       carrito, el menú o cualquier panel se bloquea el scroll: sin esto la
+       barra desaparece, el contenido se ensancha ~15px de golpe y toda la
+       página da un salto. Reservando el hueco, el ancho nunca cambia — y
+       arregla también los elementos fijos (navbar, botón de WhatsApp), que
+       con un relleno en el body seguirían saltando. */
+    scrollbar-gutter: stable;
   }
 
   body {
