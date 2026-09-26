@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useSelection } from "@/lib/store";
 import { coleccionHref } from "@/lib/catalog-url";
 import { site } from "@/lib/site";
+import { lockScroll } from "@/lib/scroll-lock";
 
 const links = [
   { href: "/", label: "Inicio" },
@@ -61,10 +62,8 @@ export default function Navbar() {
   }
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
+    if (!open) return;
+    return lockScroll();
   }, [open]);
 
   // Sobre el hero oscuro (solo home, sin scroll y sin menú abierto) usamos texto claro.

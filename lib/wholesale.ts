@@ -12,6 +12,11 @@ export type WholesaleProduct = {
   price: number; // wholesalePrice (o retailPrice si no hay costo cargado)
   retailPrice: number; // precio sugerido de venta al público
   material: string;
+  // Medida visible ("Talla 7", "45 cm"...). El distribuidor la necesita para
+  // saber qué está pidiendo: sin ella dos referencias del mismo modelo en
+  // tallas distintas se ven idénticas.
+  size: string;
+  description: string;
   images: string[];
 };
 
@@ -21,6 +26,8 @@ function toWholesaleProduct(p: {
   retailPrice: number;
   wholesalePrice: number | null;
   material: string | null;
+  size: string | null;
+  description: string;
   images: string[];
   category: { slug: string; name: string };
 }): WholesaleProduct {
@@ -32,6 +39,8 @@ function toWholesaleProduct(p: {
     price: p.wholesalePrice ?? p.retailPrice,
     retailPrice: p.retailPrice,
     material: p.material ?? "",
+    size: p.size ?? "",
+    description: p.description ?? "",
     images: p.images,
   };
 }
@@ -48,6 +57,8 @@ export async function getWholesaleProducts(categorySlug?: string): Promise<Whole
       retailPrice: true,
       wholesalePrice: true,
       material: true,
+      size: true,
+      description: true,
       images: true,
       category: { select: { slug: true, name: true } },
     },

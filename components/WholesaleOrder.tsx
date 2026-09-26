@@ -8,6 +8,7 @@ import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useWholesaleSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
 import { buildWholesaleSelectionLink } from "@/lib/whatsapp";
+import { lockScroll } from "@/lib/scroll-lock";
 
 const MAX_QTY = 999;
 
@@ -68,12 +69,12 @@ export default function WholesaleOrder() {
   // no coinciden.
   useEffect(() => setMounted(true), []);
 
+  // Incluye `items.length`: al vaciar el pedido el panel deja de dibujarse sin
+  // desmontarse, y antes se quedaba con el scroll bloqueado para siempre.
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
+    if (!isOpen || items.length === 0) return;
+    return lockScroll();
+  }, [isOpen, items.length]);
 
   const total = items.reduce((n, i) => n + i.qty * i.price, 0);
   const count = items.reduce((n, i) => n + i.qty, 0);

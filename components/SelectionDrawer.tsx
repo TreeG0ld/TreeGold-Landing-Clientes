@@ -9,16 +9,15 @@ import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
 import { buildSelectionLink } from "@/lib/whatsapp";
+import { lockScroll } from "@/lib/scroll-lock";
 
 export default function SelectionDrawer() {
   const { items, isOpen, close, remove, setQty } = useSelection();
   const total = items.reduce((n, i) => n + i.qty * i.price, 0);
 
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
+    if (!isOpen) return;
+    return lockScroll();
   }, [isOpen]);
 
   return (

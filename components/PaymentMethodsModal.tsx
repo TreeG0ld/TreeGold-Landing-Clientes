@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { CreditCard } from "lucide-react";
+import { lockScroll } from "@/lib/scroll-lock";
 
 // Aviso de medios de pago. Aparece en CADA carga de la página, a propósito: no
 // se guarda que ya se aceptó, ni en sessionStorage ni en localStorage. Navegar
@@ -40,11 +41,8 @@ export default function PaymentMethodsModal() {
   // desbloquearla. También libera el scroll apenas empieza la salida.
   useEffect(() => {
     if (!visible) return;
-    document.body.style.overflow = "hidden";
     acceptRef.current?.focus();
-    return () => {
-      document.body.style.overflow = "";
-    };
+    return lockScroll();
   }, [visible]);
 
   function accept() {

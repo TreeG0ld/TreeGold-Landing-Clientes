@@ -50,6 +50,17 @@ export function validateProductPayload(body: unknown): ValidationResult {
 
   const slug = cleanString(b.slug, MAX_TEXT);
   if (!slug) return { ok: false, error: "El código (slug) es obligatorio." };
+  // El código es la dirección web del producto (/producto/<código>). Un espacio
+  // ahí rompe la página: tres productos quedaron inaccesibles ("COMBO 3",
+  // "Combo 4", "COMBO 2") hasta que se detectó. Se permiten letras, números,
+  // guiones, guion bajo y punto, que es lo que admite una URL sin codificar.
+  if (!/^[a-zA-Z0-9._-]+$/.test(slug)) {
+    return {
+      ok: false,
+      error:
+        "El código solo puede tener letras, números, guiones (-), guion bajo (_) y puntos. Sin espacios ni tildes: por ejemplo, escribe COMBO-3 en vez de COMBO 3.",
+    };
+  }
 
   const name = cleanString(b.name, MAX_TEXT);
   if (!name) return { ok: false, error: "El nombre es obligatorio." };

@@ -5,13 +5,16 @@ import Image from "next/image";
 import { Check, Plus } from "lucide-react";
 import { formatCOP } from "@/lib/format";
 import { useWholesaleSelection } from "@/lib/store";
+import WholesaleProductModal from "@/components/WholesaleProductModal";
 import type { WholesaleProduct } from "@/lib/wholesale";
 
-// Tarjeta simple para el catálogo de mayoristas: NO enlaza a /producto/[slug]
-// (esa ruta pública muestra el precio de venta al detal, no el de costo).
+// Tarjeta del catálogo de mayoristas. Al tocarla NO navega a /producto/[slug]
+// (esa ruta pública muestra el precio de venta al detal): abre una ventana con
+// la vista ampliada dentro del mismo catálogo.
 export default function WholesaleProductCard({ product }: { product: WholesaleProduct }) {
   const add = useWholesaleSelection((s) => s.add);
   const [added, setAdded] = useState(false);
+  const [openDetail, setOpenDetail] = useState(false);
 
   // Sin tope de clics seguidos, al revés que en la tienda pública: un
   // distribuidor pide por cantidad y necesita sumar unidades rápido.
@@ -28,18 +31,26 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
 
   return (
     <div className="group">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-white">
+      <button
+        type="button"
+        onClick={() => setOpenDetail(true)}
+        aria-label={`Ver ${product.name} en detalle`}
+        className="relative block aspect-[4/5] w-full overflow-hidden rounded-2xl bg-white cursor-pointer"
+      >
         <Image
           src={product.images[0]}
           alt={product.name}
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-contain p-4"
+          className="object-contain p-4 transition-transform duration-500 ease-luxe group-hover:scale-105"
         />
-      </div>
+      </button>
       <div className="mt-4 px-1">
         <div className="flex items-baseline justify-between gap-2">
-          <h3 className="min-w-0 truncate font-serif text-sm leading-tight pr-1 sm:text-base">
+          <h3
+            onClick={() => setOpenDetail(true)}
+            className="min-w-0 truncate font-serif text-sm leading-tight pr-1 transition-colors hover:text-accent sm:text-base cursor-pointer"
+          >
             {product.name}
           </h3>
           <div className="shrink-0 text-right">
@@ -51,8 +62,16 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
             </span>
           </div>
         </div>
+        {/* La medida va aquí porque es lo que distingue dos referencias del
+            mismo modelo: sin ella el distribuidor no sabe qué está pidiendo. */}
         <p className="mt-1 text-xs uppercase tracking-wide text-secondary/60">
-          {[product.categoryName, product.material].filter(Boolean).join(" · ")}
+          {/* `Set` quita repetidos: en muchas piezas la categoría y el material
+              son el mismo texto ("Plata ley 925") y salía dos veces. */}
+          {[
+            ...new Set(
+              [product.categoryName, product.material, product.size].filter(Boolean)
+            ),
+          ].join(" · ")}
         </p>
         <button
           onClick={handleAdd}
@@ -74,6 +93,13 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
           )}
         </button>
       </div>
+
+      {openDetail && (
+        <WholesaleProductModal
+          product={product}
+          onClose={() => setOpenDetail(false)}
+        />
+      )}
     </div>
   );
 }
