@@ -100,8 +100,10 @@ export default function PaymentMethodsModal() {
               fetchPriority="low"
               // Anchos reales de la tarjeta (max-w-sm = 384px, md:max-w-md =
               // 448px), no "100vw": con 100vw una tablet de 768px pedía una
-              // imagen del doble de ancho del que de verdad se pinta.
-              sizes="(max-width: 768px) 384px, 448px"
+              // imagen del doble de ancho del que de verdad se pinta. En
+              // celulares de menos de 432px la tarjeta no llega a 384: ocupa
+              // la pantalla menos 48px (px-5 del fondo, p-[3px] y el borde).
+              sizes="(max-width: 432px) calc(100vw - 48px), (max-width: 768px) 384px, 448px"
               className="object-contain"
             />
             {/* Funde la foto con la tarjeta: sin esto queda una línea dura

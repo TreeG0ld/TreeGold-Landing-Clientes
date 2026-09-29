@@ -2,10 +2,10 @@
 
 import { useRef } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { onEnterView } from "@/lib/on-enter-view";
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+gsap.registerPlugin(useGSAP);
 
 export type Stat = { value: number; suffix?: string; label: string };
 
@@ -17,19 +17,23 @@ export default function StatsCounter({ stats }: { stats: Stat[] }) {
   useGSAP(
     () => {
       const nums = gsap.utils.toArray<HTMLElement>(".stat-num");
-      nums.forEach((el) => {
-        const end = Number(el.dataset.value);
-        const obj = { val: 0 };
-        gsap.to(obj, {
-          val: end,
-          duration: 2,
-          ease: "power2.out",
-          scrollTrigger: { trigger: el, start: "top 88%" },
-          onUpdate: () => {
-            el.textContent = Math.round(obj.val).toLocaleString("es-CO");
-          },
-        });
-      });
+      // Cada número cuenta al entrar en pantalla (antes con ScrollTrigger;
+      // ver lib/on-enter-view.ts).
+      const stops = nums.map((el) =>
+        onEnterView(el, 0.88, () => {
+          const end = Number(el.dataset.value);
+          const obj = { val: 0 };
+          gsap.to(obj, {
+            val: end,
+            duration: 2,
+            ease: "power2.out",
+            onUpdate: () => {
+              el.textContent = Math.round(obj.val).toLocaleString("es-CO");
+            },
+          });
+        })
+      );
+      return () => stops.forEach((stop) => stop());
     },
     { scope: root }
   );

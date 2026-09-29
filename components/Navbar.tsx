@@ -90,10 +90,14 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center" aria-label={site.fullName}>
           <Image
-            src="/logo.png"
+            // logo-sm.png (188x200, 12 KB) y no logo.png (820x876, 23 KB): el
+            // loader no redimensiona archivos locales, así que se servía el
+            // original completo para pintarlo a 56px. logo.png queda solo
+            // para los datos estructurados de Google (app/layout.tsx).
+            src="/logo-sm.png"
             alt={site.fullName}
-            width={300}
-            height={320}
+            width={188}
+            height={200}
             // Sin `priority`: el LCP real de la home es el banner del Hero.
             // Este logo mide 56px de alto en pantalla — precargarlo competía
             // por ancho de banda con la imagen que sí importa medir en LCP.

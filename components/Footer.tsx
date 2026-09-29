@@ -12,10 +12,10 @@ export default function Footer() {
           <div>
             <Link href="/" aria-label={site.fullName} className="inline-block">
               <Image
-                src="/logo.png"
+                src="/logo-sm.png"
                 alt={site.fullName}
-                width={820}
-                height={876}
+                width={188}
+                height={200}
                 className="h-24 w-auto"
               />
             </Link>

@@ -3,12 +3,11 @@
 import { useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { ChevronDown } from "lucide-react";
 import imageLoader from "@/lib/imageLoader";
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+gsap.registerPlugin(useGSAP);
 
 // Banner oficial de marca (logo + eslogan integrados en la imagen), subido a
 // treegold/marca/ (carpeta exenta del recorte de catálogo en imageLoader).

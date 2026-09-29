@@ -26,7 +26,7 @@ export default async function LoginPage() {
 
       <div className="relative w-full max-w-md rounded-3xl border border-border bg-white p-10 shadow-lg sm:p-12">
         <div className="flex justify-center">
-          <Image src="/logo.png" alt="TreeGold" width={820} height={876} priority className="h-20 w-auto" />
+          <Image src="/logo-sm.png" alt="TreeGold" width={188} height={200} priority className="h-20 w-auto" />
         </div>
 
         <h1 className="mt-5 text-center font-serif text-3xl text-primary">Iniciar Sesión</h1>

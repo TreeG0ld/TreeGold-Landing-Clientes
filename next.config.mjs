@@ -141,6 +141,11 @@ const nextConfig = {
     // el paquete entero al bundle. Next reescribe cada import para traer solo
     // lo que se usa.
     optimizePackageImports: ["lucide-react", "motion", "embla-carousel-react"],
+    // Los estilos van dentro del HTML en vez de en un .css aparte: son solo
+    // 10 KB y así el navegador no espera una segunda descarga antes de pintar
+    // la primera pantalla (PageSpeed lo marcaba como "solicitud que bloquea
+    // el renderizado").
+    inlineCss: true,
   },
   images: {
     // Loader propio: optimiza cada imagen (formato, calidad y tamaño)
@@ -151,9 +156,10 @@ const nextConfig = {
     // todos en su srcset, y en la portada eso sumaba 56 KB de HTML. Los que
     // se quitaron (16-48 px y 2048/3840) no los usa ninguna foto del sitio;
     // los que quedan cubren desde la miniatura del carrito hasta una pantalla
-    // grande.
+    // grande. 750 se queda: es el ancho exacto de muchos celulares con
+    // pantalla de alta densidad, y sin él saltaban a 828.
     imageSizes: [64, 128, 256, 384],
-    deviceSizes: [640, 828, 1080, 1200, 1920],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

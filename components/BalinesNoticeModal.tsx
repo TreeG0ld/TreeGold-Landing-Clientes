@@ -104,7 +104,8 @@ export default function BalinesNoticeModal() {
               alt="Balines dorados sobre mármol negro"
               fill
               priority
-              sizes="(max-width: 768px) 384px, 448px"
+              // Igual que el aviso de medios de pago (ver PaymentMethodsModal).
+              sizes="(max-width: 432px) calc(100vw - 48px), (max-width: 768px) 384px, 448px"
               className="object-cover [mask-image:linear-gradient(to_bottom,black_55%,transparent)]"
             />
           </div>

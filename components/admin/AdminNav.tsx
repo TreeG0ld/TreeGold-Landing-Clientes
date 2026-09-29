@@ -34,7 +34,7 @@ export default function AdminNav({ user }: { user: string }) {
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-y-3 px-5 py-3.5">
         <div className="flex items-center gap-3 md:gap-6">
           <Link href="/admin/productos" className="flex shrink-0 items-center gap-2" aria-label="TreeGold · Admin">
-            <Image src="/logo.png" alt="" width={820} height={876} className="h-8 w-auto" />
+            <Image src="/logo-sm.png" alt="" width={188} height={200} className="h-8 w-auto" />
             <span className="hidden font-serif text-lg text-primary sm:inline">Admin</span>
           </Link>
           <nav className="flex items-center gap-1">
