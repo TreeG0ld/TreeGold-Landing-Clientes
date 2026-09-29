@@ -1,11 +1,11 @@
 "use client";
 
-import { useRef } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
+import { useEffect, useRef } from "react";
 import { onEnterView } from "@/lib/on-enter-view";
 
-gsap.registerPlugin(useGSAP);
+// power2.out de GSAP (la curva que usaba antes): rápido al inicio, suave al final.
+const easeOut = (t: number) => 1 - (1 - t) ** 3;
+const DURATION_MS = 2000;
 
 export type Stat = { value: number; suffix?: string; label: string };
 
@@ -14,29 +14,30 @@ export type Stat = { value: number; suffix?: string; label: string };
 export default function StatsCounter({ stats }: { stats: Stat[] }) {
   const root = useRef<HTMLDivElement>(null);
 
-  useGSAP(
-    () => {
-      const nums = gsap.utils.toArray<HTMLElement>(".stat-num");
-      // Cada número cuenta al entrar en pantalla (antes con ScrollTrigger;
-      // ver lib/on-enter-view.ts).
-      const stops = nums.map((el) =>
-        onEnterView(el, 0.88, () => {
-          const end = Number(el.dataset.value);
-          const obj = { val: 0 };
-          gsap.to(obj, {
-            val: end,
-            duration: 2,
-            ease: "power2.out",
-            onUpdate: () => {
-              el.textContent = Math.round(obj.val).toLocaleString("es-CO");
-            },
-          });
-        })
-      );
-      return () => stops.forEach((stop) => stop());
-    },
-    { scope: root }
-  );
+  // Cada número cuenta de 0 a su valor al entrar en pantalla. Con
+  // requestAnimationFrame y no con GSAP: era la única razón para cargar la
+  // librería en /historia.
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    const frames = new Set<number>();
+    const stops = Array.from(el.querySelectorAll<HTMLElement>(".stat-num")).map((num) =>
+      onEnterView(num, 0.88, () => {
+        const end = Number(num.dataset.value);
+        const start = performance.now();
+        const tick = (now: number) => {
+          const t = Math.min(1, (now - start) / DURATION_MS);
+          num.textContent = Math.round(end * easeOut(t)).toLocaleString("es-CO");
+          if (t < 1) frames.add(requestAnimationFrame(tick));
+        };
+        frames.add(requestAnimationFrame(tick));
+      })
+    );
+    return () => {
+      stops.forEach((stop) => stop());
+      frames.forEach((id) => cancelAnimationFrame(id));
+    };
+  }, []);
 
   return (
     <div

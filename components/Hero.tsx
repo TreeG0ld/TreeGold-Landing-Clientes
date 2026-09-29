@@ -1,13 +1,13 @@
-"use client";
-
-import { useRef } from "react";
 import Link from "next/link";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import { ChevronDown } from "lucide-react";
 import imageLoader from "@/lib/imageLoader";
 
-gsap.registerPlugin(useGSAP);
+// Componente de servidor, sin JavaScript en el navegador: la entrada (el
+// banner que se acerca, los botones que suben, la flecha) son animaciones de
+// CSS (.hero-img/.hero-fade/.hero-scroll en globals.css). Antes las hacía GSAP
+// al hidratar: el celular tenía que descargar y ejecutar la librería antes de
+// animar, y en ese momento los botones desaparecían para volver a entrar.
+// Ahora arrancan con el primer pintado.
 
 // Banner oficial de marca (logo + eslogan integrados en la imagen), subido a
 // treegold/marca/ (carpeta exenta del recorte de catálogo en imageLoader).
@@ -55,39 +55,8 @@ const BANNER_MOBILE_FALLBACK = imageLoader({
 });
 
 export default function Hero() {
-  const root = useRef<HTMLDivElement>(null);
-
-  useGSAP(
-    () => {
-      // Nada de esto debe dejar el banner invisible si algo sale mal: por
-      // eso los elementos NO empiezan ocultos por CSS (nada de opacity:0 por
-      // defecto en el markup) — quedan visibles de fábrica, y es GSAP quien
-      // decide animarlos. Si el usuario prefiere menos movimiento, o si esta
-      // función nunca llega a ejecutarse (JS lento, bloqueado, error), lo
-      // peor que pasa es que no hay animación: el banner SIGUE viéndose.
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-
-      // El banner solo se acerca, SIN fundido de opacidad: es el elemento más
-      // grande de la portada (el "LCP" que mide Google), y al esconderlo con
-      // opacity:0 mientras cargaba el JavaScript el celular lo contaba como
-      // pintado recién al terminar la animación, segundos después de que la
-      // foto ya había llegado.
-      tl.from(".hero-img", { scale: 1.06, duration: 1.6, ease: "power2.out" })
-        .from(
-          ".hero-fade",
-          { y: 24, opacity: 0, duration: 0.9, stagger: 0.15 },
-          "-=0.8"
-        )
-        .from(".hero-scroll", { opacity: 0, duration: 0.8 }, "-=0.3");
-    },
-    { scope: root }
-  );
-
   return (
     <section
-      ref={root}
       // El alto NO depende del viewport (min-h): se fija a la proporción
       // exacta de cada foto (retrato 1086x1448 en celular, panorámica
       // 7672x3280 en escritorio), así el rectángulo siempre tiene la misma

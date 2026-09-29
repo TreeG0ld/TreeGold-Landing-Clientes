@@ -1,11 +1,7 @@
 "use client";
 
-import { useRef, type ElementType, type ReactNode } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
+import { useLayoutEffect, useRef, type ElementType, type ReactNode } from "react";
 import { onEnterView } from "@/lib/on-enter-view";
-
-gsap.registerPlugin(useGSAP);
 
 type RevealProps = {
   children: ReactNode;
@@ -19,9 +15,13 @@ type RevealProps = {
   className?: string;
 };
 
-// Aparece al llegar con el scroll: GSAP anima, IntersectionObserver decide
-// cuándo (ver lib/on-enter-view.ts: antes era ScrollTrigger). Se dispara una
-// sola vez, cuando el borde superior del bloque pasa el 85% de la pantalla.
+// power3.out de GSAP, la curva que usaba este componente.
+const EASE_OUT = "cubic-bezier(0.165, 0.84, 0.44, 1)";
+
+// Aparece al llegar con el scroll, una sola vez, cuando el borde superior del
+// bloque pasa el 85% de la pantalla (lib/on-enter-view.ts). La animación es
+// de la Web Animations API del navegador: antes era GSAP, una librería que el
+// celular tenía que descargar en cada visita solo para esto.
 // Anima opacity + translateY (solo transform/opacity => 60fps).
 export default function Reveal({
   children,
@@ -36,29 +36,55 @@ export default function Reveal({
   const ref = useRef<HTMLDivElement>(null);
   const Tag = (as ?? "div") as ElementType;
 
-  useGSAP(
-    () => {
-      const root = ref.current;
-      if (!root) return;
-      const targets = childSelector
-        ? root.querySelectorAll(childSelector)
-        : [root];
+  // Layout effect: oculta ANTES de que el navegador pinte tras hidratar; con
+  // useEffect se alcanzaba a ver el contenido un instante antes de esconderse.
+  useLayoutEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-      gsap.set(targets, { autoAlpha: 0, y });
-      // Lo que devuelve se ejecuta al desmontar (useGSAP): deja de observar.
-      return onEnterView(root, 0.85, () =>
-        gsap.to(targets, {
-          autoAlpha: 1,
-          y: 0,
-          duration,
-          delay,
-          ease: "power3.out",
-          stagger: childSelector ? stagger : 0,
-        })
-      );
-    },
-    { scope: ref }
-  );
+    const targets = childSelector
+      ? Array.from(root.querySelectorAll<HTMLElement>(childSelector))
+      : [root];
+
+    // Ocultos (y fuera del foco del teclado, igual que el autoAlpha de GSAP)
+    // hasta que entren en pantalla.
+    for (const t of targets) {
+      t.style.opacity = "0";
+      t.style.visibility = "hidden";
+    }
+
+    const stop = onEnterView(root, 0.85, () => {
+      targets.forEach((t, i) => {
+        t.style.opacity = "";
+        t.style.visibility = "";
+        // fill "backwards": mientras espera su turno en la cascada se queda
+        // en el primer fotograma (oculto y abajo); al terminar vuelve a sus
+        // propios estilos, sin dejar nada pegado.
+        t.animate(
+          [
+            { opacity: 0, transform: `translateY(${y}px)` },
+            { opacity: 1, transform: "none" },
+          ],
+          {
+            duration: duration * 1000,
+            delay: (delay + (childSelector ? i * stagger : 0)) * 1000,
+            easing: EASE_OUT,
+            fill: "backwards",
+          }
+        );
+      });
+    });
+
+    return () => {
+      stop();
+      for (const t of targets) {
+        t.style.opacity = "";
+        t.style.visibility = "";
+        t.getAnimations().forEach((a) => a.cancel());
+      }
+    };
+  }, [childSelector, stagger, y, delay, duration]);
 
   return (
     <Tag ref={ref} className={className}>

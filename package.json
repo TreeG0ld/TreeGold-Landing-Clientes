@@ -11,13 +11,11 @@
     "test": "node --test --import ./tests/helpers/register-alias.mjs \"tests/**/*.test.mjs\""
   },
   "dependencies": {
-    "@gsap/react": "^2.1.2",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.10.0",
     "embla-carousel-react": "^8.6.0",
-    "gsap": "^3.13.0",
     "lucide-react": "^0.460.0",
     "motion": "^12.40.0",
     "next": "^15.5.20",

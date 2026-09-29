@@ -171,12 +171,82 @@
   background-position: center;
   border: 2px solid rgba(255, 255, 255, 0.85);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
-  will-change: transform;
+  will-change: translate, scale, opacity;
 }
 
-/* Hide elements until GSAP reveals them (prevents flash). Disabled if reduced motion. */
-.reveal-init {
-  opacity: 0;
+/* Entrada del banner de la portada (components/Hero.tsx). En CSS y no en
+   JavaScript: arranca con el primer pintado, sin esperar a que el celular
+   descargue y ejecute código. Mismo guion que tenía con GSAP: el banner se
+   acerca 1,6 s; los botones suben desde los 0,8 s y la flecha aparece al
+   final. El banner NO se desvanece (solo escala): es el elemento que Google
+   mide como LCP, y esconderlo lo daba por pintado recién al terminar. */
+@keyframes hero-zoom {
+  from {
+    transform: scale(1.06);
+  }
+}
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+@keyframes hero-appear {
+  from {
+    opacity: 0;
+  }
+}
+.hero-img {
+  /* power2.out de GSAP */
+  animation: hero-zoom 1.6s cubic-bezier(0.215, 0.61, 0.355, 1) both;
+}
+.hero-fade {
+  /* power3.out */
+  animation: hero-rise 0.9s cubic-bezier(0.165, 0.84, 0.44, 1) 0.8s both;
+}
+.hero-scroll {
+  animation: hero-appear 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) 1.4s both;
+}
+
+/* Aviso de medios de pago (components/PaymentMethodsModal.tsx). Entra con
+   animaciones de CSS desde el HTML del servidor, así que se ve con el primer
+   pintado; antes esperaba a que cargara el JavaScript y recién ahí empezaba
+   a fundirse, lo que retrasaba el "Speed Index" de PageSpeed en celular.
+   El fondo tarda más que la tarjeta (700 contra 500 ms): al entrar se
+   oscurece primero la tienda y al salir se disuelve primero la tarjeta. */
+@keyframes pm-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes pm-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes pm-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.9);
+  }
+}
+@keyframes pm-card-out {
+  to {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.9);
+  }
+}
+.pm-backdrop-in {
+  animation: pm-fade-in 700ms ease-out both;
+}
+.pm-backdrop-out {
+  animation: pm-fade-out 700ms ease-out forwards;
+}
+.pm-card-in {
+  animation: pm-card-in 500ms ease-out 150ms both;
+}
+.pm-card-out {
+  animation: pm-card-out 500ms ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -186,8 +256,15 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  .reveal-init {
-    opacity: 1 !important;
+  /* La regla de arriba acorta la duración pero no el retraso: sin esto los
+     botones del banner y la tarjeta del aviso seguirían ocultos durante su
+     espera inicial. */
+  .hero-img,
+  .hero-fade,
+  .hero-scroll,
+  .pm-backdrop-in,
+  .pm-card-in {
+    animation: none !important;
   }
 }
 

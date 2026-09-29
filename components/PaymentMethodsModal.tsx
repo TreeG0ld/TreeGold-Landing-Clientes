@@ -13,40 +13,43 @@ const IMAGE = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_C
 
 const METHODS = ["Addi", "Sistecrédito", "Débito y crédito"];
 
-// Debe sobrevivir a la transición más larga (la del fondo, 700ms).
+// Debe sobrevivir a la animación de salida más larga (la del fondo, 700 ms).
 const EXIT_MS = 750;
 
+// Casilla oculta que permite cerrar el aviso ANTES de que cargue el
+// JavaScript (ver el botón "Entendido" más abajo).
+const CHECKBOX_ID = "aviso-pagos-aceptado";
+
 export default function PaymentMethodsModal() {
-  // `visible` maneja la transición (entrar y salir); `inDom` retira el nodo
-  // solo cuando la salida ya terminó. Las animaciones son transiciones de CSS
-  // y no de la librería de animación: con esta última la salida no llegaba a
-  // ejecutarse nunca —el aviso desaparecía de golpe— mientras que una
-  // transición de CSS la dispara el propio navegador al cambiar la clase.
-  const [visible, setVisible] = useState(false);
+  // El aviso ya viene visible en el HTML del servidor y entra con animaciones
+  // de CSS (.pm-backdrop-in / .pm-card-in en globals.css): se ve con el
+  // primer pintado, sin esperar al JavaScript. `saliendo` cambia a las
+  // animaciones de salida; `inDom` retira el nodo cuando terminaron.
+  const [saliendo, setSaliendo] = useState(false);
   const [inDom, setInDom] = useState(true);
-  const acceptRef = useRef<HTMLButtonElement>(null);
+  const acceptRef = useRef<HTMLLabelElement>(null);
+  const checkboxRef = useRef<HTMLInputElement>(null);
 
-  // Arranca oculto y se muestra en el siguiente fotograma: una transición de
-  // CSS solo corre si el navegador alcanza a pintar el estado inicial antes
-  // del cambio. Sin este salto de fotograma, aparecería de golpe.
+  // Bloquea el scroll y lleva el foco al botón mientras el aviso está en
+  // pantalla; lo libera apenas empieza la salida.
   useEffect(() => {
-    const id = requestAnimationFrame(() => setVisible(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
-
-  // El bloqueo del scroll va atado a que el aviso esté VISIBLE, no a que el
-  // componente exista. Si se bloqueara al montar y el aviso no llegara a
-  // aparecer (JavaScript lento, una extensión que rompe la hidratación), el
-  // cliente quedaría con la página trabada y sin nada que tocar para
-  // desbloquearla. También libera el scroll apenas empieza la salida.
-  useEffect(() => {
-    if (!visible) return;
+    if (saliendo) return;
+    // Si el cliente lo cerró antes de que cargara el JavaScript, la casilla
+    // ya está marcada y el CSS lo ocultó: no hay nada que bloquear.
+    if (checkboxRef.current?.checked) {
+      setInDom(false);
+      return;
+    }
     acceptRef.current?.focus();
     return lockScroll();
-  }, [visible]);
+  }, [saliendo]);
 
-  function accept() {
-    setVisible(false);
+  function accept(e: React.SyntheticEvent) {
+    // Con JavaScript no se marca la casilla (eso lo ocultaría de golpe): se
+    // hace la salida animada.
+    e.preventDefault();
+    if (saliendo) return;
+    setSaliendo(true);
     setTimeout(() => setInDom(false), EXIT_MS);
   }
 
@@ -59,100 +62,117 @@ export default function PaymentMethodsModal() {
   if (!inDom) return null;
 
   return (
-    <div
-      onKeyDown={trapKeys}
-      className={`fixed inset-0 z-[100] flex items-center justify-center bg-primary/55 px-5 py-8 backdrop-blur-md transition-opacity duration-700 ease-out ${
-        visible ? "opacity-100" : "pointer-events-none opacity-0"
-      }`}
-    >
+    <>
+      {/* Cierre sin JavaScript: el botón es una <label> de esta casilla, y
+          `peer-checked:hidden` oculta el aviso al marcarla. Antes de hidratar
+          (o si el JavaScript fallara), tocar "Entendido" igual deja entrar a
+          la tienda; el aviso nunca puede dejar la página trabada. */}
+      <input
+        ref={checkboxRef}
+        type="checkbox"
+        id={CHECKBOX_ID}
+        className="peer hidden"
+        tabIndex={-1}
+        aria-hidden="true"
+      />
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="medios-pago-titulo"
-        // Sale más rápido que el fondo (500ms contra 700ms): primero se
-        // disuelve la tarjeta y después se despeja la tienda. Al entrar lleva
-        // un retraso para que el fondo se oscurezca primero.
-        className={`flex max-h-full w-full max-w-sm flex-col overflow-hidden rounded-[1.125rem] border border-white/25 bg-white/15 p-[3px] shadow-2xl shadow-black/40 ring-1 ring-inset ring-white/10 backdrop-blur-xl transition-[opacity,transform] duration-500 ease-out md:max-w-md ${
-          visible
-            ? "translate-y-0 scale-100 opacity-100 delay-150"
-            : "translate-y-3 scale-90 opacity-0"
+        onKeyDown={trapKeys}
+        className={`fixed inset-0 z-[100] flex items-center justify-center bg-primary/55 px-5 py-8 backdrop-blur-md peer-checked:hidden ${
+          saliendo ? "pm-backdrop-out pointer-events-none" : "pm-backdrop-in"
         }`}
       >
-        {/* Dos capas: el marco de arriba es el vidrio translúcido (deja ver la
-            tienda borrosa por detrás) y este de adentro es la tarjeta sólida
-            con el contenido. El radio interior es el exterior menos el grosor
-            del marco, si no las esquinas no encajan. */}
-        <div className="min-h-0 overflow-y-auto rounded-[0.9375rem] bg-background">
-          {/* Más alto que la foto (4:3 vs 3:2) con `object-contain`: el negro
-              ocupa más sin recortar los globos de los extremos. El fondo de la
-              imagen ya es negro, así que no se nota el relleno. */}
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-[0.9375rem] bg-black">
-            <Image
-              src={IMAGE}
-              alt="Addi, Sistecrédito y tarjetas débito y crédito"
-              fill
-              // Sin `priority`: eso metía un preload en el <head> y la foto del
-              // aviso se descargaba a la par con el banner de la portada, que
-              // es lo que el visitante ve primero. `eager` la sigue pidiendo
-              // de una vez (sin esperar a que se vea), para que esté lista
-              // cuando el aviso aparece, pero con prioridad baja.
-              loading="eager"
-              fetchPriority="low"
-              // Anchos reales de la tarjeta (max-w-sm = 384px, md:max-w-md =
-              // 448px), no "100vw": con 100vw una tablet de 768px pedía una
-              // imagen del doble de ancho del que de verdad se pinta. En
-              // celulares de menos de 432px la tarjeta no llega a 384: ocupa
-              // la pantalla menos 48px (px-5 del fondo, p-[3px] y el borde).
-              sizes="(max-width: 432px) calc(100vw - 48px), (max-width: 768px) 384px, 448px"
-              className="object-contain"
-            />
-            {/* Funde la foto con la tarjeta: sin esto queda una línea dura
-                entre el negro de la imagen y el fondo crema. Baja 1px de más
-                (el contenedor lo recorta) porque con el alto en decimales
-                quedaba una fila de píxeles negros sin tapar. */}
-            <div className="absolute inset-x-0 -bottom-px h-1/3 bg-gradient-to-t from-background via-background/70 to-transparent" />
-          </div>
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="medios-pago-titulo"
+          // Sale más rápido que el fondo (500ms contra 700ms): primero se
+          // disuelve la tarjeta y después se despeja la tienda. Al entrar lleva
+          // un retraso para que el fondo se oscurezca primero.
+          className={`flex max-h-full w-full max-w-sm flex-col overflow-hidden rounded-[1.125rem] border border-white/25 bg-white/15 p-[3px] shadow-2xl shadow-black/40 ring-1 ring-inset ring-white/10 backdrop-blur-xl md:max-w-md ${
+            saliendo ? "pm-card-out" : "pm-card-in"
+          }`}
+        >
+          {/* Dos capas: el marco de arriba es el vidrio translúcido (deja ver la
+              tienda borrosa por detrás) y este de adentro es la tarjeta sólida
+              con el contenido. El radio interior es el exterior menos el grosor
+              del marco, si no las esquinas no encajan. */}
+          <div className="min-h-0 overflow-y-auto rounded-[0.9375rem] bg-background">
+            {/* Más alto que la foto (4:3 vs 3:2) con `object-contain`: el negro
+                ocupa más sin recortar los globos de los extremos. El fondo de la
+                imagen ya es negro, así que no se nota el relleno. */}
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-[0.9375rem] bg-black">
+              <Image
+                src={IMAGE}
+                alt="Addi, Sistecrédito y tarjetas débito y crédito"
+                fill
+                // Sin `priority`: eso metía un preload en el <head> que competía
+                // con el banner de la portada (el LCP). `eager` la pide de una
+                // vez, porque el aviso se ve desde el primer pintado, pero con
+                // prioridad baja EXPLÍCITA: al estar en pantalla, el navegador
+                // la subía solo a "alta" y le quitaba ancho de banda al banner
+                // (en celular el LCP pasaba de ~0,8 a ~1,3 s de descarga).
+                loading="eager"
+                fetchPriority="low"
+                // Anchos reales de la tarjeta (max-w-sm = 384px, md:max-w-md =
+                // 448px), no "100vw": con 100vw una tablet de 768px pedía una
+                // imagen del doble de ancho del que de verdad se pinta. En
+                // celulares de menos de 432px la tarjeta no llega a 384: ocupa
+                // la pantalla menos 48px (px-5 del fondo, p-[3px] y el borde).
+                sizes="(max-width: 432px) calc(100vw - 48px), (max-width: 768px) 384px, 448px"
+                className="object-contain"
+              />
+              {/* Funde la foto con la tarjeta: sin esto queda una línea dura
+                  entre el negro de la imagen y el fondo crema. Baja 1px de más
+                  (el contenedor lo recorta) porque con el alto en decimales
+                  quedaba una fila de píxeles negros sin tapar. */}
+              <div className="absolute inset-x-0 -bottom-px h-1/3 bg-gradient-to-t from-background via-background/70 to-transparent" />
+            </div>
 
-          <div className="px-6 pb-6 pt-2 text-center">
-            <p className="eyebrow mb-3 flex items-center justify-center gap-2">
-              <CreditCard className="h-3.5 w-3.5" /> Formas de pago
-            </p>
-            <h2
-              id="medios-pago-titulo"
-              className="font-serif text-2xl leading-tight text-primary"
-            >
-              Llévatela hoy, págala a tu ritmo
-            </h2>
-            <p className="mx-auto mt-3 text-[0.8rem] leading-relaxed text-secondary">
-              Paga a crédito con <span className="text-primary">Addi</span> o{" "}
-              <span className="text-primary">Sistecrédito</span>, o con tus
-              tarjetas débito y crédito.
-            </p>
+            <div className="px-6 pb-6 pt-2 text-center">
+              <p className="eyebrow mb-3 flex items-center justify-center gap-2">
+                <CreditCard className="h-3.5 w-3.5" /> Formas de pago
+              </p>
+              <h2
+                id="medios-pago-titulo"
+                className="font-serif text-2xl leading-tight text-primary"
+              >
+                Llévatela hoy, págala a tu ritmo
+              </h2>
+              <p className="mx-auto mt-3 text-[0.8rem] leading-relaxed text-secondary">
+                Paga a crédito con <span className="text-primary">Addi</span> o{" "}
+                <span className="text-primary">Sistecrédito</span>, o con tus
+                tarjetas débito y crédito.
+              </p>
 
-            <ul className="mt-5 flex flex-wrap items-center justify-center gap-1.5">
-              {METHODS.map((m) => (
-                <li
-                  key={m}
-                  className="rounded-full border border-border px-3 py-1 text-[0.7rem] font-medium tracking-wide text-secondary"
-                >
-                  {m}
-                </li>
-              ))}
-            </ul>
+              <ul className="mt-5 flex flex-wrap items-center justify-center gap-1.5">
+                {METHODS.map((m) => (
+                  <li
+                    key={m}
+                    className="rounded-full border border-border px-3 py-1 text-[0.7rem] font-medium tracking-wide text-secondary"
+                  >
+                    {m}
+                  </li>
+                ))}
+              </ul>
 
-            {/* El foco entra aquí solo para poder aceptar con Enter, pero sin
-                anillo visible: es el único botón del aviso, así que el borde
-                del navegador no orienta a nadie y ensucia el diseño. */}
-            <button
-              ref={acceptRef}
-              onClick={accept}
-              className="btn-primary mt-6 w-full py-3 outline-none focus:outline-none focus-visible:outline-none"
-            >
-              Entendido, ver la tienda
-            </button>
+              {/* El foco entra aquí solo para poder aceptar con Enter, pero sin
+                  anillo visible: es el único botón del aviso, así que el borde
+                  del navegador no orienta a nadie y ensucia el diseño. */}
+              <label
+                ref={acceptRef}
+                htmlFor={CHECKBOX_ID}
+                role="button"
+                tabIndex={0}
+                onClick={accept}
+                onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && accept(e)}
+                className="btn-primary mt-6 w-full cursor-pointer select-none py-3 outline-none focus:outline-none focus-visible:outline-none"
+              >
+                Entendido, ver la tienda
+              </label>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
