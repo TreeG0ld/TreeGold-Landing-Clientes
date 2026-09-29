@@ -20,10 +20,12 @@ const MAX_QTY = 999;
 function QtyInput({
   value,
   label,
+  min,
   onCommit,
 }: {
   value: number;
   label: string;
+  min: number;
   onCommit: (qty: number) => void;
 }) {
   const [draft, setDraft] = useState(String(value));
@@ -47,8 +49,10 @@ function QtyInput({
         if (n > 0) onCommit(Math.min(n, MAX_QTY));
       }}
       onBlur={() => {
-        // Si lo dejó vacío o en cero, se vuelve a la cantidad real del pedido.
-        if (!draft || parseInt(draft, 10) < 1) setDraft(String(value));
+        // Vacío o por debajo del mínimo: se vuelve a la cantidad real. No se
+        // corrige mientras escribe porque para llegar a "50" primero se teclea
+        // "5", y saltarle a 12 en ese momento le arruinaría la cifra.
+        if (!draft || parseInt(draft, 10) < min) setDraft(String(value));
       }}
       className="w-12 bg-transparent text-center text-sm outline-none"
     />
@@ -161,18 +165,23 @@ export default function WholesaleOrder() {
                         </div>
                         <span className="mt-0.5 text-xs text-secondary/70">
                           {formatCOP(i.price)} c/u
+                          {(i.minQty ?? 1) > 1 && ` · mínimo ${i.minQty} u.`}
                         </span>
                         <div className="mt-auto flex items-center justify-between pt-2">
                           <div className="flex items-center gap-3 rounded-full border border-border px-2 py-1">
                             <button
                               onClick={() => setQty(i.slug, i.size, i.qty - 1)}
                               aria-label="Disminuir"
-                              className="text-secondary transition-colors hover:text-accent cursor-pointer"
+                              // En el mínimo no baja más (para quitarla está la
+                              // papelera); se atenúa para que se entienda.
+                              disabled={(i.minQty ?? 1) > 1 && i.qty <= (i.minQty ?? 1)}
+                              className="text-secondary transition-colors hover:text-accent cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:text-secondary"
                             >
                               <Minus className="h-4 w-4" />
                             </button>
                             <QtyInput
                               value={i.qty}
+                              min={i.minQty ?? 1}
                               label={`Cantidad de ${i.name}`}
                               onCommit={(n) => setQty(i.slug, i.size, n)}
                             />

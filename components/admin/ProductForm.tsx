@@ -148,13 +148,16 @@ export default function ProductForm({
       const data = await res.json();
       if (!res.ok) {
         setError(data.error ?? "Error al guardar.");
+        setSaving(false);
         return;
       }
+      // Sigue en "Guardando..." hasta que llega el listado: antes el botón
+      // volvía a "Crear producto" mientras la página cambiaba y parecía que no
+      // había pasado nada. Sin `router.refresh()`: el listado es dinámico y la
+      // navegación ya lo trae actualizado; el refresh lo pedía dos veces.
       router.push("/admin/productos");
-      router.refresh();
     } catch {
       setError("Error de conexión. Intenta de nuevo.");
-    } finally {
       setSaving(false);
     }
   };

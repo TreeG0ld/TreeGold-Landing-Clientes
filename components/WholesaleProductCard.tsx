@@ -7,6 +7,7 @@ import { formatCOP } from "@/lib/format";
 import { useWholesaleSelection } from "@/lib/store";
 import WholesaleProductModal from "@/components/WholesaleProductModal";
 import type { WholesaleProduct } from "@/lib/wholesale";
+import { minQtyFor } from "@/lib/wholesale-rules";
 
 // Tarjeta del catálogo de mayoristas. Al tocarla NO navega a /producto/[slug]
 // (esa ruta pública muestra el precio de venta al detal): abre una ventana con
@@ -15,6 +16,11 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
   const add = useWholesaleSelection((s) => s.add);
   const [added, setAdded] = useState(false);
   const [openDetail, setOpenDetail] = useState(false);
+  const minQty = minQtyFor(product.category);
+  // Ya en el pedido: el siguiente clic suma de a 1, no otro lote de 12.
+  const enPedido = useWholesaleSelection((s) =>
+    s.items.some((i) => i.slug === product.slug)
+  );
 
   // Sin tope de clics seguidos, al revés que en la tienda pública: un
   // distribuidor pide por cantidad y necesita sumar unidades rápido.
@@ -24,6 +30,7 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
       name: product.name,
       price: product.price,
       image: product.images[0],
+      minQty: minQtyFor(product.category),
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1200);
@@ -88,7 +95,8 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
             </>
           ) : (
             <>
-              <Plus className="h-4 w-4" /> Agregar al pedido
+              <Plus className="h-4 w-4" />
+              {minQty > 1 && !enPedido ? `Agregar ${minQty}` : "Agregar al pedido"}
             </>
           )}
         </button>

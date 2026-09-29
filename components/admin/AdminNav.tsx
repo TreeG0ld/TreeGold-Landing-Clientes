@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { LogOut, Package, Tags, Store } from "lucide-react";
 
@@ -14,6 +15,13 @@ const links = [
 export default function AdminNav({ user }: { user: string }) {
   const pathname = usePathname();
   const router = useRouter();
+  // Pestaña tocada cuya página todavía no llega. Se marca al instante para que
+  // el clic se note aunque el servidor tarde un momento en responder; antes la
+  // pestaña no cambiaba hasta que la página nueva estaba lista y parecía que
+  // el clic no había funcionado.
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+
+  useEffect(() => setPendingHref(null), [pathname]);
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -31,11 +39,12 @@ export default function AdminNav({ user }: { user: string }) {
           </Link>
           <nav className="flex items-center gap-1">
             {links.map(({ href, label, icon: Icon }) => {
-              const active = pathname.startsWith(href);
+              const active = pendingHref ? pendingHref === href : pathname.startsWith(href);
               return (
                 <Link
                   key={href}
                   href={href}
+                  onClick={() => !pathname.startsWith(href) && setPendingHref(href)}
                   className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
                     active ? "bg-primary text-white" : "text-secondary hover:text-primary"
                   }`}

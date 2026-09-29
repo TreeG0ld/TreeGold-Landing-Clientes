@@ -10,6 +10,11 @@ export type SelectionItem = {
   image: string;
   size?: string;
   qty: number;
+  // Cantidad mínima por referencia (los balines del mayorista se venden desde
+  // 12). Viaja con la pieza para que la regla se cumpla desde CUALQUIER botón
+  // —tarjeta, vista ampliada, + y −, campo de cantidad— sin que cada uno tenga
+  // que acordarse de aplicarla.
+  minQty?: number;
 };
 
 type SelectionState = {
@@ -49,7 +54,11 @@ function createSelectionStore(persistKey: string) {
               ),
             };
           }
-          return { items: [...state.items, { ...item, qty }] };
+          // La primera vez entra directamente con el mínimo; de ahí en
+          // adelante cada clic suma lo pedido (normalmente 1).
+          return {
+            items: [...state.items, { ...item, qty: Math.max(qty, item.minQty ?? 1) }],
+          };
         }),
       remove: (slug, size) =>
         set((state) => ({
@@ -58,7 +67,14 @@ function createSelectionStore(persistKey: string) {
       setQty: (slug, size, qty) =>
         set((state) => ({
           items: state.items
-            .map((i) => (sameLine(i, slug, size) ? { ...i, qty } : i))
+            // 0 o menos elimina la pieza; cualquier otra cifra se sube al
+            // mínimo de su referencia (bajar de 12 balines no es posible: para
+            // quitarlos está el botón de eliminar).
+            .map((i) =>
+              sameLine(i, slug, size)
+                ? { ...i, qty: qty > 0 ? Math.max(qty, i.minQty ?? 1) : 0 }
+                : i
+            )
             .filter((i) => i.qty > 0),
         })),
       clear: () => set({ items: [] }),

@@ -24,6 +24,8 @@ import { rateLimit } from "@/lib/rate-limit";
 import WholesaleProductCard from "@/components/WholesaleProductCard";
 import WholesaleOrder from "@/components/WholesaleOrder";
 import WholesaleSearch from "@/components/WholesaleSearch";
+import BalinesNoticeModal from "@/components/BalinesNoticeModal";
+import { BALINES_CATEGORY } from "@/lib/wholesale-rules";
 
 // El código es corto y fijo (una sola constante, sin BD detrás), así que sin
 // límite se puede recorrer por fuerza bruta a base de peticiones GET
@@ -174,6 +176,11 @@ export default async function CatchAllPage({
       </div>
 
       <WholesaleOrder />
+
+      {/* Solo en balinería: cada vez que se entra a la categoría se recuerda la
+          compra mínima. Buscar dentro de ella no lo vuelve a abrir, porque el
+          componente sigue montado mientras la categoría no cambie. */}
+      {category === BALINES_CATEGORY && <BalinesNoticeModal />}
     </div>
   );
 }

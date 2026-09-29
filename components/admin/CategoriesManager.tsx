@@ -85,7 +85,10 @@ export default function CategoriesManager({ categories }: { categories: Category
 
       {error && <p className="mb-4 text-sm text-destructive">{error}</p>}
 
-      <div className="overflow-x-auto rounded-2xl border border-border bg-white">
+      {/* overflow-y-hidden: las filas entran subiendo 16px (.cascade) y, sin
+          esto, mientras sobresalen aparecía un instante una barra vertical que
+          angostaba la tabla y la hacía tambalear. */}
+      <div className="overflow-x-auto overflow-y-hidden rounded-2xl border border-border bg-white">
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-muted/40 text-left text-xs uppercase tracking-wide text-secondary">
             <tr>

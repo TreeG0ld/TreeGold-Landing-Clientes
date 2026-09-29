@@ -43,8 +43,11 @@ export default function ProductsTable({ products }: { products: Row[] }) {
     return <p className="py-12 text-center text-secondary">No hay productos que coincidan.</p>;
   }
 
+  // overflow-y-hidden: las filas entran subiendo 16px (.cascade) y, sin esto,
+  // mientras sobresalen aparecía un instante una barra vertical que angostaba
+  // la tabla y la hacía tambalear.
   return (
-    <div className="overflow-x-auto rounded-2xl border border-border bg-white">
+    <div className="overflow-x-auto overflow-y-hidden rounded-2xl border border-border bg-white">
       <table className="w-full text-sm">
         <thead className="border-b border-border bg-muted/40 text-left text-xs uppercase tracking-wide text-secondary">
           <tr>

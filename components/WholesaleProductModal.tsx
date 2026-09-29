@@ -8,6 +8,7 @@ import { X, Plus, Check } from "lucide-react";
 import { formatCOP } from "@/lib/format";
 import { useWholesaleSelection } from "@/lib/store";
 import type { WholesaleProduct } from "@/lib/wholesale";
+import { minQtyFor } from "@/lib/wholesale-rules";
 import { lockScroll } from "@/lib/scroll-lock";
 
 // Vista ampliada de una pieza del catálogo mayorista. Es una ventana dentro de
@@ -24,6 +25,10 @@ export default function WholesaleProductModal({
   const [active, setActive] = useState(0);
   const [added, setAdded] = useState(false);
   const add = useWholesaleSelection((s) => s.add);
+  const minQty = minQtyFor(product.category);
+  const enPedido = useWholesaleSelection((s) =>
+    s.items.some((i) => i.slug === product.slug)
+  );
 
   useEffect(() => lockScroll(), []);
 
@@ -39,6 +44,7 @@ export default function WholesaleProductModal({
       name: product.name,
       price: product.price,
       image: product.images[0],
+      minQty: minQtyFor(product.category),
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1200);
@@ -166,7 +172,8 @@ export default function WholesaleProductModal({
                 </>
               ) : (
                 <>
-                  <Plus className="h-5 w-5" /> Agregar al pedido
+                  <Plus className="h-5 w-5" />
+                  {minQty > 1 && !enPedido ? `Agregar ${minQty} unidades` : "Agregar al pedido"}
                 </>
               )}
             </button>
