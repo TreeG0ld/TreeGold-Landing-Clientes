@@ -98,16 +98,20 @@ export default function ProductCard({
                 {formatCOP(product.price)}
               </span>
               {product.isPromo && product.originalPrice && product.originalPrice > product.price && (
-                <span className="text-xs text-secondary/50 line-through decoration-destructive/40">
+                // /80 y no /50: con menos intensidad no llegaba al contraste
+                // mínimo (4,5:1) sobre el fondo crema de Promociones.
+                <span className="text-xs text-secondary/80 line-through decoration-destructive/40">
                   {formatCOP(product.originalPrice)}
                 </span>
               )}
             </div>
           </div>
-          <p className="mt-1 text-xs uppercase tracking-wide text-secondary/60">
+          <p className="mt-1 text-xs uppercase tracking-wide text-secondary/80">
             {[product.material, product.size].filter(Boolean).join(" · ")}
             {product.isPromo && product.originalPrice && product.originalPrice > product.price && (
-              <span className="ml-2 font-semibold text-destructive">
+              // red-700 y no `destructive` (red-600): este texto es chico y
+              // sobre el fondo crema no alcanzaba el contraste mínimo.
+              <span className="ml-2 font-semibold text-red-700">
                 -{Math.round((1 - product.price / product.originalPrice) * 100)}%
               </span>
             )}

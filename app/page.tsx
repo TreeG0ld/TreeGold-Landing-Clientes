@@ -28,7 +28,10 @@ export default async function Home() {
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <Reveal>
               <div className="mb-10 text-center">
-                <p className="eyebrow mb-3">Por tiempo limitado</p>
+                {/* Dorado un tono más oscuro que el de `.eyebrow` solo aquí: sobre
+                    el fondo crema de esta sección el normal no llegaba al
+                    contraste mínimo (4,1 contra 4,5:1). */}
+                <p className="eyebrow mb-3 text-[#8f5606]">Por tiempo limitado</p>
                 <h2 className="text-4xl md:text-5xl">Promociones</h2>
               </div>
             </Reveal>
