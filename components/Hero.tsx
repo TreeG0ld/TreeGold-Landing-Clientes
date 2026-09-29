@@ -70,7 +70,12 @@ export default function Hero() {
 
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-      tl.from(".hero-img", { scale: 1.06, opacity: 0, duration: 1.6, ease: "power2.out" })
+      // El banner solo se acerca, SIN fundido de opacidad: es el elemento más
+      // grande de la portada (el "LCP" que mide Google), y al esconderlo con
+      // opacity:0 mientras cargaba el JavaScript el celular lo contaba como
+      // pintado recién al terminar la animación, segundos después de que la
+      // foto ya había llegado.
+      tl.from(".hero-img", { scale: 1.06, duration: 1.6, ease: "power2.out" })
         .from(
           ".hero-fade",
           { y: 24, opacity: 0, duration: 0.9, stagger: 0.15 },

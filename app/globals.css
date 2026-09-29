@@ -164,6 +164,9 @@
   top: 0;
   left: 0;
   border-radius: 9999px;
+  /* Blanco de fondo, como las fotos del catálogo: si la imagen tardara, se
+     ve una burbuja blanca en vez de un círculo transparente. */
+  background-color: #fff;
   background-size: cover;
   background-position: center;
   border: 2px solid rgba(255, 255, 255, 0.85);

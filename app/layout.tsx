@@ -163,16 +163,17 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(businessJsonLd).replace(/</g, "\\u003c") }}
         />
 
-        {/* Google Analytics. `afterInteractive` lo carga DESPUÉS de que la
-            página ya responde al usuario: medir no debe retrasar la tienda.
+        {/* Google Analytics. `lazyOnload` lo carga cuando la página ya terminó
+            de cargar y el navegador está libre: son 173 KB que en celular le
+            quitaban tiempo al primer pintado. Medir no debe retrasar la tienda.
             Los hosts de Google están permitidos uno a uno en la política de
             seguridad de next.config.mjs (script-src, connect-src e img-src);
             sin eso el navegador bloquearía la medición en silencio. */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="ga-init" strategy="afterInteractive">
+        <Script id="ga-init" strategy="lazyOnload">
           {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());

@@ -91,7 +91,13 @@ export default function PaymentMethodsModal() {
               src={IMAGE}
               alt="Addi, Sistecrédito y tarjetas débito y crédito"
               fill
-              priority
+              // Sin `priority`: eso metía un preload en el <head> y la foto del
+              // aviso se descargaba a la par con el banner de la portada, que
+              // es lo que el visitante ve primero. `eager` la sigue pidiendo
+              // de una vez (sin esperar a que se vea), para que esté lista
+              // cuando el aviso aparece, pero con prioridad baja.
+              loading="eager"
+              fetchPriority="low"
               // Anchos reales de la tarjeta (max-w-sm = 384px, md:max-w-md =
               // 448px), no "100vw": con 100vw una tablet de 768px pedía una
               // imagen del doble de ancho del que de verdad se pinta.

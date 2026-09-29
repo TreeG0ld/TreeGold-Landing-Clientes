@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { Check, ShoppingBag, ChevronLeft } from "lucide-react";
@@ -19,11 +19,18 @@ export default function ProductDetail({ product }: { product: Product }) {
   const [size, setSize] = useState(product.sizes?.[0]);
   const [added, setAdded] = useState(false);
   const { remaining, claim } = useAddCooldown();
+  // Recuadro de la foto principal: de ahí sale la imagen de la burbuja.
+  const galeriaRef = useRef<HTMLDivElement>(null);
 
   const handleAdd = (e: React.MouseEvent) => {
     if (!claim()) return;
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    flyToCart(r.left + r.width / 2, r.top + r.height / 2, product.images[active]);
+    flyToCart(
+      r.left + r.width / 2,
+      r.top + r.height / 2,
+      product.images[active],
+      galeriaRef.current?.querySelector("img")
+    );
     add({
       slug: product.slug,
       name: product.name,
@@ -47,7 +54,7 @@ export default function ProductDetail({ product }: { product: Product }) {
       <div className="grid gap-10 lg:grid-cols-2">
         {/* Galería */}
         <div>
-          <div className="relative aspect-square overflow-hidden rounded-3xl bg-white">
+          <div ref={galeriaRef} className="relative aspect-square overflow-hidden rounded-3xl bg-white">
             <AnimatePresence mode="wait">
               <motion.div
                 key={active}
@@ -153,7 +160,7 @@ export default function ProductDetail({ product }: { product: Product }) {
               )}
             </button>
             <a
-              href={buildProductLink(product.name, product.price)}
+              href={buildProductLink(product.name, product.price, product.slug)}
               target="_blank"
               rel="noopener noreferrer"
               className="flex flex-1 items-center justify-center gap-2 rounded-full border border-[#25D366] px-7 py-3.5 text-sm font-medium text-[#1c8a47] transition-all duration-300 ease-luxe hover:bg-[#25D366]/10 active:scale-[0.98]"

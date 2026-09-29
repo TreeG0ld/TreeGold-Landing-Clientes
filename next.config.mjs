@@ -147,6 +147,13 @@ const nextConfig = {
     // a partir de su URL. Ver lib/imageLoader.ts.
     loader: "custom",
     loaderFile: "./lib/imageLoader.ts",
+    // Menos tamaños que los 16 que trae Next por defecto: cada <img> lista
+    // todos en su srcset, y en la portada eso sumaba 56 KB de HTML. Los que
+    // se quitaron (16-48 px y 2048/3840) no los usa ninguna foto del sitio;
+    // los que quedan cubren desde la miniatura del carrito hasta una pantalla
+    // grande.
+    imageSizes: [64, 128, 256, 384],
+    deviceSizes: [640, 828, 1080, 1200, 1920],
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

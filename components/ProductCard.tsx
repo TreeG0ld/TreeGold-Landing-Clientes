@@ -26,8 +26,11 @@ export default function ProductCard({
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!claim()) return;
-    const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    flyToCart(r.left + r.width / 2, r.top + r.height / 2, product.images[0]);
+    const btn = e.currentTarget as HTMLElement;
+    const r = btn.getBoundingClientRect();
+    // La foto de esta misma tarjeta: el botón vive dentro de su recuadro.
+    const foto = btn.parentElement?.querySelector("img");
+    flyToCart(r.left + r.width / 2, r.top + r.height / 2, product.images[0], foto);
     add({
       slug: product.slug,
       name: product.name,
