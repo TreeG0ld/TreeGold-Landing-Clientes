@@ -91,13 +91,20 @@ export function validateProductPayload(body: unknown): ValidationResult {
     }
   }
 
-  const isRetail = Boolean(b.isRetail);
-  const isWholesale = Boolean(b.isWholesale);
+  // "Ocultar producto" (casilla del admin): no es una columna de la base de
+  // datos, es la combinación ni detal ni mayorista. Todas las consultas de la
+  // tienda ya filtran por isRetail / isWholesale, así que con las dos en false
+  // el producto no aparece en ningún lado. Se exige la marca explícita para
+  // que nadie deje un producto invisible por olvidar las dos casillas.
+  const isHidden = b.isHidden === true;
+  const isRetail = !isHidden && Boolean(b.isRetail);
+  const isWholesale = !isHidden && Boolean(b.isWholesale);
   const isPromo = Boolean(b.isPromo);
-  if (!isRetail && !isWholesale) {
+  if (!isHidden && !isRetail && !isWholesale) {
     return {
       ok: false,
-      error: "El producto debe ser visible en al menos una tienda (detal o mayorista).",
+      error:
+        "El producto debe ser visible en al menos una tienda (detal o mayorista). Si no quieres mostrarlo en ninguna, marca «Ocultar producto».",
     };
   }
 

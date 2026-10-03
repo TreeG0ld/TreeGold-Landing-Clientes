@@ -55,6 +55,23 @@ test("unitario: isRetail y isWholesale ambos false -> rechazado", () => {
   const r = validateProductPayload({ ...base, isRetail: false, isWholesale: false });
   assert.equal(r.ok, false);
   assert.match(r.error, /al menos una tienda/i);
+  assert.match(r.error, /Ocultar producto/);
+});
+
+test("unitario: isHidden true -> aceptado y sin ninguna tienda, aunque lleguen marcadas", () => {
+  const r = validateProductPayload({ ...base, isRetail: true, isWholesale: true, isHidden: true });
+  assert.equal(r.ok, true);
+  assert.equal(r.data.isRetail, false);
+  assert.equal(r.data.isWholesale, false);
+  // Ocultar no es una columna: no debe colarse en lo que se guarda.
+  assert.equal("isHidden" in r.data, false);
+});
+
+test("unitario: isHidden solo cuenta como booleano true (no 'true' ni 1)", () => {
+  for (const isHidden of ["true", 1, "1"]) {
+    const r = validateProductPayload({ ...base, isRetail: false, isWholesale: false, isHidden });
+    assert.equal(r.ok, false, `isHidden=${JSON.stringify(isHidden)} no debería ocultar`);
+  }
 });
 
 test("unitario: wholesalePrice vacío se guarda como null; inválido se rechaza", () => {

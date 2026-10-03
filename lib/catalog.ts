@@ -70,6 +70,7 @@ const listSelect = {
 const detailSelect = {
   slug: true,
   name: true,
+  isRetail: true,
   description: true,
   retailPrice: true,
   originalPrice: true,
@@ -224,9 +225,13 @@ const getProductRow = cache(async (slug: string) =>
   prisma.product.findUnique({ where: { slug }, select: detailSelect })
 );
 
+// Solo productos de la tienda pública. Antes la ficha se abría con cualquier
+// slug: un producto solo de mayoristas mostraba su precio al público con el
+// enlace directo, y uno oculto desde el admin (ni detal ni mayorista) seguía
+// accesible. Ahora ambos dan "Producto no encontrado".
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const p = await getProductRow(slug);
-  return p ? toUiProduct(p) : null;
+  return p?.isRetail ? toUiProduct(p) : null;
 }
 
 // "También te puede gustar": otros productos de la misma categoría.

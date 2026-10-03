@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { validateProductPayload } from "@/lib/validate-product";
@@ -45,6 +45,9 @@ export async function POST(req: Request) {
     const product = await prisma.product.create({ data: result.data });
     revalidatePath("/");
     revalidatePath("/coleccion");
+    // Cachés del catálogo con etiqueta (búsqueda, categorías, conteos): sin
+    // esto un producto recién ocultado podía seguir contando hasta 1 hora.
+    revalidateTag("catalogo");
     return NextResponse.json({ product }, { status: 201 });
   } catch (err: any) {
     if (err.code === "P2002") {

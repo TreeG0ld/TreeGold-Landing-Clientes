@@ -88,6 +88,12 @@ export default function ProductsTable({ products }: { products: Row[] }) {
                   {p.isWholesale && (
                     <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs text-accent">Mayorista</span>
                   )}
+                  {/* Ni detal ni mayorista = "Ocultar producto" en el formulario. */}
+                  {!p.isRetail && !p.isWholesale && (
+                    <span className="rounded-full border border-dashed border-border px-2 py-0.5 text-xs text-secondary">
+                      Oculto
+                    </span>
+                  )}
                 </div>
               </td>
               <td className="px-4 py-3">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUploader from "@/components/admin/ImageUploader";
 import GlassSelect from "@/components/admin/GlassSelect";
@@ -88,6 +88,28 @@ export default function ProductForm({
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
+  // "Ocultar producto": apaga las dos tiendas sin borrar nada. No hay columna
+  // para esto en la base de datos: oculto = ni detal ni mayorista (todas las
+  // consultas de la tienda filtran por esas dos marcas). Un producto guardado
+  // así arranca con la casilla marcada.
+  const [oculto, setOculto] = useState(
+    () => isEdit && !initialValues!.isRetail && !initialValues!.isWholesale
+  );
+  // Tiendas que tenía antes de ocultarlo, para devolvérselas al desmarcar. Si
+  // ya venía oculto de la base de datos no hay rastro: se ofrece la tienda
+  // pública, que es lo más común, y se puede ajustar ahí mismo.
+  const visibilidadPrevia = useRef({ isRetail: true, isWholesale: false });
+
+  const handleOcultar = (checked: boolean) => {
+    setOculto(checked);
+    if (checked) {
+      visibilidadPrevia.current = { isRetail: values.isRetail, isWholesale: values.isWholesale };
+      setValues((v) => ({ ...v, isRetail: false, isWholesale: false }));
+    } else {
+      setValues((v) => ({ ...v, ...visibilidadPrevia.current }));
+    }
+  };
+
   const set = <K extends keyof ProductFormValues>(key: K, value: ProductFormValues[K]) =>
     setValues((v) => ({ ...v, [key]: value }));
 
@@ -143,7 +165,9 @@ export default function ProductForm({
       const res = await fetch(url, {
         method: isEdit ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        // `isHidden` le confirma al servidor que el producto sin tiendas es a
+        // propósito (si no, lo rechaza para que nadie lo oculte por error).
+        body: JSON.stringify({ ...values, isHidden: oculto }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -275,27 +299,33 @@ export default function ProductForm({
       </div>
 
       <div className="flex flex-wrap gap-x-6 gap-y-3">
-        <label className="flex items-center gap-2 text-sm font-medium text-primary">
+        {/* Con "Ocultar producto" marcado, las otras tres quedan apagadas y
+            bloqueadas: no tendría sentido elegir tienda para algo que no se
+            muestra. */}
+        <label className={`flex items-center gap-2 text-sm font-medium text-primary ${oculto ? "opacity-40" : ""}`}>
           <input
             type="checkbox"
             checked={values.isRetail}
+            disabled={oculto}
             onChange={(e) => set("isRetail", e.target.checked)}
-            className="h-4 w-4 cursor-pointer accent-accent"
+            className="h-4 w-4 cursor-pointer accent-accent disabled:cursor-not-allowed"
           />
           Visible en tienda pública
         </label>
-        <label className="flex items-center gap-2 text-sm font-medium text-primary">
+        <label className={`flex items-center gap-2 text-sm font-medium text-primary ${oculto ? "opacity-40" : ""}`}>
           <input
             type="checkbox"
             checked={values.isWholesale}
+            disabled={oculto}
             onChange={(e) => set("isWholesale", e.target.checked)}
-            className="h-4 w-4 cursor-pointer accent-accent"
+            className="h-4 w-4 cursor-pointer accent-accent disabled:cursor-not-allowed"
           />
           Visible en mayoristas
         </label>
-        <label className="flex items-center gap-2 text-sm font-medium text-primary">
+        <label className={`flex items-center gap-2 text-sm font-medium text-primary ${oculto ? "opacity-40" : ""}`}>
           <input
             type="checkbox"
+            disabled={oculto}
             checked={values.isPromo}
             onChange={(e) =>
               // Al quitar la promo se limpia el precio anterior para no
@@ -306,11 +336,28 @@ export default function ProductForm({
                 originalPrice: e.target.checked ? v.originalPrice : "",
               }))
             }
-            className="h-4 w-4 cursor-pointer accent-accent"
+            className="h-4 w-4 cursor-pointer accent-accent disabled:cursor-not-allowed"
           />
           En promoción (aparece en la home)
         </label>
+        <label className="flex items-center gap-2 text-sm font-medium text-primary">
+          <input
+            type="checkbox"
+            checked={oculto}
+            onChange={(e) => handleOcultar(e.target.checked)}
+            className="h-4 w-4 cursor-pointer accent-accent"
+          />
+          Ocultar producto (no aparece en ninguna tienda)
+        </label>
       </div>
+
+      {oculto && (
+        <p className="-mt-2 rounded-xl bg-muted px-4 py-3 text-sm text-secondary">
+          El producto queda guardado aquí en el panel, pero no aparece en la
+          tienda pública, en mayoristas ni en promociones, y su página deja de
+          abrirse. Desmarca la casilla para volver a publicarlo.
+        </p>
+      )}
 
       {values.isPromo && (
         <div className="grid gap-4 sm:grid-cols-2">

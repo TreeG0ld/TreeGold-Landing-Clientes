@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 import { validateProductPayload } from "@/lib/validate-product";
@@ -27,6 +27,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const product = await prisma.product.update({ where: { id }, data: result.data });
     revalidatePath("/");
     revalidatePath("/coleccion");
+    // Cachés del catálogo con etiqueta (búsqueda, categorías, conteos): sin
+    // esto un producto recién ocultado podía seguir contando hasta 1 hora.
+    revalidateTag("catalogo");
     revalidatePath(`/producto/${body.slug}`);
     return NextResponse.json({ product });
   } catch (err: any) {
@@ -52,6 +55,9 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     await prisma.product.delete({ where: { id } });
     revalidatePath("/");
     revalidatePath("/coleccion");
+    // Cachés del catálogo con etiqueta (búsqueda, categorías, conteos): sin
+    // esto un producto recién ocultado podía seguir contando hasta 1 hora.
+    revalidateTag("catalogo");
     return NextResponse.json({ ok: true });
   } catch (err: any) {
     if (err.code === "P2025") {
