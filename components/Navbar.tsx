@@ -71,14 +71,19 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-luxe ${
+      // `border-b` va SIEMPRE y en la parte de arriba es transparente. Antes se
+      // quitaba al volver al tope: el color saltaba al beige opaco de la regla
+      // global de bordes mientras el grosor tardaba medio segundo en irse, y
+      // se veía una línea clara sobre el banner oscuro. Así solo cambia el
+      // color, que se desvanece.
+      className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-500 ease-luxe ${
         searchOpen
-          ? "glass-strong border-b border-border/40 shadow-lg shadow-black/5"
+          ? "glass-strong border-border/40 shadow-lg shadow-black/5"
           : scrolled || open
-            ? "glass border-b border-border/60"
+            ? "glass border-border/60"
             : overHero
-              ? "bg-gradient-to-b from-black/50 via-black/20 to-transparent"
-              : "bg-transparent"
+              ? "border-transparent bg-gradient-to-b from-black/50 via-black/20 to-transparent"
+              : "border-transparent bg-transparent"
       }`}
     >
       {/* mt-3/px-6 en celular: el logo y los iconos quedaban justo sobre el
