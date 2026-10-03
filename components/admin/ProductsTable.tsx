@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { formatCOP } from "@/lib/format";
+import ScrollFadeBox from "@/components/admin/ScrollFadeBox";
 
 type Row = {
   id: string;
@@ -43,27 +44,31 @@ export default function ProductsTable({ products }: { products: Row[] }) {
     return <p className="py-12 text-center text-secondary">No hay productos que coincidan.</p>;
   }
 
-  // overflow-y-hidden: las filas entran subiendo 16px (.cascade) y, sin esto,
-  // mientras sobresalen aparecía un instante una barra vertical que angostaba
-  // la tabla y la hacía tambalear.
+  // Alto máximo con scroll propio: con cientos de productos la tabla estiraba
+  // toda la página. El cálculo deja a la vista el título, el buscador y la
+  // paginación sin que la página haga scroll. Los títulos de columna quedan
+  // fijos arriba (sticky): fondo opaco y la línea inferior como sombra,
+  // porque un borde de tabla colapsada no viaja con el encabezado.
   return (
-    <div className="overflow-x-auto overflow-y-hidden rounded-2xl border border-border bg-white">
+    <ScrollFadeBox className="max-h-[calc(100dvh-21rem)] min-h-72 overflow-auto rounded-2xl border border-border bg-white">
       <table className="w-full text-sm">
-        <thead className="border-b border-border bg-muted/40 text-left text-xs uppercase tracking-wide text-secondary">
+        <thead className="text-left text-xs uppercase tracking-wide text-secondary">
           <tr>
-            <th className="px-4 py-3">Producto</th>
-            <th className="px-4 py-3">Categoría</th>
-            <th className="px-4 py-3">Precio</th>
-            <th className="px-4 py-3">Stock</th>
-            <th className="px-4 py-3">Visibilidad</th>
-            <th className="px-4 py-3" />
+            <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Producto</th>
+            <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Categoría</th>
+            <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Precio</th>
+            <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Stock</th>
+            <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Visibilidad</th>
+            <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]" />
           </tr>
         </thead>
         <tbody>
           {products.map((p, i) => (
             <tr
               key={p.id}
-              className="cascade border-b border-border last:border-0"
+              // Solo fundido: el desplazamiento de .cascade hacía parpadear el
+              // scroll de este recuadro.
+              className="cascade cascade-fade border-b border-border last:border-0"
               style={{ "--i": Math.min(i, 14) } as React.CSSProperties}
             >
               <td className="flex items-center gap-3 px-4 py-3">
@@ -119,6 +124,6 @@ export default function ProductsTable({ products }: { products: Row[] }) {
           ))}
         </tbody>
       </table>
-    </div>
+    </ScrollFadeBox>
   );
 }

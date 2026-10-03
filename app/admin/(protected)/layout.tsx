@@ -23,7 +23,10 @@ export default async function AdminProtectedLayout({
   return (
     <div className="min-h-dvh bg-muted/30">
       <AdminNav user={display} />
-      <main className="mx-auto max-w-6xl px-5 py-8">{children}</main>
+      {/* max-w-screen-2xl (1536px) y no max-w-6xl (1152px): las tablas del
+          panel tienen muchas columnas y en pantallas grandes sobraba espacio
+          a los lados. AdminNav usa el mismo ancho para quedar alineado. */}
+      <main className="mx-auto max-w-screen-2xl px-5 py-8 md:px-8">{children}</main>
     </div>
   );
 }

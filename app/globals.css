@@ -151,6 +151,20 @@
   animation: cascade-in 0.55s cubic-bezier(0.65, 0, 0.35, 1) forwards;
   animation-delay: calc(var(--i, 0) * 60ms);
 }
+/* Variante solo con fundido, para filas dentro de un recuadro con scroll
+   propio (tablas del admin): el translateY de .cascade hacía sobresalir las
+   últimas filas y la barra de scroll aparecía y desaparecía un instante. */
+@keyframes cascade-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.cascade-fade {
+  animation-name: cascade-fade-in;
+}
 
 /* Skeleton de carga con brillo (shimmer), tono cálido acorde al sitio */
 @keyframes skeleton-shimmer {

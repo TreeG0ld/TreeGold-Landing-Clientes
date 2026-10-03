@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
+import ScrollFadeBox from "@/components/admin/ScrollFadeBox";
 
 type Category = { id: string; name: string; slug: string; _count: { products: number } };
 
@@ -85,24 +86,23 @@ export default function CategoriesManager({ categories }: { categories: Category
 
       {error && <p className="mb-4 text-sm text-destructive">{error}</p>}
 
-      {/* overflow-y-hidden: las filas entran subiendo 16px (.cascade) y, sin
-          esto, mientras sobresalen aparecía un instante una barra vertical que
-          angostaba la tabla y la hacía tambalear. */}
-      <div className="overflow-x-auto overflow-y-hidden rounded-2xl border border-border bg-white">
+      {/* Alto máximo con scroll propio y títulos de columna fijos, igual que
+          la tabla de productos (ver ProductsTable). */}
+      <ScrollFadeBox className="max-h-[calc(100dvh-17rem)] min-h-72 overflow-auto rounded-2xl border border-border bg-white">
         <table className="w-full text-sm">
-          <thead className="border-b border-border bg-muted/40 text-left text-xs uppercase tracking-wide text-secondary">
+          <thead className="text-left text-xs uppercase tracking-wide text-secondary">
             <tr>
-              <th className="px-4 py-3">Nombre</th>
-              <th className="px-4 py-3">Slug</th>
-              <th className="px-4 py-3">Productos</th>
-              <th className="px-4 py-3" />
+              <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Nombre</th>
+              <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Slug</th>
+              <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Productos</th>
+              <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]" />
             </tr>
           </thead>
           <tbody>
             {categories.map((c, i) => (
               <tr
                 key={c.id}
-                className="cascade border-b border-border last:border-0"
+                className="cascade cascade-fade border-b border-border last:border-0"
                 style={{ "--i": Math.min(i, 14) } as React.CSSProperties}
               >
                 <td className="px-4 py-3">
@@ -154,7 +154,7 @@ export default function CategoriesManager({ categories }: { categories: Category
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollFadeBox>
     </div>
   );
 }
