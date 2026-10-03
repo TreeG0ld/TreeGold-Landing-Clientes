@@ -9,6 +9,7 @@ import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
 import { buildSelectionLink } from "@/lib/whatsapp";
+import EmptyBagIcon from "@/components/EmptyBagIcon";
 
 export default function SelectionView() {
   const { items, remove, setQty, clear } = useSelection();
@@ -25,6 +26,7 @@ export default function SelectionView() {
   if (items.length === 0) {
     return (
       <div className="mx-auto flex max-w-md flex-col items-center gap-5 px-5 py-32 text-center">
+        <EmptyBagIcon />
         <h1 className="font-serif text-4xl">Tu selección está vacía</h1>
         <p className="text-secondary">
           Explora nuestra colección y guarda las piezas que te enamoren.

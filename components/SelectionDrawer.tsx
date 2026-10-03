@@ -10,6 +10,7 @@ import { useSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
 import { buildSelectionLink } from "@/lib/whatsapp";
 import { lockScroll } from "@/lib/scroll-lock";
+import EmptyBagIcon from "@/components/EmptyBagIcon";
 
 export default function SelectionDrawer() {
   const { items, isOpen, close, remove, setQty } = useSelection();
@@ -57,6 +58,7 @@ export default function SelectionDrawer() {
 
             {items.length === 0 ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
+                <EmptyBagIcon />
                 <p className="font-serif text-2xl text-secondary">
                   Tu selección está vacía
                 </p>
