@@ -85,12 +85,34 @@ export default async function CatchAllPage({
   const category = categoria ?? "todos";
   const query = q?.trim() ?? "";
 
-  const [products, categories] = await Promise.all([
-    getWholesaleProducts(category, query),
+  // Con búsqueda se trae lo que coincide en TODAS las categorías: antes se
+  // buscaba solo dentro de la pestaña elegida, y "tio rico" en "Anillos" daba
+  // cero aunque hubiera piezas en otras categorías. De ese total salen los
+  // conteos de cada pestaña y, filtrando aquí, la categoría elegida.
+  const [found, categories] = await Promise.all([
+    getWholesaleProducts(query ? "todos" : category, query),
     getWholesaleCategories(),
   ]);
 
-  const tabs = [{ slug: "todos", name: "Todo" }, ...categories];
+  const matchesByCategory = new Map<string, number>();
+  if (query) {
+    for (const p of found) {
+      matchesByCategory.set(p.category, (matchesByCategory.get(p.category) ?? 0) + 1);
+    }
+  }
+  const products =
+    query && category !== "todos" ? found.filter((p) => p.category === category) : found;
+
+  // Buscando, solo quedan las pestañas con resultados (más la activa, si se
+  // llegó a una vacía por un enlace viejo): así no se puede caer en una
+  // categoría vacía sin saberlo.
+  const tabs = [
+    { slug: "todos", name: "Todo", count: query ? found.length : null },
+    ...categories.map((c) => ({
+      ...c,
+      count: query ? matchesByCategory.get(c.slug) ?? 0 : null,
+    })),
+  ].filter((t) => t.count !== 0 || t.slug === category);
   const base = `/${PREFIX}${codigo}`;
 
   return (
@@ -136,6 +158,11 @@ export default async function CatchAllPage({
                     }`}
                   >
                     {t.name}
+                    {t.count !== null && (
+                      <span className={`ml-1.5 text-xs ${active ? "text-white/70" : "text-secondary/60"}`}>
+                        {t.count}
+                      </span>
+                    )}
                   </Link>
                 );
               })}
@@ -161,11 +188,25 @@ export default async function CatchAllPage({
             ))}
           </div>
         ) : (
-          <p className="py-24 text-center text-secondary">
-            {query
-              ? `No encontramos piezas con “${query}”. Prueba con otra palabra.`
-              : "No hay piezas disponibles en esta categoría por ahora."}
-          </p>
+          <div className="py-24 text-center text-secondary">
+            <p>
+              {query
+                ? category !== "todos" && found.length > 0
+                  ? `No hay piezas con “${query}” en esta categoría.`
+                  : `No encontramos piezas con “${query}”. Prueba con otra palabra.`
+                : "No hay piezas disponibles en esta categoría por ahora."}
+            </p>
+            {/* Solo pasa con un enlace viejo que combine búsqueda y categoría:
+                las pestañas ya no dejan llegar aquí. */}
+            {query && category !== "todos" && found.length > 0 && (
+              <Link
+                href={`${base}?q=${encodeURIComponent(query)}`}
+                className="mt-4 inline-block text-sm font-medium text-accent underline-offset-4 hover:underline"
+              >
+                Ver las {found.length} {found.length === 1 ? "pieza" : "piezas"} en todas las categorías
+              </Link>
+            )}
+          </div>
         )}
 
         {/* Pie neutro, sin marca. pb extra: la barra del pedido es fija y

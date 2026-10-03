@@ -38,9 +38,12 @@ export default function WholesaleSearch({
     if (open) inputRef.current?.focus();
   }, [open]);
 
-  function hrefCon(q: string) {
+  // `conCategoria`: una búsqueda nueva va SIEMPRE a todas las categorías
+  // (antes se quedaba en la pestaña elegida y "tio rico" en "Anillos" no
+  // encontraba nada). Al cerrar el buscador sí se vuelve a la categoría.
+  function hrefCon(q: string, conCategoria: boolean) {
     const sp = new URLSearchParams();
-    if (categoria && categoria !== "todos") sp.set("categoria", categoria);
+    if (conCategoria && categoria && categoria !== "todos") sp.set("categoria", categoria);
     if (q.trim()) sp.set("q", q.trim());
     const qs = sp.toString();
     return `${base}${qs ? `?${qs}` : ""}`;
@@ -48,13 +51,13 @@ export default function WholesaleSearch({
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    router.push(hrefCon(query));
+    router.push(hrefCon(query, false));
   }
 
   function cerrar() {
     setQuery("");
     setOpen(false);
-    if (initialQuery) router.push(hrefCon(""));
+    if (initialQuery) router.push(hrefCon("", true));
   }
 
   return (
