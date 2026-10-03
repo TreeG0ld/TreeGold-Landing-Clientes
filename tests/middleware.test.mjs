@@ -117,3 +117,42 @@ test("integración: cookie con basura -> rechazada sin lanzar excepción", async
   const res = await middleware(makeRequest("/admin/productos", "garbage.token"));
   assert.equal(res.status, 307);
 });
+
+// --- cuentas de clientes: /perfil y /login ---
+// La redirección por sesión se hace en el middleware para que el navegador no
+// pinte /perfil vacío antes de llegar a /login.
+
+test("integración: /perfil sin sesión -> redirige a /login, sin querystring", async () => {
+  const res = await middleware(makeRequest("/perfil?volver=https://evil.example"));
+  assert.equal(res.status, 307);
+  const destino = new URL(res.headers.get("location"));
+  assert.equal(destino.pathname, "/login");
+  assert.equal(destino.search, "");
+});
+
+test("integración: /perfil con sesión de cliente o admin -> pasa", async () => {
+  const cliente = await forgeToken({ role: "CLIENT", user: "x", exp: Date.now() + 60_000 });
+  assert.ok(isPassThrough(await middleware(makeRequest("/perfil", cliente))));
+  const admin = await createSessionToken("admin", "ADMIN");
+  assert.ok(isPassThrough(await middleware(makeRequest("/perfil", admin))));
+});
+
+test("integración: /perfil con sesión expirada o basura -> a /login", async () => {
+  const vencida = await forgeToken({ role: "CLIENT", user: "x", exp: Date.now() - 1 });
+  assert.equal(new URL((await middleware(makeRequest("/perfil", vencida))).headers.get("location")).pathname, "/login");
+  assert.equal((await middleware(makeRequest("/perfil", "garbage.token"))).status, 307);
+});
+
+test("integración: /login sin sesión -> pasa; con sesión -> a /perfil", async () => {
+  assert.ok(isPassThrough(await middleware(makeRequest("/login"))));
+  const cliente = await forgeToken({ role: "CLIENT", user: "x", exp: Date.now() + 60_000 });
+  const res = await middleware(makeRequest("/login", cliente));
+  assert.equal(res.status, 307);
+  assert.equal(new URL(res.headers.get("location")).pathname, "/perfil");
+});
+
+test("integración: la sesión de cliente sigue SIN abrir el admin", async () => {
+  const cliente = await forgeToken({ role: "CLIENT", user: "x", exp: Date.now() + 60_000 });
+  const res = await middleware(makeRequest("/admin/productos", cliente));
+  assert.equal(new URL(res.headers.get("location")).pathname, "/admin/login");
+});

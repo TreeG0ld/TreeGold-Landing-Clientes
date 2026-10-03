@@ -8,6 +8,25 @@ import { AUTH_COOKIE, verifySessionToken } from "@/lib/auth";
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  // /perfil y /login (cuentas de clientes): la redirección según haya sesión
+  // se hace AQUÍ y no solo en la página. Con redirect() dentro de la página,
+  // al tocar el ícono de perfil el navegador pintaba /perfil vacío ~0,6 s
+  // (solo la barra y el pie de página) antes de llegar a /login; redirigiendo
+  // desde el middleware recibe /login directamente. Las páginas siguen
+  // verificando por su cuenta (p. ej. /perfil comprueba que el usuario exista
+  // en la base de datos). Ninguna de las dos exige rol: no tocan el admin.
+  if (pathname === "/perfil" || pathname === "/login") {
+    const session = await verifySessionToken(req.cookies.get(AUTH_COOKIE)?.value);
+    const destino = pathname === "/perfil" && !session ? "/login"
+      : pathname === "/login" && session ? "/perfil"
+      : null;
+    if (!destino) return NextResponse.next();
+    const url = req.nextUrl.clone();
+    url.pathname = destino;
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   // Solo la PÁGINA de login queda fuera: el formulario envía a /api/auth/login,
   // que no cae en este matcher. No hay ninguna API bajo /api/admin que deba ser
   // accesible sin sesión, así que cualquier excepción aquí sería una puerta
@@ -34,5 +53,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"],
+  matcher: ["/admin/:path*", "/api/admin/:path*", "/perfil", "/login"],
 };
