@@ -6,7 +6,7 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { site } from "@/lib/site";
-import { matchesSearch, searchWords } from "@/lib/search-text";
+import { matchesCode, matchesSearch, searchWords } from "@/lib/search-text";
 import type { Product, Category } from "@/lib/products";
 
 // Productos por página en el catálogo.
@@ -150,7 +150,11 @@ async function slugsMatching(q: string): Promise<string[]> {
   const words = searchWords(q);
   if (!words.length) return [];
   const rows = await getSearchIndex();
-  return rows.filter((r) => matchesSearch(r.name, words)).map((r) => r.slug);
+  // Por nombre o por código de referencia (el slug, que es el "Ref:" de los
+  // pedidos de WhatsApp; no se muestra en la tienda pero sí se puede buscar).
+  return rows
+    .filter((r) => matchesSearch(r.name, words) || matchesCode(r.slug, q))
+    .map((r) => r.slug);
 }
 
 // Página del catálogo: filtra por categoría y por nombre, ordena y pagina EN EL

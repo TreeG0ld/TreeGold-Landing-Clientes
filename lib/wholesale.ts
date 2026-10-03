@@ -3,7 +3,7 @@
 // costo deben verse siempre frescos, recién corregidos en el panel /admin.
 
 import { prisma } from "@/lib/prisma";
-import { matchesSearch, searchWords } from "@/lib/search-text";
+import { matchesCode, matchesSearch, searchWords } from "@/lib/search-text";
 
 export type WholesaleProduct = {
   slug: string;
@@ -75,7 +75,8 @@ export async function getWholesaleProducts(
 
   const words = searchWords(q);
   const filtradas = words.length
-    ? rows.filter((r) => matchesSearch(r.name, words))
+    ? // Por nombre o por código de referencia (el "Ref:" del pedido).
+      rows.filter((r) => matchesSearch(r.name, words) || matchesCode(r.slug, q))
     : rows;
 
   return filtradas.map(toWholesaleProduct);
