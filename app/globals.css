@@ -27,6 +27,16 @@
     border-color: rgb(var(--color-border));
   }
 
+  /* Imágenes y enlaces no se arrastran: el navegador sacaba una copia
+     fantasma del logo o de las fotos de producto al arrastrarlas, y en los
+     carruseles ese arrastre se cruzaba con el deslizamiento. Esta regla la
+     entienden Chrome, Edge y Safari desde el primer pintado; Firefox no, y
+     lo cubre components/NoNativeDrag.tsx. */
+  img,
+  a {
+    -webkit-user-drag: none;
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;

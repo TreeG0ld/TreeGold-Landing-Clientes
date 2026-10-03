@@ -5,6 +5,7 @@ import "./globals.css";
 import { site } from "@/lib/site";
 import SiteChrome from "@/components/SiteChrome";
 import Footer from "@/components/Footer";
+import NoNativeDrag from "@/components/NoNativeDrag";
 
 // Marcellus solo existe en peso 400: los títulos toman su carácter de la
 // propia fuente, no del peso.
@@ -179,6 +180,8 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', '${GA_MEASUREMENT_ID}');`}
         </Script>
+        {/* Fuera de SiteChrome: también rige en /admin y en mayoristas. */}
+        <NoNativeDrag />
         <SiteChrome footer={<Footer />}>{children}</SiteChrome>
       </body>
     </html>
