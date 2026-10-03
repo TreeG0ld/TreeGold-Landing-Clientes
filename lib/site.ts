@@ -31,4 +31,7 @@ export const site = {
   mapsUrl: "https://www.google.com/maps/search/?api=1&query=Calle+49+%237+-+28+Buenos+Aires+Medellin",
   city: "Colombia",
   currency: "COP",
+  // Envío nacional, tarifa fija en pesos. Se suma al total en el checkout de
+  // Wompi (/api/checkout); el pedido por WhatsApp sigue acordándolo aparte.
+  shippingCost: 15000,
 };

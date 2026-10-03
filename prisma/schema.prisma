@@ -87,19 +87,89 @@ model Category {
 }
 
 // ==============================
-// 4. HISTORIAL DE ÓRDENES (Para WhatsApp / Perfil Cliente)
+// 4. PEDIDOS PAGADOS EN LÍNEA (Wompi)
 // ==============================
+// Un pedido nace PENDING en /api/checkout, justo antes de mandar al cliente a
+// Wompi, y SOLO el webhook de Wompi lo mueve a un estado final: la URL a la
+// que vuelve el cliente no es prueba de pago. Los pedidos por WhatsApp no
+// pasan por aquí.
+enum OrderStatus {
+  PENDING  // creado, esperando el pago
+  PAID     // Wompi respondió APPROVED
+  DECLINED // rechazado por el banco o el medio de pago
+  VOIDED   // anulado
+  ERROR    // falló del lado de Wompi o del medio de pago
+}
+
 model Order {
-  id          String   @id @default(cuid())
-  userId      String?  // Opcional por si compra sin iniciar sesión
-  user        User?    @relation(fields: [userId], references: [id])
-  
-  totalAmount Float
-  status      String   @default("PENDING") // PENDING, SENT_TO_WHATSAPP, COMPLETED
-  
-  // Detalles del carrito en formato JSON
-  items       Json     
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          String      @id @default(cuid())
+  // La referencia que se firma y viaja a Wompi; con ella el webhook ubica el
+  // pedido y el cliente lo consulta en /pedido/[referencia].
+  reference   String      @unique
+  status      OrderStatus @default(PENDING)
+
+  userId      String?     // Opcional: se puede comprar sin iniciar sesión
+  user        User?       @relation(fields: [userId], references: [id])
+
+  // Copia de las piezas al momento de pagar (productId, slug, nombre, talla,
+  // cantidad, precio unitario): si luego cambia el catálogo, el pedido no.
+  items       Json
+
+  // Importes en pesos, igual que Product.retailPrice.
+  subtotal     Float
+  shippingCost Float
+  totalAmount  Float
+  // El monto exacto que se firmó para Wompi. El webhook tiene que traer este
+  // mismo número; si no, el pedido no se marca como pagado.
+  amountInCents Int
+  currency     String     @default("COP")
+
+  // Datos de contacto y envío que llena el cliente en el checkout.
+  customerName       String
+  customerEmail      String
+  customerPhone      String
+  shippingAddress    String
+  shippingCity       String
+  shippingDepartment String
+  shippingNotes      String?  // barrio, apartamento, indicaciones
+
+  // Lo que devuelve Wompi al confirmar el pago.
+  wompiTransactionId String?  @unique
+  paymentMethod      String?  // CARD, PSE, NEQUI, BANCOLOMBIA_TRANSFER...
+  paidAt             DateTime?
+  // El stock se revisa al crear el pedido pero se descuenta al confirmarse el
+  // pago: si entre medias otra persona pagó la última pieza, el pago ya está
+  // hecho y no se puede rechazar. Se marca aquí para que el admin lo resuelva
+  // (conseguir la pieza o devolver el dinero).
+  stockShortage      Boolean   @default(false)
+  // Lo marca el admin cuando despacha el pedido.
+  shippedAt          DateTime?
+
+  events      PaymentEvent[]
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // El panel lista los pedidos por estado, del más reciente al más viejo.
+  @@index([status, createdAt])
+}
+
+// Registro de cada evento de Wompi que llegó con firma válida. Wompi reintenta
+// solo 3 veces en 24 h, así que si algo sale mal esto es lo único que queda
+// para reconstruir qué pasó. Los eventos con firma inválida no se guardan.
+model PaymentEvent {
+  id            String   @id @default(cuid())
+  orderId       String?  // null si la referencia no corresponde a ningún pedido
+  order         Order?   @relation(fields: [orderId], references: [id])
+
+  reference     String
+  transactionId String
+  status        String   // APPROVED, DECLINED, VOIDED, ERROR, PENDING
+  environment   String   // "test" o "prod"
+  payload       Json
+
+  createdAt     DateTime @default(now())
+
+  @@index([reference])
+  @@index([transactionId])
 }

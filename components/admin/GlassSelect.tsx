@@ -21,6 +21,8 @@ export default function GlassSelect({
   placeholder = "Selecciona…",
   submitOnChange = false,
   className = "",
+  id,
+  surface = "bg-white",
 }: {
   options: GlassOption[];
   value: string;
@@ -29,6 +31,10 @@ export default function GlassSelect({
   placeholder?: string;
   submitOnChange?: boolean;
   className?: string;
+  /** Id del botón, para conectarlo con un <label htmlFor>. */
+  id?: string;
+  /** Fondo del botón: el checkout usa el crema de sus otros campos. */
+  surface?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [internal, setInternal] = useState(value);
@@ -66,11 +72,12 @@ export default function GlassSelect({
       {name && <input type="hidden" name={name} value={current} />}
 
       <button
+        id={id}
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`flex h-full w-full items-center justify-between gap-2 rounded-xl border bg-white px-4 py-2.5 text-base md:text-sm outline-none transition-all duration-300 ease-luxe cursor-pointer ${
+        className={`flex h-full w-full items-center justify-between gap-2 rounded-xl border ${surface} px-4 py-2.5 text-base md:text-sm outline-none transition-all duration-300 ease-luxe cursor-pointer ${
           open ? "border-accent text-primary" : "border-border text-primary hover:border-accent"
         }`}
       >

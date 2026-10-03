@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import { Minus, Plus, Trash2, ArrowRight } from "lucide-react";
+import { Minus, Plus, Trash2, ArrowRight, Lock } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
+import CheckoutForm from "@/components/CheckoutForm";
 import { useSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
+import { site } from "@/lib/site";
 import { buildSelectionLink } from "@/lib/whatsapp";
 import EmptyBagIcon from "@/components/EmptyBagIcon";
 
@@ -15,7 +17,20 @@ export default function SelectionView() {
   const { items, remove, setQty, clear } = useSelection();
   const total = items.reduce((n, i) => n + i.qty * i.price, 0);
   const [mounted, setMounted] = useState(false);
+  const [checkingOut, setCheckingOut] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  // "Pagar en línea" del panel lateral trae ?pagar=1: se abre el formulario
+  // de pago de una vez y se baja hasta él (en celular queda debajo de las
+  // piezas). Se lee en un efecto y no con useSearchParams para no obligar a
+  // la página a renderizarse en el cliente.
+  useEffect(() => {
+    if (!mounted || new URLSearchParams(window.location.search).get("pagar") !== "1") return;
+    setCheckingOut(true);
+    requestAnimationFrame(() =>
+      document.getElementById("pagar")?.scrollIntoView({ behavior: "smooth", block: "start" })
+    );
+  }, [mounted]);
 
   // Hasta montar en cliente, el estado del localStorage no está disponible:
   // evitamos el desajuste de hidratación mostrando un placeholder neutro.
@@ -119,7 +134,7 @@ export default function SelectionView() {
         </ul>
 
         {/* Resumen */}
-        <aside className="h-fit lg:sticky lg:top-28">
+        <aside id="pagar" className="h-fit scroll-mt-24 lg:sticky lg:top-28">
           <div className="rounded-2xl border border-border bg-muted/30 p-6">
             <h2 className="font-serif text-2xl">Resumen</h2>
             <div className="mt-5 space-y-3 text-sm">
@@ -127,30 +142,54 @@ export default function SelectionView() {
                 <span>Piezas</span>
                 <span>{items.reduce((n, i) => n + i.qty, 0)}</span>
               </div>
+              <div className="flex justify-between text-secondary">
+                <span>Subtotal</span>
+                <span>{formatCOP(total)}</span>
+              </div>
+              <div className="flex justify-between text-secondary">
+                <span>Envío a toda Colombia</span>
+                <span>{formatCOP(site.shippingCost)}</span>
+              </div>
               <div className="flex items-baseline justify-between border-t border-border pt-3">
-                <span className="font-medium">Total estimado</span>
-                <span className="font-serif text-2xl">{formatCOP(total)}</span>
+                <span className="font-medium">Total</span>
+                <span className="font-serif text-2xl">{formatCOP(total + site.shippingCost)}</span>
               </div>
             </div>
-            <p className="mt-4 text-xs text-secondary/60">
-              Los precios son referenciales. Confirmamos disponibilidad, tallas y
-              forma de pago por WhatsApp.
-            </p>
-            <a
-              href={buildSelectionLink(items, total)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-7 py-4 text-sm font-semibold text-white transition-all duration-300 ease-luxe hover:brightness-105 active:scale-[0.98]"
-            >
-              <WhatsAppIcon className="h-5 w-5" />
-              Finalizar por WhatsApp
-            </a>
-            <Link
-              href="/coleccion"
-              className="mt-3 block text-center text-sm text-secondary underline-offset-4 transition-colors hover:text-accent hover:underline"
-            >
-              Seguir explorando
-            </Link>
+
+            {checkingOut ? (
+              <CheckoutForm items={items} onCancel={() => setCheckingOut(false)} />
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setCheckingOut(true)}
+                  className="btn-primary mt-6 w-full py-4"
+                >
+                  <Lock className="h-4 w-4" />
+                  Pagar en línea
+                </button>
+                <p className="mt-2 text-center text-xs text-secondary/60">
+                  Pago seguro con Wompi (Bancolombia)
+                </p>
+                {/* WhatsApp sigue como alternativa: el mensaje lleva el
+                    subtotal y el envío se acuerda en la conversación. */}
+                <a
+                  href={buildSelectionLink(items, total)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-7 py-4 text-sm font-semibold text-white transition-all duration-300 ease-luxe hover:brightness-105 active:scale-[0.98]"
+                >
+                  <WhatsAppIcon className="h-5 w-5" />
+                  Prefiero pedir por WhatsApp
+                </a>
+                <Link
+                  href="/coleccion"
+                  className="mt-3 block text-center text-sm text-secondary underline-offset-4 transition-colors hover:text-accent hover:underline"
+                >
+                  Seguir explorando
+                </Link>
+              </>
+            )}
           </div>
         </aside>
       </div>
