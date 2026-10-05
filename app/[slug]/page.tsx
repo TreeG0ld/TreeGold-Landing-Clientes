@@ -25,7 +25,7 @@ import WholesaleProductCard from "@/components/WholesaleProductCard";
 import WholesaleOrder from "@/components/WholesaleOrder";
 import WholesaleSearch from "@/components/WholesaleSearch";
 import BalinesNoticeModal from "@/components/BalinesNoticeModal";
-import { BALINES_CATEGORY } from "@/lib/wholesale-rules";
+import { BALINES_CATEGORY, groupBalines } from "@/lib/wholesale-rules";
 
 // El código es corto y fijo (una sola constante, sin BD detrás), así que sin
 // límite se puede recorrer por fuerza bruta a base de peticiones GET
@@ -174,19 +174,37 @@ export default async function CatchAllPage({
           </div>
         </div>
 
-        {/* Grid */}
+        {/* Grid. En balinería (sin búsqueda) va por secciones según el tipo
+            de pieza: balín liso, diamantado, italiano, barriles... (ver
+            groupBalines). Buscando se muestra la lista normal: los resultados
+            ya son pocos y las secciones solo estorbarían. */}
         {products.length > 0 ? (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-10 pt-2 lg:grid-cols-4">
-            {products.map((p, i) => (
-              <div
-                key={p.slug}
-                className="cascade"
-                style={{ "--i": i % 8 } as React.CSSProperties}
-              >
-                <WholesaleProductCard product={p} />
+          (category === BALINES_CATEGORY && !query
+            ? groupBalines(products)
+            : [{ label: null as string | null, items: products }]
+          ).map((seccion) => (
+            <section key={seccion.label ?? "todas"} className={seccion.label ? "mb-16" : ""}>
+              {seccion.label && (
+                <h2 className="mb-6 flex items-baseline gap-3 border-b border-border pb-3 font-serif text-2xl text-primary">
+                  {seccion.label}
+                  <span className="font-sans text-xs text-secondary/60">
+                    {seccion.items.length} {seccion.items.length === 1 ? "pieza" : "piezas"}
+                  </span>
+                </h2>
+              )}
+              <div className="grid grid-cols-2 gap-x-4 gap-y-10 pt-2 lg:grid-cols-4">
+                {seccion.items.map((p, i) => (
+                  <div
+                    key={p.slug}
+                    className="cascade"
+                    style={{ "--i": i % 8 } as React.CSSProperties}
+                  >
+                    <WholesaleProductCard product={p} />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </section>
+          ))
         ) : (
           <div className="py-24 text-center text-secondary">
             <p>
