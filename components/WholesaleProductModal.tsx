@@ -10,6 +10,7 @@ import { useWholesaleSelection } from "@/lib/store";
 import type { WholesaleProduct } from "@/lib/wholesale";
 import { minQtyFor } from "@/lib/wholesale-rules";
 import { lockScroll } from "@/lib/scroll-lock";
+import { isAdminPhoto, squarePhotoLoader } from "@/lib/imageLoader";
 
 // Vista ampliada de una pieza del catálogo mayorista. Es una ventana dentro de
 // la misma página y NO un enlace a /producto/[slug] a propósito: esa ruta es la
@@ -98,11 +99,12 @@ export default function WholesaleProductModal({
           <div className="md:w-1/2 md:shrink-0">
             <div className="relative aspect-square w-full bg-white">
               <Image
+                loader={squarePhotoLoader}
                 src={product.images[active]}
                 alt={`${product.name} — vista ${active + 1}`}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-contain p-4"
+                className={`${isAdminPhoto(product.images[active]) ? "object-cover" : "object-contain p-4"}`}
               />
             </div>
 

@@ -65,3 +65,33 @@ export default function imageLoader({ src, width, quality }: LoaderArgs): string
   // --- Cualquier otra (locales en /public, etc.): se deja igual ---
   return src;
 }
+
+// ¿Es una foto subida desde el panel /admin? Son fotos tomadas en el local,
+// con su propio fondo: en las tarjetas llenan el recuadro (object-cover). Las
+// del catálogo del proveedor vienen recortadas sobre fondo blanco y se
+// muestran enteras con margen (object-contain), porque ahí el blanco no se
+// nota. Misma carpeta que reconoce el loader de arriba.
+export function isAdminPhoto(src: string): boolean {
+  return src.includes("res.cloudinary.com") && src.includes("/treegold/admin/");
+}
+
+// Loader para fotos del /admin que van en un recuadro de proporción fija:
+// en vez de recortarlas para llenarlo (a la "Manilla Tio Rico" le cortaba los
+// lados), Cloudinary las COMPLETA hasta esa proporción rellenando con un
+// degradado del color de su propio borde (b_auto:border_gradient). Una foto con
+// fondo blanco se completa en blanco; una tomada en el local, con sus tonos.
+// La joya queda siempre entera y la foto llena el recuadro sin franjas
+// blancas. Las demás fotos siguen con el loader normal.
+function padToAspect(aspect: string) {
+  return ({ src, width }: LoaderArgs): string =>
+    isAdminPhoto(src)
+      ? src.replace(
+          "/upload/",
+          `/upload/c_pad,ar_${aspect},b_auto:border_gradient,w_${width}/f_auto,q_auto:good/`
+        )
+      : imageLoader({ src, width });
+}
+
+// Tarjetas de producto (aspect-[4/5]) y vistas ampliadas cuadradas.
+export const cardPhotoLoader = padToAspect("4:5");
+export const squarePhotoLoader = padToAspect("1:1");

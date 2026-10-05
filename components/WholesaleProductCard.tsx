@@ -8,6 +8,7 @@ import { useWholesaleSelection } from "@/lib/store";
 import WholesaleProductModal from "@/components/WholesaleProductModal";
 import type { WholesaleProduct } from "@/lib/wholesale";
 import { minQtyFor } from "@/lib/wholesale-rules";
+import { cardPhotoLoader, isAdminPhoto } from "@/lib/imageLoader";
 
 // Tarjeta del catálogo de mayoristas. Al tocarla NO navega a /producto/[slug]
 // (esa ruta pública muestra el precio de venta al detal): abre una ventana con
@@ -45,11 +46,12 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
         className="relative block aspect-[4/5] w-full overflow-hidden rounded-2xl bg-white cursor-pointer"
       >
         <Image
+          loader={cardPhotoLoader}
           src={product.images[0]}
           alt={product.name}
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-contain p-4 transition-transform duration-500 ease-luxe group-hover:scale-105"
+          className={`${isAdminPhoto(product.images[0]) ? "object-cover" : "object-contain p-4"} transition-transform duration-500 ease-luxe group-hover:scale-105`}
         />
       </button>
       <div className="mt-4 px-1">

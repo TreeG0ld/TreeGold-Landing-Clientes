@@ -8,6 +8,7 @@ import type { Product } from "@/lib/products";
 import { useSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
 import { flyToCart } from "@/lib/flyToCart";
+import { cardPhotoLoader, isAdminPhoto } from "@/lib/imageLoader";
 import { useAddCooldown } from "@/lib/useAddCooldown";
 
 // "index" escalona la entrada (cascada): cada tarjeta espera su turno.
@@ -51,11 +52,12 @@ export default function ProductCard({
       <Link href={`/producto/${product.slug}`} className="block">
         <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-white">
           <Image
+            loader={cardPhotoLoader}
             src={product.images[0]}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-contain p-4 transition-transform duration-700 ease-luxe group-hover:scale-105"
+            className={`${isAdminPhoto(product.images[0]) ? "object-cover" : "object-contain p-4"} transition-transform duration-700 ease-luxe group-hover:scale-105`}
           />
           {/* Overlay gradient on hover */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
