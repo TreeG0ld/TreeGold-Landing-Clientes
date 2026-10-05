@@ -20,7 +20,7 @@ import {
   isValidWholesaleCode,
 } from "@/lib/wholesale-auth";
 import { clientIpFromHeaders, rateLimitIp } from "@/lib/client-ip";
-import { rateLimit } from "@/lib/rate-limit";
+import { rateLimit, refundRateLimit } from "@/lib/rate-limit";
 import WholesaleProductCard from "@/components/WholesaleProductCard";
 import WholesaleOrder from "@/components/WholesaleOrder";
 import WholesaleSearch from "@/components/WholesaleSearch";
@@ -29,10 +29,11 @@ import { BALINES_CATEGORY, groupBalines } from "@/lib/wholesale-rules";
 
 // El código es corto y fijo (una sola constante, sin BD detrás), así que sin
 // límite se puede recorrer por fuerza bruta a base de peticiones GET
-// normales, sin necesidad de falsificar nada. 30/10 min por IP: generoso
-// para el uso real (un distribuidor guarda el enlace y lo abre pocas veces
-// al día) pero bastante bajo el ritmo que necesitaría un ataque de fuerza
-// bruta para tener alguna chance contra un secreto de longitud razonable.
+// normales, sin necesidad de falsificar nada. 30 intentos FALLIDOS cada 10
+// min por IP: las visitas con el código correcto devuelven su intento (ver
+// refundRateLimit más abajo), así que un distribuidor puede navegar sin
+// límite, y 30 sigue muy por debajo del ritmo que necesitaría un ataque de
+// fuerza bruta para tener alguna chance contra un secreto razonable.
 const WHOLESALE_MAX_ATTEMPTS = 30;
 const WHOLESALE_WINDOW_MS = 10 * 60 * 1000;
 
@@ -71,15 +72,24 @@ export default async function CatchAllPage({
   // Solo se gasta cupo en slugs que de verdad empiezan por "mayoristas-": el
   // resto del catch-all (cualquier ruta 404 normal del sitio) no debe
   // consumir esta cubeta.
+  let limitKey: string | null = null;
   if (codigo !== null) {
     const ip = clientIpFromHeaders(await headers());
     // Fail-closed, igual que en login/registro: sin IP de confianza no hay
     // límite que valga, así que se rechaza en vez de compartir cubeta.
     if (!ip) notFound();
-    const limit = rateLimit(`wholesale:ip:${rateLimitIp(ip)}`, WHOLESALE_MAX_ATTEMPTS, WHOLESALE_WINDOW_MS);
+    limitKey = `wholesale:ip:${rateLimitIp(ip)}`;
+    const limit = rateLimit(limitKey, WHOLESALE_MAX_ATTEMPTS, WHOLESALE_WINDOW_MS);
     if (!limit.allowed) notFound();
   }
   if (!(await isValidWholesaleCode(codigo))) notFound();
+  // Código correcto: se devuelve el intento. El límite solo debe frenar a
+  // quien prueba códigos al azar; antes contaba también cada búsqueda,
+  // pestaña o recarga de un distribuidor legítimo, y explorando el catálogo
+  // llegaba a 30 en pocos minutos y veía un 404. Los intentos fallidos se
+  // siguen acumulando igual (refundRateLimit solo devuelve lo que gastó esta
+  // misma petición), y una IP ya bloqueada no llega hasta aquí.
+  if (limitKey) refundRateLimit(limitKey);
 
   const { categoria, q } = await searchParams;
   const category = categoria ?? "todos";
