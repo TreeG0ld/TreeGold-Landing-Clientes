@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
-import { Search, X } from "lucide-react";
+import { Loader2, Search, X } from "lucide-react";
 
 // En píxeles y no en clases de ancho porque se animan como número: 40 es el
 // círculo cerrado (igual que el alto) y 240 entra sin apretar en un celular.
@@ -33,6 +33,9 @@ export default function WholesaleSearch({
   const [query, setQuery] = useState(initialQuery);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  // Mientras llega la página nueva se muestra un indicador en la lupa: volver
+  // a "todo" trae ~800 piezas y, sin señal, parecía que no había pasado nada.
+  const [pending, startTransition] = useTransition();
 
   useEffect(() => {
     if (open) inputRef.current?.focus();
@@ -51,13 +54,13 @@ export default function WholesaleSearch({
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    router.push(hrefCon(query, false));
+    startTransition(() => router.push(hrefCon(query, false)));
   }
 
   function cerrar() {
     setQuery("");
     setOpen(false);
-    if (initialQuery) router.push(hrefCon("", true));
+    if (initialQuery) startTransition(() => router.push(hrefCon("", true)));
   }
 
   return (
@@ -78,7 +81,11 @@ export default function WholesaleSearch({
       {/* La lupa no se mueve: queda fija a la izquierda y el campo crece a su
           derecha, así el ojo tiene un punto de anclaje durante la animación. */}
       <span className="pointer-events-none absolute left-0 flex h-10 w-10 items-center justify-center text-secondary">
-        <Search className="h-4 w-4" />
+        {pending ? (
+          <Loader2 aria-label="Buscando" className="h-4 w-4 animate-spin" />
+        ) : (
+          <Search className="h-4 w-4" />
+        )}
       </span>
 
       <input
