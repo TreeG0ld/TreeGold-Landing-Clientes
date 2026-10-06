@@ -71,6 +71,12 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
             </span>
           </div>
         </div>
+        {/* Código de referencia: el mismo "Ref:" que llega en el pedido de
+            WhatsApp, para que el distribuidor lo pueda citar o buscar. Solo
+            aquí: en la tienda pública el código no se muestra. */}
+        <p className="mt-1 text-xs text-secondary/70">
+          Ref: <span className="font-medium text-secondary">{product.slug}</span>
+        </p>
         {/* La medida va aquí porque es lo que distingue dos referencias del
             mismo modelo: sin ella el distribuidor no sabe qué está pidiendo. */}
         <p className="mt-1 text-xs uppercase tracking-wide text-secondary/60">

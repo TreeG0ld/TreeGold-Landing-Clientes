@@ -54,6 +54,8 @@ export default function WholesaleProductModal({
   // Se omite el material cuando repite la categoría: en muchas piezas ambos
   // dicen lo mismo ("Plata ley 925") y quedaba una fila duplicada.
   const detalles = [
+    // El mismo código que va en el pedido de WhatsApp ("Ref:").
+    ["Referencia", product.slug],
     ["Categoría", product.categoryName],
     ["Material", product.material === product.categoryName ? "" : product.material],
     ["Medida", product.size],
