@@ -15,12 +15,10 @@ export default function CategoryFilter({
   categories,
   value,
   sort,
-  q,
 }: {
   categories: CategoryOption[];
   value: string;
   sort: string;
-  q?: string;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -86,7 +84,10 @@ export default function CategoryFilter({
                     type="button"
                     onClick={() => {
                       setOpen(false);
-                      router.push(coleccionHref({ category: c.slug, sort, page: 1, q }));
+                      // Sin `q`: cambiar de categoría reinicia la búsqueda. Antes
+                      // la arrastraba ("trio" en Aretes daba 0 piezas) y el
+                      // cliente quedaba perdido en una categoría vacía.
+                      router.push(coleccionHref({ category: c.slug, sort, page: 1 }));
                     }}
                     className={`flex w-full items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left text-sm transition-colors duration-200 cursor-pointer ${
                       active
