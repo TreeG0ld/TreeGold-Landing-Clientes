@@ -12,8 +12,12 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ShieldCheck } from "lucide-react";
-import { getWholesaleProducts, getWholesaleCategories } from "@/lib/wholesale";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
+import {
+  getWholesaleProducts,
+  getWholesaleCategories,
+  getWholesaleCategoryTiles,
+} from "@/lib/wholesale";
 import {
   WHOLESALE_PREFIX as PREFIX,
   extractWholesaleCode,
@@ -24,6 +28,7 @@ import { rateLimit, refundRateLimit } from "@/lib/rate-limit";
 import WholesaleProductCard from "@/components/WholesaleProductCard";
 import WholesaleOrder from "@/components/WholesaleOrder";
 import WholesaleSearch from "@/components/WholesaleSearch";
+import WholesaleCategoryGrid from "@/components/WholesaleCategoryGrid";
 import BalinesNoticeModal from "@/components/BalinesNoticeModal";
 import { BALINES_CATEGORY, groupBalines } from "@/lib/wholesale-rules";
 
@@ -94,14 +99,18 @@ export default async function CatchAllPage({
   const { categoria, q } = await searchParams;
   const category = categoria ?? "todos";
   const query = q?.trim() ?? "";
+  // Sin categoría ni búsqueda, el catálogo abre con la cuadrícula de
+  // categorías (y no carga piezas). "Ver todo" es ?categoria=todos.
+  const landing = !categoria && !query;
 
   // Con búsqueda se trae lo que coincide en TODAS las categorías: antes se
   // buscaba solo dentro de la pestaña elegida, y "tio rico" en "Anillos" daba
   // cero aunque hubiera piezas en otras categorías. De ese total salen los
   // conteos de cada pestaña y, filtrando aquí, la categoría elegida.
-  const [found, categories] = await Promise.all([
-    getWholesaleProducts(query ? "todos" : category, query),
+  const [found, categories, tiles] = await Promise.all([
+    landing ? Promise.resolve([]) : getWholesaleProducts(query ? "todos" : category, query),
     getWholesaleCategories(),
+    landing ? getWholesaleCategoryTiles() : Promise.resolve([]),
   ]);
 
   const matchesByCategory = new Map<string, number>();
@@ -124,6 +133,9 @@ export default async function CatchAllPage({
     })),
   ].filter((t) => t.count !== 0 || t.slug === category);
   const base = `/${PREFIX}${codigo}`;
+  const categoryName =
+    category === "todos" ? "Todas las categorías" : categories.find((c) => c.slug === category)?.name ?? "";
+  const piezas = (n: number) => `${n} ${n === 1 ? "pieza" : "piezas"}`;
 
   return (
     <div className="min-h-dvh bg-background">
@@ -144,9 +156,35 @@ export default async function CatchAllPage({
       </header>
 
       <div className="mx-auto max-w-7xl px-5 pb-20 md:px-8">
-        {/* Filtros por categoría (sticky) */}
+        {/* Barra superior (sticky). Buscando: pestañas con cuántas piezas
+            encontró cada categoría. Dentro de una categoría: volver a la
+            cuadrícula y su nombre. En la entrada: una invitación a elegir. */}
         <div className="sticky top-0 z-30 -mx-5 mb-10 border-b border-border glass px-5 py-3 md:mx-0 md:mt-6 md:rounded-full md:border md:px-4">
           <div className="flex items-center gap-3">
+            {!query ? (
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                {landing ? (
+                  <p className="truncate pl-1 text-sm font-medium text-primary">
+                    Elige una categoría
+                  </p>
+                ) : (
+                  <>
+                    <Link
+                      href={base}
+                      className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-secondary transition-colors hover:bg-white/70 hover:text-primary"
+                    >
+                      <ArrowLeft className="h-4 w-4" /> Categorías
+                    </Link>
+                    <span className="min-w-0 truncate font-serif text-lg text-primary">
+                      {categoryName}
+                    </span>
+                    <span className="hidden shrink-0 text-xs text-secondary/70 sm:block">
+                      {piezas(products.length)}
+                    </span>
+                  </>
+                )}
+              </div>
+            ) : (
             <div className="flex flex-1 gap-2 overflow-x-auto pb-1 md:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {tabs.map((t) => {
                 const active = category === t.slug;
@@ -177,10 +215,13 @@ export default async function CatchAllPage({
                 );
               })}
             </div>
-            <span className="hidden shrink-0 pr-2 text-xs text-secondary/70 sm:block">
-              {products.length} {products.length === 1 ? "pieza" : "piezas"}
-            </span>
-            <WholesaleSearch base={base} categoria={category} initialQuery={query} />
+            )}
+            {query && (
+              <span className="hidden shrink-0 pr-2 text-xs text-secondary/70 sm:block">
+                {piezas(products.length)}
+              </span>
+            )}
+            <WholesaleSearch base={base} categoria={categoria ?? ""} initialQuery={query} />
           </div>
         </div>
 
@@ -188,7 +229,9 @@ export default async function CatchAllPage({
             de pieza: balín liso, diamantado, italiano, barriles... (ver
             groupBalines). Buscando se muestra la lista normal: los resultados
             ya son pocos y las secciones solo estorbarían. */}
-        {products.length > 0 ? (
+        {landing ? (
+          <WholesaleCategoryGrid tiles={tiles} base={base} />
+        ) : products.length > 0 ? (
           (category === BALINES_CATEGORY && !query
             ? groupBalines(products)
             : [{ label: null as string | null, items: products }]

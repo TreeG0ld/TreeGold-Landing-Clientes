@@ -90,3 +90,38 @@ export async function getWholesaleCategories(): Promise<{ slug: string; name: st
   });
   return cats;
 }
+
+export type WholesaleCategoryTile = {
+  slug: string;
+  name: string;
+  count: number;
+  image: string | null;
+};
+
+// Cuadrícula de categorías con la que abre el catálogo mayorista: nombre,
+// cuántas piezas mayoristas tiene y una foto de portada (la de su pieza más
+// antigua, igual que las tarjetas de categoría de la tienda pública). Una sola
+// consulta y sin traer las ~800 piezas: la entrada al catálogo carga rápido.
+export async function getWholesaleCategoryTiles(): Promise<WholesaleCategoryTile[]> {
+  const cats = await prisma.category.findMany({
+    where: { products: { some: { isWholesale: true } } },
+    select: {
+      slug: true,
+      name: true,
+      _count: { select: { products: { where: { isWholesale: true } } } },
+      products: {
+        where: { isWholesale: true },
+        select: { images: true },
+        orderBy: { createdAt: "asc" },
+        take: 1,
+      },
+    },
+    orderBy: { name: "asc" },
+  });
+  return cats.map((c) => ({
+    slug: c.slug,
+    name: c.name,
+    count: c._count.products,
+    image: c.products[0]?.images[0] ?? null,
+  }));
+}

@@ -46,7 +46,9 @@ export default function WholesaleSearch({
   // encontraba nada). Al cerrar el buscador sí se vuelve a la categoría.
   function hrefCon(q: string, conCategoria: boolean) {
     const sp = new URLSearchParams();
-    if (conCategoria && categoria && categoria !== "todos") sp.set("categoria", categoria);
+    // "todos" también se conserva: es "Ver todo"; sin categoría se vuelve a la
+    // cuadrícula de categorías.
+    if (conCategoria && categoria) sp.set("categoria", categoria);
     if (q.trim()) sp.set("q", q.trim());
     const qs = sp.toString();
     return `${base}${qs ? `?${qs}` : ""}`;
