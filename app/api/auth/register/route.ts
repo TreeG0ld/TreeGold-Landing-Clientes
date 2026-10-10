@@ -42,7 +42,16 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const NEUTRAL_CONFLICT =
   "No se pudo completar el registro. Si ya tienes una cuenta con este correo, inicia sesión o recupera tu acceso.";
 
+// Registro de clientes cerrado: la tienda cobra por Wompi sin cuenta y solo el
+// administrador entra con usuario. Para reabrirlo, poner esto en false y
+// restaurar app/registro desde git.
+const REGISTRATION_CLOSED = true;
+
 export async function POST(req: Request) {
+  if (REGISTRATION_CLOSED) {
+    return NextResponse.json({ error: "El registro de cuentas no está disponible." }, { status: 403 });
+  }
+
   try {
     // Sin IP de confianza no hay límite que valga, y aquí el límite por IP es
     // la única defensa contra la enumeración masiva de correos: se rechaza en

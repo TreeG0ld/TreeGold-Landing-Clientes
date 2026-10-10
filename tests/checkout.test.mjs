@@ -16,6 +16,7 @@ const customer = {
   city: "Medellín",
   address: "Calle 10 # 20 - 30",
   notes: "",
+  acceptedPolicy: true,
 };
 
 test("unitario: payload válido -> datos normalizados", () => {
@@ -164,4 +165,15 @@ test("webhook: un rechazo no pisa otro estado final", () => {
 test("webhook: transacción PENDING -> sin efecto", () => {
   const r = decideTransition(pending, { ...approved, status: "PENDING" });
   assert.equal(r.action, "ignore");
+});
+
+test("Ley 1581: sin aceptar la política de datos no se crea el pedido", () => {
+  for (const acceptedPolicy of [false, undefined, "true", 1]) {
+    const r = validateCheckoutPayload({
+      items: [{ slug: "anillo-1", qty: 1 }],
+      customer: { ...customer, acceptedPolicy },
+    });
+    assert.equal(r.ok, false);
+    assert.match(r.error, /política de tratamiento de datos/);
+  }
 });

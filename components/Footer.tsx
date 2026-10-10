@@ -68,6 +68,9 @@ export default function Footer() {
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-on-primary/15 pt-8 text-xs text-on-primary/50 md:flex-row">
           <p>© {new Date().getFullYear()} {site.fullName}. Todos los derechos reservados.</p>
+          <Link href="/privacidad" className="transition-colors hover:text-accent-soft">
+            Política de tratamiento de datos
+          </Link>
         </div>
       </div>
     </footer>

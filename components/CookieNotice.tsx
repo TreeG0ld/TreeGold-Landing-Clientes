@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 // Aviso de cookies. Google Analytics las usa y la ley colombiana de protección
 // de datos pide informarlo.
@@ -45,8 +46,12 @@ export default function CookieNotice() {
     >
       <div className="mx-auto flex max-w-3xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
         <p className="text-center text-xs leading-relaxed text-secondary sm:text-left">
-          Usamos cookies para entender cómo se navega la tienda y mejorarla. No
-          recogemos datos personales ni los compartimos con terceros.
+          Usamos cookies para entender cómo se navega la tienda y mejorarla. Los
+          datos que nos das al comprar se tratan como explica nuestra{" "}
+          <Link href="/privacidad" className="underline underline-offset-2 hover:text-accent">
+            política de datos
+          </Link>
+          .
         </p>
         <button
           onClick={accept}

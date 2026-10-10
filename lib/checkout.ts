@@ -151,6 +151,14 @@ export function validateCheckoutPayload(body: unknown): CheckoutValidation {
   if (address.length < 5 || address.length > CHECKOUT_LIMITS.address) {
     return { ok: false, error: "Escribe la dirección de envío completa." };
   }
+  // Autorización de la política de datos (Ley 1581): el navegador la pide con
+  // una casilla, pero se exige también aquí para que no se pueda saltar.
+  if (c.acceptedPolicy !== true) {
+    return {
+      ok: false,
+      error: "Debes aceptar la política de tratamiento de datos para continuar.",
+    };
+  }
   if (notes.length > CHECKOUT_LIMITS.notes) {
     return {
       ok: false,

@@ -39,5 +39,13 @@ export const site = {
   freeShippingFrom: 600000,
   // Tiempos de entrega que se le prometen al cliente (aviso de envío y
   // confirmación del pedido). Cambiar aquí si cambian.
+  // Responsable del tratamiento de datos personales (Ley 1581 de 2012). Estos
+  // datos se publican tal cual en /privacidad.
+  dataController: {
+    name: "Juan Diego Gonzalez Hincapie",
+    idType: "CC",
+    idNumber: "1017273205",
+    phone: "300 393 4328",
+  },
   deliveryNote: "Despachamos al día siguiente de tu pedido y llega en unos 3 días hábiles.",
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import Link from "next/link";
 import { ArrowLeft, Lock } from "lucide-react";
 import type { SelectionItem } from "@/lib/store";
 import { DEPARTAMENTOS, CHECKOUT_LIMITS } from "@/lib/checkout";
@@ -29,6 +30,7 @@ export default function CheckoutForm({
     city: "",
     address: "",
     notes: "",
+    acceptedPolicy: false,
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,6 +46,10 @@ export default function CheckoutForm({
     // no aplica: se revisa aquí (el servidor también lo valida).
     if (!form.department) {
       setError("Elige tu departamento.");
+      return;
+    }
+    if (!form.acceptedPolicy) {
+      setError("Debes aceptar la política de tratamiento de datos para continuar.");
       return;
     }
     setLoading(true);
@@ -179,6 +185,27 @@ export default function CheckoutForm({
           className={inputClass}
         />
       </div>
+
+      <label className="flex cursor-pointer items-start gap-2.5 text-xs leading-relaxed text-secondary">
+        <input
+          type="checkbox"
+          checked={form.acceptedPolicy}
+          onChange={(e) => setForm((f) => ({ ...f, acceptedPolicy: e.target.checked }))}
+          required
+          className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-accent"
+        />
+        <span>
+          Acepto la{" "}
+          <Link
+            href="/privacidad"
+            target="_blank"
+            className="text-accent underline underline-offset-2 hover:text-primary"
+          >
+            política de tratamiento de datos personales
+          </Link>
+          .
+        </span>
+      </label>
 
       {error && (
         <p role="alert" className="text-sm text-destructive">
