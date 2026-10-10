@@ -27,7 +27,7 @@ const BANNER_MOBILE_H = 1448;
 // Anchos del srcset de escritorio (los mismos tramos que generaba next/image).
 // Construimos las URLs con el MISMO loader del sitio (lib/imageLoader.ts) en
 // vez de escribir las transformaciones a mano: así el banner se sigue sirviendo
-// en WebP/AVIF al ancho justo (f_auto,q_auto:good,w_N,c_limit) y las reglas de
+// en WebP al ancho justo (f_webp,fl_awebp,q_auto:good,w_N,c_limit) y las reglas de
 // Cloudinary siguen viviendo en un solo archivo, aunque esta imagen ya no pase
 // por el componente <Image>. Tope en 2560: es el recurso LCP de la home y a
 // partir de ahí solo se gana peso (c_limit tampoco agranda más que el original).
@@ -37,7 +37,7 @@ const BANNER_SRCSET = DESKTOP_WIDTHS.map(
 ).join(", ");
 
 // Srcset de celular: mismo loader (esta foto también vive en treegold/marca/,
-// así que sale sin recorte de catálogo, solo f_auto,q_auto:good,w_N,c_limit).
+// así que sale sin recorte de catálogo, solo f_webp,fl_awebp,q_auto:good,w_N,c_limit).
 // c_limit nunca agranda más allá del original (1086px), así que los tramos
 // mayores simplemente sirven el archivo tal cual.
 const MOBILE_WIDTHS = [480, 750, 1086];

@@ -83,9 +83,17 @@ mantenerlo real desde `/admin`.
 `images.loader: "custom"`). Para fotos de Cloudinary recorta automáticamente la franja
 inferior de la imagen original donde el catálogo del proveedor imprime el código y los
 precios (`c_crop,g_north,h_0.75`), hace `e_trim` + `c_pad` a cuadrado con fondo blanco, y
-sirve WebP/AVIF según el navegador. Si en el futuro aparecen fotos con el precio todavía
+sirve WebP a todos (`f_webp,fl_awebp`, no `f_auto`). Si en el futuro aparecen fotos con el precio todavía
 visible, es porque la franja de precio empieza más arriba del recorte actual — bajar el
 valor de `h_` (no subirlo).
+
+**Cuota de Cloudinary (plan gratuito, 25 créditos en ventana móvil de 30 días).** En octubre
+de 2026 llegó al 126%: el 65% eran transformaciones, porque `f_auto` guardaba una copia por
+formato (WebP, JPEG XL para iPhone, original para bots) × cada ancho × cada loader. Por eso
+el formato es WebP fijo y `next.config.mjs` tiene solo 7 anchos. **Cualquier cambio al texto de
+las transformaciones regenera todas las copias** (el 5-oct-2026, al cambiar los loaders de
+fotos del admin, se generaron 3.000 en un día): no tocarlo a la ligera, y no agregar anchos.
+`tests/imageLoader.test.mjs` fija las URLs exactas para que un cambio así no pase sin querer.
 
 La subida de imágenes desde `/admin` usa **upload firmado** directo del navegador a
 Cloudinary (`/api/admin/cloudinary-signature` genera la firma; solo un admin con sesión

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import loader from "../lib/imageLoader.ts";
+import loader, { cardPhotoLoader, squarePhotoLoader } from "../lib/imageLoader.ts";
 
 const CLD =
   "https://res.cloudinary.com/dkab59i18/image/upload/v1782339418/treegold/anillos/09120002.jpg";
@@ -9,7 +9,7 @@ test("Cloudinary: encadena recorte de precio + e_trim + cuadrado blanco + optimi
   const url = loader({ src: CLD, width: 400 });
   assert.match(
     url,
-    /\/upload\/c_crop,g_north,h_0\.75\/e_trim\/c_pad,ar_1:1,b_white\/f_auto,q_auto:good,w_400,c_limit\//
+    /\/upload\/c_crop,g_north,h_0\.75\/e_trim\/c_pad,ar_1:1,b_white\/f_webp,fl_awebp,q_auto:good,w_400,c_limit\//
   );
 });
 
@@ -18,9 +18,10 @@ test("Cloudinary: oculta el precio (recorte del 25% inferior)", () => {
   assert.ok(url.includes("c_crop,g_north,h_0.75"), "debe recortar la franja del precio");
 });
 
-test("Rendimiento: siempre formato y calidad automáticos (WebP/AVIF, q_auto)", () => {
+test("Rendimiento: WebP fijo (no f_auto, que guarda una copia por formato) y q_auto", () => {
   const url = loader({ src: CLD, width: 800 });
-  assert.ok(url.includes("f_auto"), "f_auto para servir WebP/AVIF");
+  assert.ok(url.includes("f_webp,fl_awebp"), "WebP para todos los navegadores");
+  assert.ok(!url.includes("f_auto"), "f_auto multiplica las copias en Cloudinary");
   assert.ok(url.includes("q_auto:good"), "q_auto para peso óptimo");
 });
 
@@ -72,7 +73,7 @@ test("Fotos nuevas (treegold/admin/): sin recorte de precio ni zoom, solo optimi
   assert.ok(!url.includes("c_crop"), "no debe recortar");
   assert.ok(!url.includes("e_trim"), "no debe recortar el marco");
   assert.ok(!url.includes("c_pad"), "no debe forzar cuadrado");
-  assert.equal(url, NEW.replace("/upload/", "/upload/f_auto,q_auto:good,w_400,c_limit/"));
+  assert.equal(url, NEW.replace("/upload/", "/upload/f_webp,fl_awebp,q_auto:good,w_400,c_limit/"));
 });
 
 test("Fotos antiguas (cualquier otra carpeta de treegold/): mantienen el recorte de siempre", () => {
@@ -83,4 +84,25 @@ test("Fotos antiguas (cualquier otra carpeta de treegold/): mantienen el recorte
     });
     assert.ok(url.includes("c_crop,g_north,h_0.75"), `${folder} debe seguir recortando`);
   }
+});
+
+// Cloudinary guarda una copia por cada texto de transformación distinto. Estas
+// URLs tienen que seguir siendo idénticas a las de las copias ya generadas:
+// si una prueba de estas falla, el cambio obligaría a rehacer TODAS las copias
+// de todas las fotos (y eso se paga en cuota). Cambiarlas solo a propósito.
+test("Cuota de Cloudinary: las URLs coinciden con las copias ya generadas", () => {
+  const ADMIN =
+    "https://res.cloudinary.com/dkab59i18/image/upload/v1/treegold/admin/abc.png";
+  assert.equal(
+    loader({ src: ADMIN, width: 640 }),
+    "https://res.cloudinary.com/dkab59i18/image/upload/f_webp,fl_awebp,q_auto:good,w_640,c_limit/v1/treegold/admin/abc.png"
+  );
+  assert.equal(
+    cardPhotoLoader({ src: ADMIN, width: 640 }),
+    "https://res.cloudinary.com/dkab59i18/image/upload/c_pad,ar_4:5,b_auto:border_gradient,w_640/f_webp,fl_awebp,q_auto:good/v1/treegold/admin/abc.png"
+  );
+  assert.equal(
+    squarePhotoLoader({ src: ADMIN, width: 384 }),
+    "https://res.cloudinary.com/dkab59i18/image/upload/c_pad,ar_1:1,b_auto:border_gradient,w_384/f_webp,fl_awebp,q_auto:good/v1/treegold/admin/abc.png"
+  );
 });

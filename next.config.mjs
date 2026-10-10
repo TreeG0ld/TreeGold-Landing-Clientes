@@ -158,8 +158,13 @@ const nextConfig = {
     // los que quedan cubren desde la miniatura del carrito hasta una pantalla
     // grande. 750 se queda: es el ancho exacto de muchos celulares con
     // pantalla de alta densidad, y sin él saltaban a 828.
-    imageSizes: [64, 128, 256, 384],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    // Octubre 2026: se quitaron también 64, 828 y 1080. Cada ancho es una
+    // copia más de cada foto guardada en Cloudinary (ver FORMAT en
+    // lib/imageLoader.ts), y esos eran los menos pedidos: el navegador toma el
+    // siguiente (128 o 1200), que casi siempre ya existe. No agregar anchos sin
+    // revisar antes la cuota de Cloudinary.
+    imageSizes: [128, 256, 384],
+    deviceSizes: [640, 750, 1200, 1920],
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

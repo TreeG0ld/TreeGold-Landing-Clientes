@@ -15,6 +15,21 @@ type LoaderArgs = {
   quality?: number;
 };
 
+// Formato de entrega: WebP para todos los navegadores, en vez de f_auto.
+// f_auto guardaba en Cloudinary una copia por formato (WebP para Chrome y
+// Android, JPEG XL para iPhone, el original para buscadores) de cada foto y
+// cada ancho, y eso llevó la cuenta gratuita al 126% de su cuota en octubre
+// de 2026 (las transformaciones eran el 65% del consumo). WebP se ve en todo
+// navegador actual (Safari desde iOS 14) y en el iPhone pesa casi lo mismo
+// que el JPEG XL.
+// Se escribe EXACTAMENTE "f_webp,fl_awebp" porque así nombra Cloudinary la
+// copia que f_auto generaba para Chrome: con este texto se reutilizan esas
+// copias en vez de crearlas de nuevo (comprobado).
+// OJO: cualquier cambio al texto de las transformaciones de este archivo
+// (formato, calidad, recorte, orden de los parámetros) obliga a Cloudinary a
+// rehacer TODAS las copias, y eso se paga en cuota. No tocarlo a la ligera.
+const FORMAT = "f_webp,fl_awebp";
+
 export default function imageLoader({ src, width, quality }: LoaderArgs): string {
   // --- Cloudinary (almacenamiento definitivo de las fotos) ---
   // Limpieza de la foto de catálogo (el original no se toca):
@@ -26,7 +41,7 @@ export default function imageLoader({ src, width, quality }: LoaderArgs): string
   //   3) c_pad,ar_1:1,b_white -> deja la imagen cuadrada con fondo blanco
   //      uniforme; el producto queda completo y centrado, sin distorsión.
   //   4) optimización de entrega:
-  //      f_auto      -> mejor formato para el navegador (WebP / AVIF)
+  //      f_webp,fl_awebp -> WebP para todos (ver FORMAT, arriba)
   //      q_auto:good -> calidad inteligente: pesa poco sin perder detalle
   //      w_<width>   -> ancho que pide el navegador según el "sizes"
   //      c_limit     -> nunca agranda más allá del original (cuida la calidad)
@@ -42,10 +57,10 @@ export default function imageLoader({ src, width, quality }: LoaderArgs): string
     //   histórico importado del catálogo del proveedor, que sí trae la franja
     //   de precio y necesita el recorte + cuadrado de siempre.
     if (src.includes("/treegold/marca/") || src.includes("/treegold/admin/")) {
-      const transforms = `f_auto,q_auto:good,w_${width},c_limit`;
+      const transforms = `${FORMAT},q_auto:good,w_${width},c_limit`;
       return src.replace("/upload/", `/upload/${transforms}/`);
     }
-    const transforms = `c_crop,g_north,h_0.75/e_trim/c_pad,ar_1:1,b_white/f_auto,q_auto:good,w_${width},c_limit`;
+    const transforms = `c_crop,g_north,h_0.75/e_trim/c_pad,ar_1:1,b_white/${FORMAT},q_auto:good,w_${width},c_limit`;
     return src.replace("/upload/", `/upload/${transforms}/`);
   }
 
@@ -87,7 +102,7 @@ function padToAspect(aspect: string) {
     isAdminPhoto(src)
       ? src.replace(
           "/upload/",
-          `/upload/c_pad,ar_${aspect},b_auto:border_gradient,w_${width}/f_auto,q_auto:good/`
+          `/upload/c_pad,ar_${aspect},b_auto:border_gradient,w_${width}/${FORMAT},q_auto:good/`
         )
       : imageLoader({ src, width });
 }
