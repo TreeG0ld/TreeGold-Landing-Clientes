@@ -1,12 +1,14 @@
 # TreeGold — guía para Claude Code
 
-E-commerce de joyería (Next.js 15 App Router + TS, Tailwind, GSAP/Motion). Sin pasarela de
-pago: el "carrito" es una selección que genera un mensaje de WhatsApp. Datos en Postgres
-(Supabase) vía Prisma; imágenes en Cloudinary.
+E-commerce de joyería (Next.js 15 App Router + TS, Tailwind, GSAP/Motion). La selección
+(carrito) de la tienda pública se paga en línea con **Wompi** o se envía como mensaje de
+WhatsApp; el catálogo mayorista sigue solo por WhatsApp. Datos en Postgres (Supabase) vía
+Prisma; imágenes en Cloudinary.
 
 ## Rutas principales
 
 - `/`, `/coleccion`, `/producto/[slug]`, `/seleccion`, `/historia`, `/contacto` — tienda pública.
+- `/pedido/[referencia]` — a donde vuelve el cliente después de pagar en Wompi (ver "Pagos").
 - `/admin/*` — panel de administración (productos, categorías). Protegido por
   `middleware.ts` + sesión propia (ver abajo). NO usa NextAuth.
 - `/mayoristas-<código>` — catálogo de costo para distribuidores, sin login, solo el
@@ -46,6 +48,34 @@ Variables de entorno relevantes (en `.env`, nunca commitear):
 - `WHOLESALE_SECRET` (el código de la URL `/mayoristas-<código>`).
 - `DATABASE_URL` / `DIRECT_URL` (Supabase Postgres, pooler vs conexión directa).
 - `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
+- `WOMPI_PUBLIC_KEY`, `WOMPI_INTEGRITY_SECRET`, `WOMPI_EVENTS_SECRET` — las tres del mismo
+  ambiente (pruebas o producción); el webhook ignora eventos del otro ambiente.
+
+## Pagos (Wompi)
+
+Se eligió Wompi (Bancolombia, cobra en COP). **Polar se descartó** porque su política de
+uso prohíbe vender productos físicos. Integración sin SDK, por **Web Checkout con
+redirección** (no el widget en iframe: la CSP de `next.config.mjs` bloquea iframes y
+formularios a otros dominios, y una navegación normal no pasa por ninguna de las dos).
+
+1. `POST /api/checkout` recibe solo `{slug, qty}` + datos de envío (`lib/checkout.ts`
+   valida). Precio y stock salen de la BD, **nunca** del carrito del navegador. Crea el
+   `Order` en `PENDING`, firma (`lib/wompi.ts`, SHA-256 con `WOMPI_INTEGRITY_SECRET`) y
+   devuelve la URL de Wompi. El enlace caduca en 1 hora. Envío: `shippingFor()`
+   (`lib/checkout.ts`): `site.shippingCost` ($18.000), gratis desde `site.freeShippingFrom`
+   ($600.000 de subtotal, inclusive).
+2. `POST /api/wompi/webhook` (URL a configurar en el panel de Wompi) verifica el
+   checksum con `WOMPI_EVENTS_SECRET`, guarda el evento en `PaymentEvent` y aplica
+   `lib/order-rules.ts`: solo un `APPROVED` con el monto firmado marca `PAID` y descuenta
+   stock (`lib/orders.ts`, en una transacción). Si otra persona pagó la última pieza entre
+   medias, el pedido queda `PAID` con `stockShortage = true` para que el admin lo resuelva.
+   Wompi reintenta solo 3 veces en 24 h si no respondemos 200.
+3. `/pedido/[referencia]` solo **lee** el estado; la URL de regreso (`?id=`) no es prueba
+   de pago. La referencia (80 bits al azar) es la única llave de la página, por eso
+   muestra lo mínimo (sin dirección ni teléfono).
+
+El stock (`Product.stock`) ahora importa: bloquea el pago cuando no alcanza. Hay que
+mantenerlo real desde `/admin`.
 
 ## Imágenes (Cloudinary)
 
@@ -118,3 +148,7 @@ Piezas del servidor, por si hay que diagnosticar:
   para que se actualice el hash de la fila `User`.
 - Verificación de correo en el registro (y con ella, cierre real de la enumeración de
   cuentas) y recuperación de contraseña.
+- Panel `/admin/pedidos` para ver los pedidos pagados y marcarlos como despachados
+  (`Order.shippedAt` ya existe en el esquema).
+- Política de tratamiento de datos personales (Ley 1581 de 2012) enlazada desde el
+  checkout, que ya pide nombre, correo, celular y dirección.

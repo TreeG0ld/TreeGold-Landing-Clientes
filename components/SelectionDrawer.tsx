@@ -4,13 +4,14 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Minus, Plus, Trash2 } from "lucide-react";
+import { X, Minus, Plus, Trash2, Lock } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
 import { buildSelectionLink } from "@/lib/whatsapp";
 import { lockScroll } from "@/lib/scroll-lock";
 import EmptyBagIcon from "@/components/EmptyBagIcon";
+import FreeShippingHint from "@/components/FreeShippingHint";
 
 export default function SelectionDrawer() {
   const { items, isOpen, close, remove, setQty } = useSelection();
@@ -142,8 +143,26 @@ export default function SelectionDrawer() {
                     <span className="text-sm text-secondary">Total estimado</span>
                     <span className="font-serif text-2xl">{formatCOP(total)}</span>
                   </div>
-                  <p className="mb-4 text-xs text-secondary/60">
-                    Precios referenciales. Confirmamos disponibilidad por WhatsApp.
+                  <p className="mb-3 text-xs text-secondary/60">
+                    Paga en línea de forma segura o finaliza tu pedido por WhatsApp.
+                  </p>
+                  <div className="mb-4">
+                    <FreeShippingHint subtotal={total} />
+                  </div>
+                  {/* Dos caminos con el mismo peso visual. Antes el pago en
+                      línea solo se alcanzaba con un enlace chico ("Ver
+                      selección completa") que casi nadie notaba. ?pagar=1 abre
+                      el formulario de pago directamente en /seleccion. */}
+                  <Link
+                    href="/seleccion?pagar=1"
+                    onClick={close}
+                    className="btn-primary w-full py-4"
+                  >
+                    <Lock className="h-4 w-4" />
+                    Pagar en línea
+                  </Link>
+                  <p className="mb-3 mt-1.5 text-center text-xs text-secondary/60">
+                    Tarjeta, PSE, Nequi y más · Pago seguro con Wompi
                   </p>
                   <a
                     href={buildSelectionLink(items, total)}
@@ -154,13 +173,6 @@ export default function SelectionDrawer() {
                     <WhatsAppIcon className="h-5 w-5" />
                     Finalizar por WhatsApp
                   </a>
-                  <Link
-                    href="/seleccion"
-                    onClick={close}
-                    className="mt-3 block text-center text-sm text-secondary underline-offset-4 transition-colors hover:text-accent hover:underline"
-                  >
-                    Ver selección completa
-                  </Link>
                 </footer>
               </>
             )}
