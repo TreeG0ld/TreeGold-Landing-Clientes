@@ -90,7 +90,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const totals = computeTotals(lines, site.shippingCost);
+    const totals = computeTotals(lines, site);
 
     // Si hay sesión de cliente, el pedido queda en su cuenta. Se confirma que
     // la fila exista porque userId es llave foránea.

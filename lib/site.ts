@@ -31,7 +31,13 @@ export const site = {
   mapsUrl: "https://www.google.com/maps/search/?api=1&query=Calle+49+%237+-+28+Buenos+Aires+Medellin",
   city: "Colombia",
   currency: "COP",
-  // Envío nacional, tarifa fija en pesos. Se suma al total en el checkout de
-  // Wompi (/api/checkout); el pedido por WhatsApp sigue acordándolo aparte.
-  shippingCost: 15000,
+  // Envío nacional en pesos: tarifa fija, gratis cuando las piezas suman
+  // `freeShippingFrom` o más (sin contar el envío). Lo aplica shippingFor()
+  // de lib/checkout.ts, tanto al cobrar en Wompi como al mostrarlo; el pedido
+  // por WhatsApp sigue acordándolo aparte.
+  shippingCost: 18000,
+  freeShippingFrom: 600000,
+  // Tiempos de entrega que se le prometen al cliente (aviso de envío y
+  // confirmación del pedido). Cambiar aquí si cambian.
+  deliveryNote: "Despachamos al día siguiente de tu pedido y llega en unos 3 días hábiles.",
 };

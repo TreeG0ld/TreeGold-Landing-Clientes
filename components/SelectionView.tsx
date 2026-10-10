@@ -12,6 +12,8 @@ import { formatCOP } from "@/lib/format";
 import { site } from "@/lib/site";
 import { buildSelectionLink } from "@/lib/whatsapp";
 import EmptyBagIcon from "@/components/EmptyBagIcon";
+import FreeShippingHint from "@/components/FreeShippingHint";
+import { shippingFor } from "@/lib/checkout";
 
 export default function SelectionView() {
   const { items, remove, setQty, clear } = useSelection();
@@ -148,12 +150,17 @@ export default function SelectionView() {
               </div>
               <div className="flex justify-between text-secondary">
                 <span>Envío a toda Colombia</span>
-                <span>{formatCOP(site.shippingCost)}</span>
+                {shippingFor(total, site) === 0 ? (
+                  <span className="font-medium text-accent">Gratis</span>
+                ) : (
+                  <span>{formatCOP(site.shippingCost)}</span>
+                )}
               </div>
               <div className="flex items-baseline justify-between border-t border-border pt-3">
                 <span className="font-medium">Total</span>
-                <span className="font-serif text-2xl">{formatCOP(total + site.shippingCost)}</span>
+                <span className="font-serif text-2xl">{formatCOP(total + shippingFor(total, site))}</span>
               </div>
+              <FreeShippingHint subtotal={total} />
             </div>
 
             {checkingOut ? (

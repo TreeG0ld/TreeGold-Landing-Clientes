@@ -61,8 +61,9 @@ formularios a otros dominios, y una navegación normal no pasa por ninguna de la
 1. `POST /api/checkout` recibe solo `{slug, qty}` + datos de envío (`lib/checkout.ts`
    valida). Precio y stock salen de la BD, **nunca** del carrito del navegador. Crea el
    `Order` en `PENDING`, firma (`lib/wompi.ts`, SHA-256 con `WOMPI_INTEGRITY_SECRET`) y
-   devuelve la URL de Wompi. El enlace caduca en 1 hora. Envío: tarifa fija
-   `site.shippingCost` (`lib/site.ts`).
+   devuelve la URL de Wompi. El enlace caduca en 1 hora. Envío: `shippingFor()`
+   (`lib/checkout.ts`): `site.shippingCost` ($18.000), gratis desde `site.freeShippingFrom`
+   ($600.000 de subtotal, inclusive).
 2. `POST /api/wompi/webhook` (URL a configurar en el panel de Wompi) verifica el
    checksum con `WOMPI_EVENTS_SECRET`, guarda el evento en `PaymentEvent` y aplica
    `lib/order-rules.ts`: solo un `APPROVED` con el monto firmado marca `PAID` y descuenta

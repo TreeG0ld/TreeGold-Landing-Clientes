@@ -86,7 +86,8 @@ export default async function OrderPage({
             <p className="mx-auto mt-4 max-w-md text-secondary">
               Gracias por tu compra. Te escribiremos para coordinar el envío a{" "}
               {order.shippingCity}, {order.shippingDepartment}. El pedido quedó registrado con
-              el correo {maskEmail(order.customerEmail)}; guarda esta página para consultarlo.
+              el correo {maskEmail(order.customerEmail)}; guarda esta página para consultarlo.{" "}
+              {site.deliveryNote}
             </p>
             {order.stockShortage && (
               <p className="mx-auto mt-4 max-w-md rounded-xl border border-border bg-muted/40 p-4 text-sm text-secondary">
@@ -164,7 +165,11 @@ export default async function OrderPage({
           </div>
           <div className="flex justify-between text-secondary">
             <span>Envío</span>
-            <span>{formatCOP(order.shippingCost)}</span>
+            {order.shippingCost === 0 ? (
+              <span className="font-medium text-accent">Gratis</span>
+            ) : (
+              <span>{formatCOP(order.shippingCost)}</span>
+            )}
           </div>
           <div className="flex items-baseline justify-between border-t border-border pt-3">
             <span className="font-medium">Total</span>

@@ -11,6 +11,7 @@ import { formatCOP } from "@/lib/format";
 import { buildSelectionLink } from "@/lib/whatsapp";
 import { lockScroll } from "@/lib/scroll-lock";
 import EmptyBagIcon from "@/components/EmptyBagIcon";
+import FreeShippingHint from "@/components/FreeShippingHint";
 
 export default function SelectionDrawer() {
   const { items, isOpen, close, remove, setQty } = useSelection();
@@ -142,9 +143,12 @@ export default function SelectionDrawer() {
                     <span className="text-sm text-secondary">Total estimado</span>
                     <span className="font-serif text-2xl">{formatCOP(total)}</span>
                   </div>
-                  <p className="mb-4 text-xs text-secondary/60">
+                  <p className="mb-3 text-xs text-secondary/60">
                     Paga en línea de forma segura o finaliza tu pedido por WhatsApp.
                   </p>
+                  <div className="mb-4">
+                    <FreeShippingHint subtotal={total} />
+                  </div>
                   {/* Dos caminos con el mismo peso visual. Antes el pago en
                       línea solo se alcanzaba con un enlace chico ("Ver
                       selección completa") que casi nadie notaba. ?pagar=1 abre

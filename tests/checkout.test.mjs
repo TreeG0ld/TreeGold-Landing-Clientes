@@ -3,7 +3,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-const { validateCheckoutPayload, normalizePhone, computeTotals } = await import(
+const { validateCheckoutPayload, normalizePhone, computeTotals, shippingFor } = await import(
   "../lib/checkout.ts"
 );
 const { decideTransition } = await import("../lib/order-rules.ts");
@@ -95,20 +95,30 @@ test("unitario: normalizePhone acepta indicativo y separadores", () => {
   assert.equal(normalizePhone(3001234567), null);
 });
 
+const REGLA = { shippingCost: 18000, freeShippingFrom: 600000 };
+
 test("unitario: computeTotals suma envío y pasa a centavos", () => {
   const t = computeTotals(
     [
       { unitPrice: 85000, qty: 2 },
       { unitPrice: 42000, qty: 1 },
     ],
-    15000
+    REGLA
   );
   assert.deepEqual(t, {
     subtotal: 212000,
-    shippingCost: 15000,
-    total: 227000,
-    amountInCents: 22700000,
+    shippingCost: 18000,
+    total: 230000,
+    amountInCents: 23000000,
   });
+});
+
+test("unitario: envío gratis desde 600.000 (inclusive), 18.000 por debajo", () => {
+  assert.equal(shippingFor(599999, REGLA), 18000);
+  assert.equal(shippingFor(600000, REGLA), 0);
+  assert.equal(shippingFor(815000, REGLA), 0);
+  const t = computeTotals([{ unitPrice: 300000, qty: 2 }], REGLA);
+  assert.deepEqual(t, { subtotal: 600000, shippingCost: 0, total: 600000, amountInCents: 60000000 });
 });
 
 // --- decideTransition ---

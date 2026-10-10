@@ -167,13 +167,24 @@ export function validateCheckoutPayload(body: unknown): CheckoutValidation {
   };
 }
 
+// Envío según el subtotal de las piezas: la tarifa fija, o 0 desde
+// `freeFrom` (inclusive). Una sola regla para cobrar (/api/checkout) y para
+// mostrar (selección), así lo que ve el cliente es lo que se le cobra.
+export function shippingFor(
+  subtotal: number,
+  rule: { shippingCost: number; freeShippingFrom: number }
+): number {
+  return subtotal >= rule.freeShippingFrom ? 0 : rule.shippingCost;
+}
+
 // Totales en pesos a partir de los precios de la BASE DE DATOS. Los precios
 // del catálogo son pesos enteros, así que el paso a centavos es exacto.
 export function computeTotals(
   lines: { unitPrice: number; qty: number }[],
-  shippingCost: number
+  rule: { shippingCost: number; freeShippingFrom: number }
 ): { subtotal: number; shippingCost: number; total: number; amountInCents: number } {
   const subtotal = lines.reduce((n, l) => n + l.unitPrice * l.qty, 0);
+  const shippingCost = shippingFor(subtotal, rule);
   const total = subtotal + shippingCost;
   return { subtotal, shippingCost, total, amountInCents: Math.round(total * 100) };
 }
