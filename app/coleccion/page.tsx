@@ -185,7 +185,7 @@ export default async function ColeccionPage({
       <div className="sticky top-[84px] z-30 -mx-5 mb-10 border-b border-border glass px-5 py-3 md:top-20 md:mx-0 md:rounded-2xl md:border md:px-5 md:py-3.5">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
           <div className="md:flex-1">
-            <CategoryFilter categories={tabs} value={category} sort={sort} q={q} />
+            <CategoryFilter categories={tabs} value={category} sort={sort} />
           </div>
 
           <div className="shrink-0 self-end md:self-auto md:border-l md:border-border md:pl-4">

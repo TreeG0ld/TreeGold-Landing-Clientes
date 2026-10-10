@@ -126,7 +126,7 @@ export default function Hero() {
 
       <div className="hero-fade relative z-10 mt-auto flex w-full max-w-md flex-col items-center justify-center gap-3 sm:flex-row">
         <Link href="/coleccion" className="btn-primary w-full text-center sm:w-auto">
-          Nuestras joyas
+          Todas las categorías
         </Link>
         <Link
           href="/historia"
