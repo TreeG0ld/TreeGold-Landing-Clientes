@@ -13,14 +13,14 @@ import imageLoader from "@/lib/imageLoader";
 // treegold/marca/ (carpeta exenta del recorte de catálogo en imageLoader).
 // Como la imagen ya trae el texto, el hero no superpone título: solo botones.
 const BANNER =
-  "https://res.cloudinary.com/dkab59i18/image/upload/v1784118180/treegold/marca/hero-banner-v2.png";
+  "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/hero-banner-v2.png";
 
 // Variante para celular: foto propia (retrato, 1086x1448), compuesta a mano
 // para ese formato — ya trae el logo/eslogan arriba con espacio de sobra y
 // las piezas más abajo, así que no hace falta ningún recorte ni relleno
 // artificial (a diferencia del banner de escritorio, que es panorámico).
 const BANNER_MOBILE =
-  "https://res.cloudinary.com/dkab59i18/image/upload/v1789257686/treegold/marca/hero-banner-movil.png";
+  "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/hero-banner-movil.png";
 const BANNER_MOBILE_W = 1086;
 const BANNER_MOBILE_H = 1448;
 

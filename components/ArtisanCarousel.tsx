@@ -11,19 +11,19 @@ import useEmblaCarousel from "embla-carousel-react";
 
 const photos = [
   {
-    src: "https://res.cloudinary.com/dkab59i18/image/upload/v1783708924/treegold/marca/WhatsApp_Image_2026-07-06_at_10.47.47.jpg",
+    src: "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/artesano-1.jpg",
     alt: "Modelo con cadenas TreeGold en oro laminado",
   },
   {
-    src: "https://res.cloudinary.com/dkab59i18/image/upload/v1783708925/treegold/marca/WhatsApp_Image_2026-07-06_at_10.47.47_2.jpg",
+    src: "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/artesano-2.jpg",
     alt: "Modelo con cadena TreeGold en plata 925",
   },
   {
-    src: "https://res.cloudinary.com/dkab59i18/image/upload/v1783708927/treegold/marca/WhatsApp_Image_2026-07-06_at_10.47.46_1.jpg",
+    src: "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/artesano-3.jpg",
     alt: "Collar TreeGold en su estuche",
   },
   {
-    src: "https://res.cloudinary.com/dkab59i18/image/upload/v1783708928/treegold/marca/WhatsApp_Image_2026-07-06_at_10.47.46.jpg",
+    src: "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/artesano-4.jpg",
     alt: "Topos TreeGold en su estuche",
   },
 ];

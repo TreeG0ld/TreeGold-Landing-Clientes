@@ -21,35 +21,29 @@ export default function ImageUploader({
     setUploading(true);
 
     try {
-      const sigRes = await fetch("/api/admin/cloudinary-signature", { method: "POST" });
-      if (!sigRes.ok) throw new Error("No se pudo obtener la firma de Cloudinary.");
-      const {
-        timestamp,
-        signature,
-        apiKey,
-        cloudName,
-        folder: signedFolder,
-        allowedFormats,
-      } = await sigRes.json();
+      const authRes = await fetch("/api/admin/imagekit-auth");
+      if (!authRes.ok) throw new Error("No se pudo obtener la autorización de ImageKit.");
+      const { token, expire, signature, publicKey, folder } = await authRes.json();
 
       const uploaded: string[] = [];
       for (const file of Array.from(files)) {
         const form = new FormData();
         form.append("file", file);
-        form.append("api_key", apiKey);
-        form.append("timestamp", String(timestamp));
+        form.append("fileName", file.name);
+        form.append("publicKey", publicKey);
         form.append("signature", signature);
-        form.append("folder", signedFolder);
-        // Debe coincidir EXACTAMENTE con lo firmado en el servidor.
-        form.append("allowed_formats", allowedFormats);
+        form.append("expire", String(expire));
+        form.append("token", token);
+        form.append("folder", folder);
+        form.append("useUniqueFileName", "true");
 
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        const res = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
           method: "POST",
           body: form,
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error?.message ?? "Error al subir la imagen.");
-        uploaded.push(data.secure_url);
+        if (!res.ok) throw new Error(data.message || data.error || "Error al subir la imagen.");
+        uploaded.push(data.url);
       }
 
       onChange([...images, ...uploaded]);

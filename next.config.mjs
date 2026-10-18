@@ -77,8 +77,8 @@ const csp = [
   // google-analytics.com en img-src: cuando el navegador bloquea las peticiones
   // normales, gtag manda la medición como un pixel de 1x1.
   isDev
-    ? "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://*.google-analytics.com https://www.googletagmanager.com"
-    : "img-src 'self' https://res.cloudinary.com https://images.unsplash.com https://*.google-analytics.com https://www.googletagmanager.com",
+    ? "img-src 'self' data: blob: https://res.cloudinary.com https://ik.imagekit.io https://images.unsplash.com https://*.google-analytics.com https://www.googletagmanager.com"
+    : "img-src 'self' https://res.cloudinary.com https://ik.imagekit.io https://images.unsplash.com https://*.google-analytics.com https://www.googletagmanager.com",
   // next/font auto-hospeda los .woff2 en /_next/static/media: no hace falta
   // fonts.gstatic.com ni fonts.googleapis.com.
   isDev ? "font-src 'self' data:" : "font-src 'self'",
@@ -87,8 +87,8 @@ const csp = [
   // www.google-analytics.com, también usa endpoints por región
   // (region1.google-analytics.com) y analytics.google.com.
   isDev
-    ? "connect-src 'self' ws: wss: https://api.cloudinary.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com"
-    : "connect-src 'self' https://api.cloudinary.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
+    ? "connect-src 'self' ws: wss: https://api.cloudinary.com https://upload.imagekit.io https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com"
+    : "connect-src 'self' https://api.cloudinary.com https://upload.imagekit.io https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
   "media-src 'none'",
   ...(isDev ? [] : ["worker-src 'none'"]),
   "manifest-src 'none'",

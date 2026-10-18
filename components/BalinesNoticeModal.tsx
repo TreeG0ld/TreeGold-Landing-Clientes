@@ -14,7 +14,7 @@ import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 // pago de la tienda, este SÍ se cierra tocando fuera o con Escape, además de
 // con "Entendido": obligar a aceptarlo en cada cambio de pestaña sería
 // castigar al distribuidor que ya lo leyó.
-const IMAGE = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/treegold/marca/balines-oro.png`;
+const IMAGE = "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/balines-oro.png";
 
 // Texto propio y no el saludo por defecto: ese nombra la marca, y el catálogo
 // mayorista no la menciona en ningún lado.

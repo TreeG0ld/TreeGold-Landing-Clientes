@@ -64,6 +64,13 @@ export default function imageLoader({ src, width, quality }: LoaderArgs): string
     return src.replace("/upload/", `/upload/${transforms}/`);
   }
 
+  // --- ImageKit (nuevo almacenamiento optimizado) ---
+  if (src.includes("ik.imagekit.io")) {
+    const url = new URL(src);
+    url.searchParams.set("tr", `w-${width},f-webp,q-${quality ?? 80},c-at_max`);
+    return url.toString();
+  }
+
   // --- Unsplash (imágenes de ejemplo mientras subes las reales) ---
   if (src.includes("images.unsplash.com")) {
     // Tope de 1600px: una imagen de fondo nunca necesita más ancho que eso,
@@ -87,24 +94,38 @@ export default function imageLoader({ src, width, quality }: LoaderArgs): string
 // muestran enteras con margen (object-contain), porque ahí el blanco no se
 // nota. Misma carpeta que reconoce el loader de arriba.
 export function isAdminPhoto(src: string): boolean {
-  return src.includes("res.cloudinary.com") && src.includes("/treegold/admin/");
+  return (
+    (src.includes("res.cloudinary.com") && src.includes("/treegold/admin/")) ||
+    (src.includes("ik.imagekit.io") && src.includes("/treegold/admin/"))
+  );
 }
 
 // Loader para fotos del /admin que van en un recuadro de proporción fija:
 // en vez de recortarlas para llenarlo (a la "Manilla Tio Rico" le cortaba los
-// lados), Cloudinary las COMPLETA hasta esa proporción rellenando con un
-// degradado del color de su propio borde (b_auto:border_gradient). Una foto con
+// lados), Cloudinary/ImageKit las COMPLETA hasta esa proporción rellenando con un
+// degradado del color de su propio borde (b_auto:border_gradient / bg-auto). Una foto con
 // fondo blanco se completa en blanco; una tomada en el local, con sus tonos.
 // La joya queda siempre entera y la foto llena el recuadro sin franjas
 // blancas. Las demás fotos siguen con el loader normal.
 function padToAspect(aspect: string) {
-  return ({ src, width }: LoaderArgs): string =>
-    isAdminPhoto(src)
-      ? src.replace(
-          "/upload/",
-          `/upload/c_pad,ar_${aspect},b_auto:border_gradient,w_${width}/${FORMAT},q_auto:good/`
-        )
-      : imageLoader({ src, width });
+  return ({ src, width, quality }: LoaderArgs): string => {
+    if (isAdminPhoto(src)) {
+      if (src.includes("ik.imagekit.io")) {
+        const ar = aspect.replace(":", "-");
+        const url = new URL(src);
+        url.searchParams.set(
+          "tr",
+          `ar-${ar},cm-pad_resize,bg-auto,w-${width},f-webp,q-${quality ?? 80}`
+        );
+        return url.toString();
+      }
+      return src.replace(
+        "/upload/",
+        `/upload/c_pad,ar_${aspect},b_auto:border_gradient,w_${width}/${FORMAT},q_auto:good/`
+      );
+    }
+    return imageLoader({ src, width, quality });
+  };
 }
 
 // Tarjetas de producto (aspect-[4/5]) y vistas ampliadas cuadradas.

@@ -106,3 +106,34 @@ test("Cuota de Cloudinary: las URLs coinciden con las copias ya generadas", () =
     "https://res.cloudinary.com/dkab59i18/image/upload/c_pad,ar_1:1,b_auto:border_gradient,w_384/f_webp,fl_awebp,q_auto:good/v1/treegold/admin/abc.png"
   );
 });
+
+test("ImageKit: optimización de catálogo estándar (WebP, ancho, calidad, c-at_max)", () => {
+  const IK = "https://ik.imagekit.io/jmbbfxnqu/treegold/pulseras/09120001.jpg";
+  const url = loader({ src: IK, width: 400 });
+  assert.equal(url, `${IK}?tr=w-400%2Cf-webp%2Cq-80%2Cc-at_max`);
+});
+
+test("ImageKit: responsive - anchos pedidos se reflejan en el parámetro tr", () => {
+  const IK = "https://ik.imagekit.io/jmbbfxnqu/treegold/pulseras/09120001.jpg";
+  assert.ok(loader({ src: IK, width: 256 }).includes("w-256"));
+  assert.ok(loader({ src: IK, width: 1200 }).includes("w-1200"));
+});
+
+test("ImageKit: fotos de /admin con cardPhotoLoader rellenan con degradado a 4:5", () => {
+  const IK_ADMIN = "https://ik.imagekit.io/jmbbfxnqu/treegold/admin/nueva-joya.jpg";
+  const url = cardPhotoLoader({ src: IK_ADMIN, width: 640 });
+  assert.equal(
+    url,
+    `${IK_ADMIN}?tr=ar-4-5%2Ccm-pad_resize%2Cbg-auto%2Cw-640%2Cf-webp%2Cq-80`
+  );
+});
+
+test("ImageKit: fotos de /admin con squarePhotoLoader rellenan con degradado a 1:1", () => {
+  const IK_ADMIN = "https://ik.imagekit.io/jmbbfxnqu/treegold/admin/nueva-joya.jpg";
+  const url = squarePhotoLoader({ src: IK_ADMIN, width: 384 });
+  assert.equal(
+    url,
+    `${IK_ADMIN}?tr=ar-1-1%2Ccm-pad_resize%2Cbg-auto%2Cw-384%2Cf-webp%2Cq-80`
+  );
+});
+

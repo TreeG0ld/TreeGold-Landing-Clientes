@@ -9,7 +9,7 @@ import { lockScroll } from "@/lib/scroll-lock";
 // se guarda que ya se aceptó, ni en sessionStorage ni en localStorage. Navegar
 // entre secciones no lo repite (el componente vive en el layout y no se vuelve
 // a montar); recargar sí.
-const IMAGE = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/treegold/marca/medios-de-pago.png`;
+const IMAGE = "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/medios-de-pago.png";
 
 const METHODS = ["Addi", "Sistecrédito", "Débito y crédito"];
 

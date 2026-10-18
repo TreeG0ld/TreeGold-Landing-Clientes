@@ -30,7 +30,7 @@ const jost = Jost({
 // plataformas, rellenando con negro (el fondo de la foto ya es negro, así que
 // no se nota) en vez de recortar: con recorte se perderían los globos de los
 // extremos.
-const OG_IMAGE = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_pad,b_black,ar_1.91,w_1200,f_jpg,q_auto/treegold/marca/medios-de-pago.png`;
+const OG_IMAGE = "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/medios-de-pago.png?tr=w-1200,h-630,cm-pad_resize,bg-000000";
 
 // Identificador público de Google Analytics (viaja en el HTML de todas las
 // páginas, no es un secreto). Va en el código y no en el .env a propósito: si
@@ -110,9 +110,9 @@ export const viewport: Viewport = {
 // va en `logo`, que es su campo propio.
 const BRAND_PHOTOS = [
   // Modelo con collar de plata (la principal).
-  "https://res.cloudinary.com/dkab59i18/image/upload/w_1200,f_jpg,q_auto/v1783708925/treegold/marca/WhatsApp_Image_2026-07-06_at_10.47.47_2.jpg",
+  "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/artesano-2.jpg?tr=w-1200,q-80",
   // Modelo con el estuche de regalo del conjunto dorado.
-  "https://res.cloudinary.com/dkab59i18/image/upload/w_1200,f_jpg,q_auto/v1783708927/treegold/marca/WhatsApp_Image_2026-07-06_at_10.47.46_1.jpg",
+  "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/artesano-3.jpg?tr=w-1200,q-80",
 ];
 
 const businessJsonLd = {

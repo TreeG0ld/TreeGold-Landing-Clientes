@@ -64,7 +64,7 @@ export default async function HistoriaPage() {
       <Reveal>
         <div className="relative mx-auto aspect-[16/9] max-w-6xl overflow-hidden md:rounded-3xl">
           <Image
-            src="https://res.cloudinary.com/dkab59i18/image/upload/v1789259209/treegold/marca/tienda-nuestra-historia.jpg"
+            src="https://ik.imagekit.io/jmbbfxnqu/treegold/marca/tienda-nuestra-historia.jpg"
             alt="Vitrinas de Joyería TreeGold"
             fill
             sizes="100vw"
