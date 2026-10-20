@@ -141,12 +141,12 @@ export default async function CatchAllPage({
   return (
     <div className="min-h-dvh bg-background font-jakarta">
       {/* Banner / Hero de Mayoristas:
-          Abarca todo el ancho del banner con su proporción natural (1024/571),
+          Abarca todo el ancho del banner con su proporción panorámica (2400/1025 o 2.34:1),
           tal como el hero de la página de inicio, sin recortes ni marcos
           oscuros que hagan contraste. */}
-      <header className="relative w-full aspect-[1024/571] overflow-hidden bg-[#bdbfbe]">
+      <header className="relative w-full aspect-[2400/1025] overflow-hidden bg-[#bdbfbe]">
         <Image
-          src="https://ik.imagekit.io/jmbbfxnqu/treegold/marca/banner-mayoristas.jpg"
+          src="https://ik.imagekit.io/jmbbfxnqu/treegold/marca/banner-mayoristas-wide.jpg"
           alt="Catálogo Mayorista — El momento de emprender es ahora"
           fill
           priority
