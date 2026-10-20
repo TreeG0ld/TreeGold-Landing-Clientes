@@ -11,7 +11,6 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import Link from "next/link";
-import Image from "next/image";
 import type { Metadata } from "next";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import {
@@ -140,25 +139,20 @@ export default async function CatchAllPage({
 
   return (
     <div className="min-h-dvh bg-background font-jakarta">
-      {/* Banner / Hero de Mayoristas:
-          Proporción panorámica ultra-wide (2560/750 o 3.41:1): menos alto en pantalla
-          para que no ocupe todo el alto vertical y permita ver las categorías de inmediato. */}
-      <header className="relative w-full aspect-[2560/750] overflow-hidden bg-black">
-        <Image
-          src="https://ik.imagekit.io/jmbbfxnqu/treegold/marca/banner-mayoristas-panoramic.jpg"
-          alt="Catálogo Mayorista — El momento de emprender es ahora"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-        {/* Badge sutil de acceso privado */}
-        <div className="absolute left-4 top-4 z-10 sm:left-6 sm:top-6 md:left-8 md:top-8">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-black/40 px-3.5 py-1.5 text-[0.68rem] font-medium uppercase tracking-luxe text-white backdrop-blur-md sm:text-xs">
-            <ShieldCheck className="h-3 w-3 text-accent-soft sm:h-3.5 sm:w-3.5" /> Acceso privado
-          </span>
+      {/* Cabecera oscura, elegante y privada */}
+      <header className="bg-primary text-on-primary">
+        <div className="mx-auto max-w-7xl px-5 py-14 md:px-8 md:py-20">
+          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-1.5 text-[0.7rem] font-semibold uppercase tracking-luxe text-accent-soft">
+            <ShieldCheck className="h-3.5 w-3.5" /> Acceso privado
+          </p>
+          <h1 className="font-prata text-4xl text-white md:text-6xl">
+            Catálogo Mayorista
+          </h1>
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/65 md:text-base font-jakarta">
+            Precios exclusivos para distribuidores. Este enlace es personal:
+            no lo compartas ni lo publiques.
+          </p>
         </div>
-        <h1 className="sr-only">Catálogo Mayorista — El momento de emprender es ahora</h1>
       </header>
 
       <div className="mx-auto max-w-7xl px-5 pb-20 md:px-8">
