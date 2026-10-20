@@ -13,7 +13,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { ArrowLeft, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
 import {
   getWholesaleProducts,
   getWholesaleCategories,
@@ -141,70 +141,23 @@ export default async function CatchAllPage({
   return (
     <div className="min-h-dvh bg-background font-jakarta">
       {/* Banner / Hero de Mayoristas:
-          Mantiene la altura original compacta (~210px en móvil, ~280-300px en desktop)
-          para que no desplace el catálogo ni redimensione la página.
-          La imagen se adapta a la altura con su proporción natural (1024/571)
-          y los laterales en pantallas anchas se visten con atmósfera ambiental
-          y beneficios clave para el distribuidor. */}
-      <header className="relative w-full overflow-hidden bg-primary text-white">
-        {/* Fondo ambiental: extensión visual difuminada del banner */}
-        <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
-          <Image
-            src="https://ik.imagekit.io/jmbbfxnqu/treegold/marca/banner-mayoristas.jpg"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover scale-125 blur-3xl opacity-30 brightness-90 saturate-125"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/50 to-primary/80" />
-        </div>
-
-        {/* Contenedor principal con la altura compacta original */}
-        <div className="relative mx-auto flex h-[210px] sm:h-[250px] md:h-[280px] lg:h-[300px] max-w-7xl items-center justify-between px-3 sm:px-6 md:px-8">
-          {/* Lado izquierdo (Desktop): Propuesta de valor 1 */}
-          <div className="hidden lg:flex flex-col justify-center gap-2 max-w-[220px] xl:max-w-[260px] text-left z-10">
-            <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-white/15 bg-black/40 px-3 py-1 text-[0.68rem] font-medium uppercase tracking-luxe text-accent-soft backdrop-blur-md">
-              <ShieldCheck className="h-3 w-3 text-accent" /> Acceso Privado
-            </span>
-            <p className="font-prata text-base xl:text-lg text-white leading-snug">
-              Precios directos de fábrica
-            </p>
-            <p className="text-xs text-white/65 font-jakarta leading-relaxed">
-              Oro laminado 18K y balinería con garantía para tu negocio.
-            </p>
-          </div>
-
-          {/* Banner central: se adapta exactamente a la altura del hero sin recortes ni deformaciones */}
-          <div className="relative h-full aspect-[1024/571] max-w-full shrink-0 mx-auto overflow-hidden shadow-2xl rounded-xl sm:rounded-2xl border border-white/10">
-            <Image
-              src="https://ik.imagekit.io/jmbbfxnqu/treegold/marca/banner-mayoristas.jpg"
-              alt="Catálogo Mayorista — El momento de emprender es ahora"
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 700px"
-              className="object-contain"
-            />
-            {/* Badge de acceso privado en móviles / tablets */}
-            <div className="absolute left-3 top-3 z-10 lg:hidden">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/55 px-2.5 py-1 text-[0.62rem] font-medium uppercase tracking-luxe text-white backdrop-blur-md">
-                <ShieldCheck className="h-3 w-3 text-accent-soft" /> Acceso privado
-              </span>
-            </div>
-          </div>
-
-          {/* Lado derecho (Desktop): Propuesta de valor 2 */}
-          <div className="hidden lg:flex flex-col justify-center items-end gap-2 max-w-[220px] xl:max-w-[260px] text-right z-10">
-            <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-accent/30 bg-accent/15 px-3 py-1 text-[0.68rem] font-medium uppercase tracking-luxe text-accent-soft backdrop-blur-md">
-              <Sparkles className="h-3 w-3 text-accent" /> Margen 100%+
-            </span>
-            <p className="font-prata text-base xl:text-lg text-white leading-snug">
-              Alta rentabilidad
-            </p>
-            <p className="text-xs text-white/65 font-jakarta leading-relaxed">
-              Despachos asegurados a toda Colombia. Asesoría directa.
-            </p>
-          </div>
+          Abarca todo el ancho del banner con su proporción natural (1024/571),
+          tal como el hero de la página de inicio, sin recortes ni marcos
+          oscuros que hagan contraste. */}
+      <header className="relative w-full aspect-[1024/571] overflow-hidden bg-[#bdbfbe]">
+        <Image
+          src="https://ik.imagekit.io/jmbbfxnqu/treegold/marca/banner-mayoristas.jpg"
+          alt="Catálogo Mayorista — El momento de emprender es ahora"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        {/* Badge sutil de acceso privado */}
+        <div className="absolute left-4 top-4 z-10 sm:left-6 sm:top-6 md:left-8 md:top-8">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-black/40 px-3.5 py-1.5 text-[0.68rem] font-medium uppercase tracking-luxe text-white backdrop-blur-md sm:text-xs">
+            <ShieldCheck className="h-3 w-3 text-accent-soft sm:h-3.5 sm:w-3.5" /> Acceso privado
+          </span>
         </div>
         <h1 className="sr-only">Catálogo Mayorista — El momento de emprender es ahora</h1>
       </header>
