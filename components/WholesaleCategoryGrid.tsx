@@ -47,7 +47,7 @@ export default function WholesaleCategoryGrid({
           </div>
           <div className="mt-3 flex items-start justify-between gap-2 px-1">
             <div className="min-w-0">
-              <h2 className="truncate font-serif text-base leading-tight text-primary transition-colors group-hover:text-accent sm:text-lg">
+              <h2 className="truncate font-prata text-base leading-tight text-primary transition-colors group-hover:text-accent sm:text-lg">
                 {t.name}
               </h2>
               <p className="mt-0.5 text-xs text-secondary/70">{piezas(t.count)}</p>
@@ -65,11 +65,11 @@ export default function WholesaleCategoryGrid({
       >
         <div className="flex aspect-square flex-col items-center justify-center gap-3 rounded-2xl bg-primary text-white transition-colors group-hover:bg-primary/90">
           <LayoutGrid className="h-8 w-8 text-accent-soft" strokeWidth={1.5} />
-          <span className="font-serif text-xl">Ver todo</span>
+          <span className="font-prata text-xl">Ver todo</span>
         </div>
         <div className="mt-3 flex items-start justify-between gap-2 px-1">
           <div className="min-w-0">
-            <h2 className="truncate font-serif text-base leading-tight text-primary transition-colors group-hover:text-accent sm:text-lg">
+            <h2 className="truncate font-prata text-base leading-tight text-primary transition-colors group-hover:text-accent sm:text-lg">
               Todas las categorías
             </h2>
             <p className="mt-0.5 text-xs text-secondary/70">{piezas(total)}</p>

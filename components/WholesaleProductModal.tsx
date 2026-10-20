@@ -130,14 +130,14 @@ export default function WholesaleProductModal({
 
           {/* Datos */}
           <div className="flex flex-1 flex-col p-6 md:p-8">
-            <h2 className="font-serif text-2xl leading-tight text-primary md:text-3xl">
+            <h2 className="font-prata text-2xl leading-tight text-primary md:text-3xl">
               {product.name}
             </h2>
 
             <div className="mt-5 rounded-2xl border border-border p-4">
               <div className="flex items-baseline justify-between gap-3">
                 <span className="text-sm text-secondary">Tu costo</span>
-                <span className="font-serif text-3xl text-accent">
+                <span className="font-prata text-3xl text-accent">
                   {formatCOP(product.price)}
                 </span>
               </div>

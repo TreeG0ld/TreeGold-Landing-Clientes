@@ -58,7 +58,7 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
         <div className="flex items-baseline justify-between gap-2">
           <h3
             onClick={() => setOpenDetail(true)}
-            className="min-w-0 truncate font-serif text-sm leading-tight pr-1 transition-colors hover:text-accent sm:text-base cursor-pointer"
+            className="min-w-0 truncate font-prata text-sm leading-tight pr-1 transition-colors hover:text-accent sm:text-base cursor-pointer"
           >
             {product.name}
           </h3>

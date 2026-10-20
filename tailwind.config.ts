@@ -22,6 +22,8 @@ const config: Config = {
       fontFamily: {
         serif: ["var(--font-marcellus)", "Marcellus", "serif"],
         sans: ["var(--font-jost)", "Jost", "system-ui", "sans-serif"],
+        prata: ["var(--font-prata)", "Prata", "serif"],
+        jakarta: ["var(--font-jakarta)", "Plus Jakarta Sans", "system-ui", "sans-serif"],
       },
       letterSpacing: {
         luxe: "0.18em",

@@ -11,8 +11,9 @@
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
-import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Sparkles } from "lucide-react";
 import {
   getWholesaleProducts,
   getWholesaleCategories,
@@ -138,21 +139,74 @@ export default async function CatchAllPage({
   const piezas = (n: number) => `${n} ${n === 1 ? "pieza" : "piezas"}`;
 
   return (
-    <div className="min-h-dvh bg-background">
-      {/* Cabecera oscura, elegante y anónima */}
-      <header className="bg-primary text-on-primary">
-        <div className="mx-auto max-w-7xl px-5 py-14 md:px-8 md:py-20">
-          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-1.5 text-[0.7rem] font-semibold uppercase tracking-luxe text-accent-soft">
-            <ShieldCheck className="h-3.5 w-3.5" /> Acceso privado
-          </p>
-          <h1 className="font-serif text-4xl text-white md:text-6xl">
-            Catálogo Mayorista
-          </h1>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/65 md:text-base">
-            Precios exclusivos para distribuidores. Este enlace es personal:
-            no lo compartas ni lo publiques.
-          </p>
+    <div className="min-h-dvh bg-background font-jakarta">
+      {/* Banner / Hero de Mayoristas:
+          Mantiene la altura original compacta (~210px en móvil, ~280-300px en desktop)
+          para que no desplace el catálogo ni redimensione la página.
+          La imagen se adapta a la altura con su proporción natural (1024/571)
+          y los laterales en pantallas anchas se visten con atmósfera ambiental
+          y beneficios clave para el distribuidor. */}
+      <header className="relative w-full overflow-hidden bg-primary text-white">
+        {/* Fondo ambiental: extensión visual difuminada del banner */}
+        <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
+          <Image
+            src="https://ik.imagekit.io/jmbbfxnqu/treegold/marca/banner-mayoristas.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover scale-125 blur-3xl opacity-30 brightness-90 saturate-125"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/50 to-primary/80" />
         </div>
+
+        {/* Contenedor principal con la altura compacta original */}
+        <div className="relative mx-auto flex h-[210px] sm:h-[250px] md:h-[280px] lg:h-[300px] max-w-7xl items-center justify-between px-3 sm:px-6 md:px-8">
+          {/* Lado izquierdo (Desktop): Propuesta de valor 1 */}
+          <div className="hidden lg:flex flex-col justify-center gap-2 max-w-[220px] xl:max-w-[260px] text-left z-10">
+            <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-white/15 bg-black/40 px-3 py-1 text-[0.68rem] font-medium uppercase tracking-luxe text-accent-soft backdrop-blur-md">
+              <ShieldCheck className="h-3 w-3 text-accent" /> Acceso Privado
+            </span>
+            <p className="font-prata text-base xl:text-lg text-white leading-snug">
+              Precios directos de fábrica
+            </p>
+            <p className="text-xs text-white/65 font-jakarta leading-relaxed">
+              Oro laminado 18K y balinería con garantía para tu negocio.
+            </p>
+          </div>
+
+          {/* Banner central: se adapta exactamente a la altura del hero sin recortes ni deformaciones */}
+          <div className="relative h-full aspect-[1024/571] max-w-full shrink-0 mx-auto overflow-hidden shadow-2xl rounded-xl sm:rounded-2xl border border-white/10">
+            <Image
+              src="https://ik.imagekit.io/jmbbfxnqu/treegold/marca/banner-mayoristas.jpg"
+              alt="Catálogo Mayorista — El momento de emprender es ahora"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 700px"
+              className="object-contain"
+            />
+            {/* Badge de acceso privado en móviles / tablets */}
+            <div className="absolute left-3 top-3 z-10 lg:hidden">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/55 px-2.5 py-1 text-[0.62rem] font-medium uppercase tracking-luxe text-white backdrop-blur-md">
+                <ShieldCheck className="h-3 w-3 text-accent-soft" /> Acceso privado
+              </span>
+            </div>
+          </div>
+
+          {/* Lado derecho (Desktop): Propuesta de valor 2 */}
+          <div className="hidden lg:flex flex-col justify-center items-end gap-2 max-w-[220px] xl:max-w-[260px] text-right z-10">
+            <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-accent/30 bg-accent/15 px-3 py-1 text-[0.68rem] font-medium uppercase tracking-luxe text-accent-soft backdrop-blur-md">
+              <Sparkles className="h-3 w-3 text-accent" /> Margen 100%+
+            </span>
+            <p className="font-prata text-base xl:text-lg text-white leading-snug">
+              Alta rentabilidad
+            </p>
+            <p className="text-xs text-white/65 font-jakarta leading-relaxed">
+              Despachos asegurados a toda Colombia. Asesoría directa.
+            </p>
+          </div>
+        </div>
+        <h1 className="sr-only">Catálogo Mayorista — El momento de emprender es ahora</h1>
       </header>
 
       <div className="mx-auto max-w-7xl px-5 pb-20 md:px-8">
@@ -175,7 +229,7 @@ export default async function CatchAllPage({
                     >
                       <ArrowLeft className="h-4 w-4" /> Categorías
                     </Link>
-                    <span className="min-w-0 truncate font-serif text-lg text-primary">
+                    <span className="min-w-0 truncate font-prata text-lg text-primary">
                       {categoryName}
                     </span>
                     <span className="hidden shrink-0 text-xs text-secondary/70 sm:block">
@@ -238,7 +292,7 @@ export default async function CatchAllPage({
           ).map((seccion) => (
             <section key={seccion.label ?? "todas"} className={seccion.label ? "mb-16" : ""}>
               {seccion.label && (
-                <h2 className="mb-6 flex items-baseline gap-3 border-b border-border pb-3 font-serif text-2xl text-primary">
+                <h2 className="mb-6 flex items-baseline gap-3 border-b border-border pb-3 font-prata text-2xl text-primary">
                   {seccion.label}
                   <span className="font-sans text-xs text-secondary/60">
                     {seccion.items.length} {seccion.items.length === 1 ? "pieza" : "piezas"}

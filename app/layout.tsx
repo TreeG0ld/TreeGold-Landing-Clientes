@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Marcellus, Jost } from "next/font/google";
+import { Marcellus, Jost, Prata, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
 import SiteChrome from "@/components/SiteChrome";
@@ -20,6 +20,21 @@ const jost = Jost({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-jost",
+  display: "swap",
+});
+
+// Opción 3: Tipografía boutique editorial para el catálogo mayorista
+const prata = Prata({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-prata",
+  display: "swap",
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-jakarta",
   display: "swap",
 });
 
@@ -155,7 +170,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${marcellus.variable} ${jost.variable}`}
+      className={`${marcellus.variable} ${jost.variable} ${prata.variable} ${plusJakartaSans.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-dvh" suppressHydrationWarning>
