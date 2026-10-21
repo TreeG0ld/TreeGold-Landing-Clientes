@@ -295,6 +295,11 @@ export const getAllCategories = unstable_cache(
 
     const coverByCategory = new Map(covers.map((p) => [p.categoryId, p.images[0] ?? ""]));
 
+    const categoryCoverOverrides: Record<string, string> = {
+      "balineria-e-insumos": "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/categoria-balineria.jpg",
+      "herrajes": "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/categoria-herrajes.jpg",
+    };
+
     // Solo categorías con al menos un producto visible en la tienda pública:
     // las recién creadas (aún sin productos) no deben aparecer con tarjeta vacía.
     return cats
@@ -305,7 +310,7 @@ export const getAllCategories = unstable_cache(
             slug: c.slug,
             name: c.name,
             description: "",
-            image: coverByCategory.get(c.id) ?? "",
+            image: categoryCoverOverrides[c.slug] ?? coverByCategory.get(c.id) ?? "",
           }) satisfies Category
       );
   },

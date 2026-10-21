@@ -98,9 +98,16 @@ export type WholesaleCategoryTile = {
   image: string | null;
 };
 
+// Portadas destacadas para categorías específicas (Balinería e Insumos, Herrajes)
+// para mostrar una foto representativa en alta calidad y con la estética del catálogo.
+const CATEGORY_TILE_IMAGE_OVERRIDES: Record<string, string> = {
+  "balineria-e-insumos": "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/categoria-balineria.jpg",
+  "herrajes": "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/categoria-herrajes.jpg",
+};
+
 // Cuadrícula de categorías con la que abre el catálogo mayorista: nombre,
 // cuántas piezas mayoristas tiene y una foto de portada (la de su pieza más
-// antigua, igual que las tarjetas de categoría de la tienda pública). Una sola
+// antigua o la portada representativa configurada). Una sola
 // consulta y sin traer las ~800 piezas: la entrada al catálogo carga rápido.
 export async function getWholesaleCategoryTiles(): Promise<WholesaleCategoryTile[]> {
   const cats = await prisma.category.findMany({
@@ -122,6 +129,6 @@ export async function getWholesaleCategoryTiles(): Promise<WholesaleCategoryTile
     slug: c.slug,
     name: c.name,
     count: c._count.products,
-    image: c.products[0]?.images[0] ?? null,
+    image: CATEGORY_TILE_IMAGE_OVERRIDES[c.slug] ?? c.products[0]?.images[0] ?? null,
   }));
 }
