@@ -87,6 +87,13 @@ sirve WebP a todos (`f_webp,fl_awebp`, no `f_auto`). Si en el futuro aparecen fo
 visible, es porque la franja de precio empieza más arriba del recorte actual — bajar el
 valor de `h_` (no subirlo).
 
+**Migración a ImageKit.** Las fotos viven ahora en ImageKit (`https://ik.imagekit.io/jmbbfxnqu/`)
+y `lib/imageLoader.ts` tiene una rama para ellas (`?tr=w-…,f-webp,q-…,c-at_max`); la rama de
+Cloudinary queda como respaldo para URLs antiguas. La CSP de `next.config.mjs` permite ambos
+dominios. Las portadas de categorías mayoristas (Balinería, Herrajes) se fijan con
+`CATEGORY_TILE_IMAGE_OVERRIDES` en `lib/wholesale.ts` (reflejado en `lib/catalog.ts`).
+Lo que sigue sobre Cloudinary es histórico, pero explica por qué las transformaciones no se tocan.
+
 **Cuota de Cloudinary (plan gratuito, 25 créditos en ventana móvil de 30 días).** En octubre
 de 2026 llegó al 126%: el 65% eran transformaciones, porque `f_auto` guardaba una copia por
 formato (WebP, JPEG XL para iPhone, original para bots) × cada ancho × cada loader. Por eso
@@ -128,7 +135,7 @@ cd /var/www/treegold
 ./deploy.sh
 ```
 
-`deploy.sh` hace `git pull` + `npm install` + `prisma generate` + `npm run build`
+`deploy.sh` hace `git pull` + `npm ci` + `prisma generate` + `npm run build`
 + `pm2 restart treegold`, y se detiene en el primer error. No toca Nginx ni el
 `.env`. Mientras compila, la tienda sigue sirviendo la versión anterior: el
 cambio ocurre en el `pm2 restart`, que tarda un par de segundos.

@@ -296,7 +296,7 @@ export const getAllCategories = unstable_cache(
     const coverByCategory = new Map(covers.map((p) => [p.categoryId, p.images[0] ?? ""]));
 
     const categoryCoverOverrides: Record<string, string> = {
-      "balineria-e-insumos": "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/categoria-balineria.jpg",
+      "balineria-e-insumos": "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/categoria-balineria-v2.jpg",
       "herrajes": "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/categoria-herrajes.jpg",
     };
 

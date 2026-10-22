@@ -101,7 +101,7 @@ export type WholesaleCategoryTile = {
 // Portadas destacadas para categorías específicas (Balinería e Insumos, Herrajes)
 // para mostrar una foto representativa en alta calidad y con la estética del catálogo.
 const CATEGORY_TILE_IMAGE_OVERRIDES: Record<string, string> = {
-  "balineria-e-insumos": "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/categoria-balineria.jpg",
+  "balineria-e-insumos": "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/categoria-balineria-v2.jpg",
   "herrajes": "https://ik.imagekit.io/jmbbfxnqu/treegold/marca/categoria-herrajes.jpg",
 };
 
