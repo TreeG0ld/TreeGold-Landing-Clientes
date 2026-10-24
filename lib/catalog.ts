@@ -256,9 +256,10 @@ export async function getRelated(slug: string, take = 4): Promise<Product[]> {
   return rows.map(toListProduct);
 }
 
-// Productos marcados "En promoción" desde /admin (Product.isPromo).
-// La home no renderiza la sección si viene vacío.
-export async function getPromos(take = 8): Promise<Product[]> {
+// Productos marcados "En promoción" desde /admin (Product.isPromo), del
+// editado más reciente al más viejo. Sin `take`, todos (página /promociones);
+// la home muestra solo los primeros y no renderiza la sección si viene vacío.
+export async function getPromos(take?: number): Promise<Product[]> {
   const rows = await prisma.product.findMany({
     where: { isRetail: true, isPromo: true },
     select: listSelect,
@@ -266,6 +267,11 @@ export async function getPromos(take = 8): Promise<Product[]> {
     take,
   });
   return rows.map(toListProduct);
+}
+
+/** Cuántos productos hay en promoción (para el "Ver todas" de la home). */
+export async function countPromos(): Promise<number> {
+  return prisma.product.count({ where: { isRetail: true, isPromo: true } });
 }
 
 export async function getFeatured(take = 8): Promise<Product[]> {

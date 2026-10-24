@@ -5,17 +5,18 @@ import Reveal from "@/components/anim/Reveal";
 import ProductCard from "@/components/ProductCard";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import ArtisanCarousel from "@/components/ArtisanCarousel";
-import { getAllCategories, getFeatured, getPromos } from "@/lib/catalog";
+import { countPromos, getAllCategories, getFeatured, getPromos } from "@/lib/catalog";
 import { site } from "@/lib/site";
 
 // Regenera la página estática cada hora (catálogo fresco sin sacrificar velocidad).
 export const revalidate = 3600;
 
 export default async function Home() {
-  const [categories, featured, promos] = await Promise.all([
+  const [categories, featured, promos, promoTotal] = await Promise.all([
     getAllCategories(),
     getFeatured(8),
     getPromos(8),
+    countPromos(),
   ]);
 
   return (
@@ -41,6 +42,17 @@ export default async function Home() {
                 <ProductCard key={p.slug} product={p} index={i} />
               ))}
             </div>
+
+            {/* Aquí solo caben las 8 editadas más recientemente; el resto,
+                en la página de promociones. */}
+            {promoTotal > promos.length && (
+              <div className="mt-16 text-center md:mt-20">
+                <Link href="/promociones" className="btn-outline group">
+                  Ver todas las promociones ({promoTotal})
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+            )}
           </div>
         </section>
       )}

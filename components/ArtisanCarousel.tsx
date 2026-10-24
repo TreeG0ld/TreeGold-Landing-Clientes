@@ -56,7 +56,7 @@ export default function ArtisanCarousel() {
   }, [emblaApi, onSelect]);
 
   return (
-    <div className="relative aspect-[4/5] overflow-hidden rounded-3xl">
+    <div className="card-photo relative aspect-[4/5] overflow-hidden rounded-3xl">
       <div ref={emblaRef} className="h-full overflow-hidden">
         <div className="flex h-full">
           {photos.map((photo) => (

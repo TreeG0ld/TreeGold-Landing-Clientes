@@ -31,6 +31,7 @@ export default function Footer() {
             </h4>
             <ul className="mt-5 space-y-3 text-sm text-on-primary/80">
               <li><Link href="/coleccion" className="transition-colors hover:text-accent-soft">Colección</Link></li>
+              <li><Link href="/promociones" className="transition-colors hover:text-accent-soft">Promociones</Link></li>
               <li><Link href="/historia" className="transition-colors hover:text-accent-soft">Historia</Link></li>
               <li><Link href="/contacto" className="transition-colors hover:text-accent-soft">Contacto</Link></li>
               <li><Link href="/seleccion" className="transition-colors hover:text-accent-soft">Mi selección</Link></li>
