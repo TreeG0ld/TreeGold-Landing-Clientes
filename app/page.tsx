@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import Hero from "@/components/Hero";
 import Reveal from "@/components/anim/Reveal";
 import ProductCard from "@/components/ProductCard";
+import PromoCta from "@/components/PromoCta";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import ArtisanCarousel from "@/components/ArtisanCarousel";
 import { countPromos, getAllCategories, getFeatured, getPromos } from "@/lib/catalog";
@@ -46,11 +47,8 @@ export default async function Home() {
             {/* Aquí solo caben las 8 editadas más recientemente; el resto,
                 en la página de promociones. */}
             {promoTotal > promos.length && (
-              <div className="mt-16 text-center md:mt-20">
-                <Link href="/promociones" className="btn-outline group">
-                  Ver todas las promociones ({promoTotal})
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Link>
+              <div className="mt-10 text-center md:mt-12">
+                <PromoCta total={promoTotal} />
               </div>
             )}
           </div>
