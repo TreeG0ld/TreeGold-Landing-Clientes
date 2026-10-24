@@ -50,16 +50,16 @@ export default function ProductsTable({ products }: { products: Row[] }) {
   // fijos arriba (sticky): fondo opaco y la línea inferior como sombra,
   // porque un borde de tabla colapsada no viaja con el encabezado.
   return (
-    <ScrollFadeBox className="max-h-[calc(100dvh-21rem)] min-h-72 overflow-auto rounded-2xl border border-border bg-white">
+    <ScrollFadeBox className="max-h-[calc(100dvh-21rem)] min-h-72 overflow-auto rounded-2xl border border-border bg-surface">
       <table className="w-full text-sm">
         <thead className="text-left text-xs uppercase tracking-wide text-secondary">
           <tr>
-            <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Producto</th>
-            <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Categoría</th>
-            <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Precio</th>
-            <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Stock</th>
-            <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Visibilidad</th>
-            <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]" />
+            <th className="sticky top-0 z-10 bg-surface-alt px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Producto</th>
+            <th className="sticky top-0 z-10 bg-surface-alt px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Categoría</th>
+            <th className="sticky top-0 z-10 bg-surface-alt px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Precio</th>
+            <th className="sticky top-0 z-10 bg-surface-alt px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Stock</th>
+            <th className="sticky top-0 z-10 bg-surface-alt px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Visibilidad</th>
+            <th className="sticky top-0 z-10 bg-surface-alt px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]" />
           </tr>
         </thead>
         <tbody>

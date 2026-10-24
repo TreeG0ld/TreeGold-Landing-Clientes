@@ -187,7 +187,7 @@ export default function ProductForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border border-border bg-white p-6">
+    <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border border-border bg-surface p-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className="mb-1.5 block text-sm font-medium text-primary">Código (slug)</label>

@@ -20,6 +20,114 @@
   --color-muted: 236 232 227;
   --color-border: 221 214 205;
   --color-destructive: 220 38 38;
+  /* Fondo de tarjetas y tablas (blanco) y de sus encabezados (crema claro).
+     Antes eran bg-white y bg-[#f7f6f4] escritos a mano en el panel; como
+     variables, el modo oscuro del panel los puede cambiar. */
+  --color-surface: 255 255 255;
+  --color-surface-alt: 247 246 244;
+}
+
+/* Modo oscuro del panel /admin (interruptor de components/admin/ThemeToggle).
+   Solo existe dentro del <div data-admin-theme="dark"> que pone
+   components/admin/AdminTheme: la tienda pública sigue siempre en claro.
+   Misma familia de colores que la tienda (piedra cálida y dorado), en oscuro;
+   el dorado sube un poco de brillo para leerse bien sobre el fondo negro. */
+[data-admin-theme="dark"] {
+  color-scheme: dark;
+  --color-primary: 245 240 232;
+  --color-on-primary: 24 21 19;
+  --color-secondary: 176 168 157;
+  --color-accent: 214 164 58;
+  --color-accent-soft: 232 192 96;
+  --color-background: 17 15 13;
+  --color-foreground: 240 235 228;
+  --color-muted: 39 35 31;
+  --color-border: 58 52 46;
+  --color-destructive: 248 113 113;
+  --color-surface: 30 27 24;
+  --color-surface-alt: 38 34 30;
+}
+/* La barra de desplazamiento y el rebote al hacer scroll son del <html>, que
+   está fuera de ese <div>: sin esto quedaban claros con el panel en oscuro. */
+html:has([data-admin-theme="dark"]),
+html:has([data-admin-theme="dark"]) body {
+  color-scheme: dark;
+  background-color: rgb(17 15 13);
+}
+/* Los campos de texto del panel no tienen fondo propio (usan el blanco del
+   navegador). En oscuro toman el de las tarjetas. :where() deja la regla sin
+   peso, así cualquier clase bg-* de un campo sigue ganando. */
+:where([data-admin-theme="dark"])
+  :where(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), textarea, select) {
+  background-color: rgb(var(--color-surface-alt));
+  color: rgb(var(--color-foreground));
+}
+/* El texto guía de los campos ("Buscar por nombre o código…", "Nombre de la
+   nueva categoría…"): Tailwind lo pinta de un gris azulado (#9ca3af) que en
+   oscuro se ve azul. Se usa el blanco cálido del texto, apenas más tenue para
+   que se distinga de lo que uno escribe. Sin :where(): necesita más peso que
+   la regla input::placeholder de Tailwind para ganarle. */
+[data-admin-theme="dark"] ::placeholder {
+  color: rgb(var(--color-foreground) / 0.8);
+  opacity: 1;
+}
+/* Cambio de tema del panel (ver AdminTheme): con View Transitions, el tema
+   nuevo aparece dentro de un círculo de borde difuminado que nace en el
+   interruptor y va tapando el tema anterior, que se queda quieto debajo. El
+   círculo es una máscara radial con centro --admin-reveal-x/y y radio
+   --admin-reveal; AdminTheme anima esos valores sobre la capa del tema nuevo
+   (Web Animations API), del radio 0 al justo para cubrir la pantalla. El 20%
+   exterior del radio es el borde suave. @property hace que el radio se pueda
+   animar; mientras vale 0 (antes de arrancar) el tema nuevo no se ve. Las dos
+   capas van sin la animación por defecto (un fundido) para que solo se vea el
+   círculo. El interruptor tiene su propio nombre de transición para quedar
+   fuera de la máscara y verse deslizar en vivo. */
+@property --admin-reveal {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+::view-transition-new(root) {
+  -webkit-mask-image: radial-gradient(
+    circle at var(--admin-reveal-x, 50%) var(--admin-reveal-y, 0px),
+    #000 calc(var(--admin-reveal) * 0.8),
+    transparent var(--admin-reveal)
+  );
+  mask-image: radial-gradient(
+    circle at var(--admin-reveal-x, 50%) var(--admin-reveal-y, 0px),
+    #000 calc(var(--admin-reveal) * 0.8),
+    transparent var(--admin-reveal)
+  );
+}
+[data-theme-toggle] {
+  view-transition-name: admin-theme-toggle;
+}
+::view-transition-old(admin-theme-toggle) {
+  display: none;
+}
+::view-transition-new(admin-theme-toggle) {
+  animation: none;
+}
+
+/* Estirón del botón redondo del interruptor mientras se desliza: se aplasta
+   hacia los lados, rebota un poco y vuelve a ser redondo. Son dos nombres
+   iguales para que la animación se repita en cada cambio (alternan). Solo
+   transform: corre en la tarjeta gráfica, sin depender de la página. */
+@keyframes theme-knob-squash-a {
+  0% { transform: scale(1, 1); }
+  30% { transform: scale(1.32, 0.84); }
+  65% { transform: scale(0.94, 1.05); }
+  100% { transform: scale(1, 1); }
+}
+@keyframes theme-knob-squash-b {
+  0% { transform: scale(1, 1); }
+  30% { transform: scale(1.32, 0.84); }
+  65% { transform: scale(0.94, 1.05); }
+  100% { transform: scale(1, 1); }
 }
 
 @layer base {
@@ -103,6 +211,12 @@
   input[type="search"]::-webkit-search-cancel-button {
     -webkit-appearance: none;
     appearance: none;
+  }
+
+  /* El menú desplegable del panel (GlassSelect) usa .glass: en oscuro, el
+     mismo vidrio pero sobre piedra oscura. */
+  [data-admin-theme="dark"] .glass {
+    background-color: rgba(30, 27, 24, 0.82);
   }
 
   .glass-dark {

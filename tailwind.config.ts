@@ -1,6 +1,9 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  // Las clases dark: solo se activan dentro del panel /admin en modo oscuro
+  // (atributo que pone components/admin/AdminTheme). La tienda no las usa.
+  darkMode: ["selector", '[data-admin-theme="dark"]'],
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -18,6 +21,8 @@ const config: Config = {
         muted: "rgb(var(--color-muted) / <alpha-value>)",
         border: "rgb(var(--color-border) / <alpha-value>)",
         destructive: "rgb(var(--color-destructive) / <alpha-value>)",
+        surface: "rgb(var(--color-surface) / <alpha-value>)",
+        "surface-alt": "rgb(var(--color-surface-alt) / <alpha-value>)",
       },
       fontFamily: {
         serif: ["var(--font-marcellus)", "Marcellus", "serif"],

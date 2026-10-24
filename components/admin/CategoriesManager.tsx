@@ -88,14 +88,14 @@ export default function CategoriesManager({ categories }: { categories: Category
 
       {/* Alto máximo con scroll propio y títulos de columna fijos, igual que
           la tabla de productos (ver ProductsTable). */}
-      <ScrollFadeBox className="max-h-[calc(100dvh-17rem)] min-h-72 overflow-auto rounded-2xl border border-border bg-white">
+      <ScrollFadeBox className="max-h-[calc(100dvh-17rem)] min-h-72 overflow-auto rounded-2xl border border-border bg-surface">
         <table className="w-full text-sm">
           <thead className="text-left text-xs uppercase tracking-wide text-secondary">
             <tr>
-              <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Nombre</th>
-              <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Slug</th>
-              <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Productos</th>
-              <th className="sticky top-0 z-10 bg-[#f7f6f4] px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]" />
+              <th className="sticky top-0 z-10 bg-surface-alt px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Nombre</th>
+              <th className="sticky top-0 z-10 bg-surface-alt px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Slug</th>
+              <th className="sticky top-0 z-10 bg-surface-alt px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]">Productos</th>
+              <th className="sticky top-0 z-10 bg-surface-alt px-4 py-3 shadow-[inset_0_-1px_0_rgb(var(--color-border))]" />
             </tr>
           </thead>
           <tbody>

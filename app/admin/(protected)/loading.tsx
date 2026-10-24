@@ -10,7 +10,7 @@ export default function AdminLoading() {
         <div className="skeleton h-10 w-40 rounded-xl" />
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-white">
+      <div className="overflow-hidden rounded-2xl border border-border bg-surface">
         <div className="border-b border-border bg-muted/40 px-4 py-3">
           <div className="skeleton h-4 w-56" />
         </div>

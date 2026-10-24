@@ -29,7 +29,7 @@ export default function WholesaleLink({ url }: { url: string }) {
       <div className="flex shrink-0 gap-2">
         <button
           onClick={copy}
-          className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/85 cursor-pointer"
+          className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-on-primary transition-colors hover:bg-primary/85 cursor-pointer"
         >
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           {copied ? "Copiado" : "Copiar"}

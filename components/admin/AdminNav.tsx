@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { LogOut, Package, Tags, Store } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
 
 const links = [
   { href: "/admin/productos", label: "Productos", icon: Package },
@@ -30,7 +31,7 @@ export default function AdminNav({ user }: { user: string }) {
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-white">
+    <header className="sticky top-0 z-30 border-b border-border bg-surface">
       <div className="mx-auto flex max-w-screen-2xl flex-wrap items-center justify-between gap-y-3 px-5 py-3.5 md:px-8">
         <div className="flex items-center gap-3 md:gap-6">
           <Link href="/admin/productos" className="flex shrink-0 items-center gap-2" aria-label="TreeGold · Admin">
@@ -46,7 +47,7 @@ export default function AdminNav({ user }: { user: string }) {
                   href={href}
                   onClick={() => !pathname.startsWith(href) && setPendingHref(href)}
                   className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                    active ? "bg-primary text-white" : "text-secondary hover:text-primary"
+                    active ? "bg-primary text-on-primary" : "text-secondary hover:text-primary"
                   }`}
                 >
                   <Icon className="h-4 w-4" /> {label}
@@ -58,6 +59,7 @@ export default function AdminNav({ user }: { user: string }) {
 
         <div className="flex items-center gap-3 text-sm text-secondary">
           <span className="hidden sm:inline-block">{user}</span>
+          <ThemeToggle />
           <button
             onClick={handleLogout}
             className="flex items-center gap-1.5 rounded-full border border-border px-3.5 py-1.5 font-medium text-secondary transition-colors hover:border-accent hover:text-primary cursor-pointer"

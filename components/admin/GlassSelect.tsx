@@ -22,7 +22,7 @@ export default function GlassSelect({
   submitOnChange = false,
   className = "",
   id,
-  surface = "bg-white",
+  surface = "bg-surface",
 }: {
   options: GlassOption[];
   value: string;
@@ -113,7 +113,7 @@ export default function GlassSelect({
                     className={`flex w-full items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left text-sm transition-all duration-200 cursor-pointer ${
                       active
                         ? "bg-primary text-on-primary"
-                        : "text-secondary hover:bg-white/70 hover:pl-4 hover:text-primary"
+                        : "text-secondary hover:bg-surface/70 hover:pl-4 hover:text-primary"
                     }`}
                   >
                     {o.label}

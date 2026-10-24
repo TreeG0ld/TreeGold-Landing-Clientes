@@ -80,7 +80,7 @@ export default async function ProductosPage({
               key={n}
               href={`/admin/productos?${new URLSearchParams({ ...(q ? { q } : {}), ...(categoryId ? { categoria: categoryId } : {}), page: String(n) })}`}
               className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                n === page ? "bg-primary text-white" : "text-secondary hover:bg-muted"
+                n === page ? "bg-primary text-on-primary" : "text-secondary hover:bg-muted"
               }`}
             >
               {n}

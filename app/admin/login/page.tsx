@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import ThemeToggle from "@/components/admin/ThemeToggle";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -39,6 +40,10 @@ export default function AdminLoginPage() {
 
   return (
     <div className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-background px-5">
+      <div className="absolute right-5 top-5 z-10">
+        <ThemeToggle />
+      </div>
+
       {/* Gradiente dorado en la parte inferior */}
       <div
         aria-hidden
@@ -47,7 +52,7 @@ export default function AdminLoginPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="relative w-full max-w-md rounded-3xl border border-border bg-white p-10 shadow-lg sm:p-12"
+        className="relative w-full max-w-md rounded-3xl border border-border bg-surface p-10 shadow-lg sm:p-12"
       >
         <div className="flex justify-center">
           <Image src="/logo-sm.png" alt="TreeGold" width={188} height={200} priority className="h-20 w-auto" />
@@ -94,7 +99,7 @@ export default function AdminLoginPage() {
 
       <Link
         href="/"
-        className="group relative mt-8 inline-flex items-center gap-2 overflow-hidden rounded-full border border-accent/30 bg-white/60 px-6 py-2.5 text-sm font-medium text-primary shadow-sm backdrop-blur transition-all duration-300 ease-luxe hover:border-accent hover:bg-white hover:shadow-md"
+        className="group relative mt-8 inline-flex items-center gap-2 overflow-hidden rounded-full border border-accent/30 bg-surface/60 px-6 py-2.5 text-sm font-medium text-primary shadow-sm backdrop-blur transition-all duration-300 ease-luxe hover:border-accent hover:bg-surface hover:shadow-md"
       >
         <ArrowLeft className="h-4 w-4 text-accent transition-transform duration-300 ease-luxe group-hover:-translate-x-1" />
         Volver a la tienda

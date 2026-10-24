@@ -106,6 +106,26 @@ La subida de imágenes desde `/admin` usa **upload firmado** directo del navegad
 Cloudinary (`/api/admin/cloudinary-signature` genera la firma; solo un admin con sesión
 puede pedirla). No hay widget de Cloudinary ni dependencia `next-cloudinary` instalada.
 
+## Modo oscuro del panel `/admin`
+
+Solo el panel tiene modo oscuro; la tienda pública es siempre clara. Piezas:
+
+- `lib/admin-theme.ts` — la preferencia vive en la cookie `tg_admin_theme` (path `/admin`),
+  no en localStorage: `app/admin/layout.tsx` la lee en el servidor y la página llega ya
+  pintada con el tema, sin destello.
+- `components/admin/AdminTheme.tsx` — pone `data-admin-theme` en un `<div>` que envuelve
+  `/admin` (no en `<html>`, para que no se filtre a la tienda). Ese atributo cambia las
+  variables de color (`app/globals.css`) y activa las clases `dark:` de Tailwind
+  (`darkMode: ["selector", '[data-admin-theme="dark"]']`).
+- `components/admin/ThemeToggle.tsx` — el interruptor (en `AdminNav` y en el login).
+- El cambio usa **View Transitions**: el tema nuevo aparece en un círculo difuminado que
+  nace en el interruptor. No volver a transiciones CSS en cada elemento: con la tabla de
+  productos congelaban la página.
+
+En el panel, los fondos de tarjetas y tablas son `bg-surface` / `bg-surface-alt` (no
+`bg-white`) y el texto sobre `bg-primary` es `text-on-primary` (no `text-white`); si no,
+no cambian con el tema.
+
 ## Modelo de datos (Prisma)
 
 `Product.isRetail` / `isWholesale` controlan en qué tienda aparece cada producto.

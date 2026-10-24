@@ -35,7 +35,7 @@ export default async function MayoristasAdminPage() {
       <h1 className="mb-6 font-serif text-3xl text-primary">Mayoristas</h1>
 
       {/* Enlace secreto */}
-      <section className="mb-8 rounded-2xl border border-border bg-white p-6">
+      <section className="mb-8 rounded-2xl border border-border bg-surface p-6">
         <h2 className="font-serif text-xl text-primary">Enlace privado de la tienda</h2>
         <p className="mb-4 mt-1 text-sm text-secondary">
           Compártelo solo con tus distribuidores (por WhatsApp, por ejemplo). Quien
@@ -45,7 +45,7 @@ export default async function MayoristasAdminPage() {
         {url ? (
           <WholesaleLink url={url} />
         ) : (
-          <p className="flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <p className="flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-400/10 dark:text-amber-200">
             <AlertTriangle className="h-4 w-4 shrink-0" />
             Falta configurar WHOLESALE_SECRET en las variables de entorno; la tienda
             mayorista está cerrada.
@@ -55,20 +55,20 @@ export default async function MayoristasAdminPage() {
 
       {/* Resumen */}
       <section className="mb-8 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl border border-border bg-white p-6">
+        <div className="rounded-2xl border border-border bg-surface p-6">
           <p className="text-sm text-secondary">Productos publicados en mayoristas</p>
           <p className="mt-1 font-serif text-4xl text-primary">{wholesaleCount}</p>
         </div>
-        <div className="rounded-2xl border border-border bg-white p-6">
+        <div className="rounded-2xl border border-border bg-surface p-6">
           <p className="text-sm text-secondary">Sin precio mayorista (usan el de venta)</p>
-          <p className={`mt-1 font-serif text-4xl ${sinPrecio > 0 ? "text-amber-600" : "text-primary"}`}>
+          <p className={`mt-1 font-serif text-4xl ${sinPrecio > 0 ? "text-amber-600 dark:text-amber-400" : "text-primary"}`}>
             {sinPrecio}
           </p>
         </div>
       </section>
 
       {/* Cómo publicar */}
-      <section className="mb-8 rounded-2xl border border-border bg-white p-6">
+      <section className="mb-8 rounded-2xl border border-border bg-surface p-6">
         <h2 className="font-serif text-xl text-primary">¿Cómo publicar un producto aquí?</h2>
         <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-secondary">
           <li>
@@ -81,7 +81,7 @@ export default async function MayoristasAdminPage() {
       </section>
 
       {/* Últimos publicados */}
-      <section className="rounded-2xl border border-border bg-white p-6">
+      <section className="rounded-2xl border border-border bg-surface p-6">
         <h2 className="mb-4 font-serif text-xl text-primary">Últimos publicados</h2>
         {recent.length === 0 ? (
           <p className="text-sm text-secondary">Todavía no hay productos en la tienda mayorista.</p>
@@ -107,7 +107,7 @@ export default async function MayoristasAdminPage() {
                     {formatCOP(p.wholesalePrice ?? p.retailPrice)}
                   </p>
                   {p.wholesalePrice == null && (
-                    <p className="text-xs text-amber-600">sin precio mayorista</p>
+                    <p className="text-xs text-amber-600 dark:text-amber-400">sin precio mayorista</p>
                   )}
                 </div>
               </li>

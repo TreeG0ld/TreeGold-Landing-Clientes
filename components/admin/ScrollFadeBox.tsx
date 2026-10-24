@@ -52,7 +52,7 @@ export default function ScrollFadeBox({
         style={{ right: barra + 1 }}
         // Sin barra visible (Mac, celular) el desvanecido llega a la esquina
         // derecha, que también va redondeada.
-        className={`pointer-events-none absolute bottom-px left-px h-20 rounded-bl-2xl ${barra === 0 ? "rounded-br-2xl" : ""} bg-gradient-to-t from-white via-white/70 to-transparent backdrop-blur-[2px] transition-opacity duration-300 [mask-image:linear-gradient(to_top,black_35%,transparent)] ${
+        className={`pointer-events-none absolute bottom-px left-px h-20 rounded-bl-2xl ${barra === 0 ? "rounded-br-2xl" : ""} bg-gradient-to-t from-surface via-surface/70 to-transparent backdrop-blur-[2px] transition-opacity duration-300 [mask-image:linear-gradient(to_top,black_35%,transparent)] ${
           masAbajo ? "opacity-100" : "opacity-0"
         }`}
       />
