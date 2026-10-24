@@ -78,7 +78,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                   fill
                   priority
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-contain p-6"
+                  className="object-contain"
                 />
               </motion.div>
             </AnimatePresence>

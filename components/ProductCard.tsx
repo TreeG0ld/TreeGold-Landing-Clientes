@@ -8,7 +8,6 @@ import type { Product } from "@/lib/products";
 import { useSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
 import { flyToCart } from "@/lib/flyToCart";
-import { cardPhotoLoader, isAdminPhoto } from "@/lib/imageLoader";
 import { useAddCooldown } from "@/lib/useAddCooldown";
 
 // "index" escalona la entrada (cascada): cada tarjeta espera su turno.
@@ -50,14 +49,16 @@ export default function ProductCard({
       className="group"
     >
       <Link href={`/producto/${product.slug}`} className="block">
-        <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-white">
+        <div className="card-photo relative aspect-square overflow-hidden rounded-2xl bg-white">
+          {/* Cuadrada como el 88% de las fotos de producto: la foto llena la
+              tarjeta de borde a borde, sin rellenos ni márgenes. Las pocas que
+              no son cuadradas se recortan un poco al centro. */}
           <Image
-            loader={cardPhotoLoader}
             src={product.images[0]}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className={`${isAdminPhoto(product.images[0]) ? "object-cover" : "object-contain p-4"} transition-transform duration-700 ease-luxe group-hover:scale-105`}
+            className="object-cover transition-transform duration-700 ease-luxe group-hover:scale-105"
           />
           {/* Overlay gradient on hover */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />

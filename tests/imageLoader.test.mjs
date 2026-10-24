@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import loader, { cardPhotoLoader, squarePhotoLoader } from "../lib/imageLoader.ts";
+import loader from "../lib/imageLoader.ts";
 
 const CLD =
   "https://res.cloudinary.com/dkab59i18/image/upload/v1782339418/treegold/anillos/09120002.jpg";
@@ -97,14 +97,6 @@ test("Cuota de Cloudinary: las URLs coinciden con las copias ya generadas", () =
     loader({ src: ADMIN, width: 640 }),
     "https://res.cloudinary.com/dkab59i18/image/upload/f_webp,fl_awebp,q_auto:good,w_640,c_limit/v1/treegold/admin/abc.png"
   );
-  assert.equal(
-    cardPhotoLoader({ src: ADMIN, width: 640 }),
-    "https://res.cloudinary.com/dkab59i18/image/upload/c_pad,ar_4:5,b_auto:border_gradient,w_640/f_webp,fl_awebp,q_auto:good/v1/treegold/admin/abc.png"
-  );
-  assert.equal(
-    squarePhotoLoader({ src: ADMIN, width: 384 }),
-    "https://res.cloudinary.com/dkab59i18/image/upload/c_pad,ar_1:1,b_auto:border_gradient,w_384/f_webp,fl_awebp,q_auto:good/v1/treegold/admin/abc.png"
-  );
 });
 
 test("ImageKit: optimización de catálogo estándar (WebP, ancho, calidad, c-at_max)", () => {
@@ -118,22 +110,3 @@ test("ImageKit: responsive - anchos pedidos se reflejan en el parámetro tr", ()
   assert.ok(loader({ src: IK, width: 256 }).includes("w-256"));
   assert.ok(loader({ src: IK, width: 1200 }).includes("w-1200"));
 });
-
-test("ImageKit: fotos de /admin con cardPhotoLoader rellenan con degradado a 4:5", () => {
-  const IK_ADMIN = "https://ik.imagekit.io/jmbbfxnqu/treegold/admin/nueva-joya.jpg";
-  const url = cardPhotoLoader({ src: IK_ADMIN, width: 640 });
-  assert.equal(
-    url,
-    `${IK_ADMIN}?tr=ar-4-5%2Ccm-pad_resize%2Cbg-auto%2Cw-640%2Cf-webp%2Cq-80`
-  );
-});
-
-test("ImageKit: fotos de /admin con squarePhotoLoader rellenan con degradado a 1:1", () => {
-  const IK_ADMIN = "https://ik.imagekit.io/jmbbfxnqu/treegold/admin/nueva-joya.jpg";
-  const url = squarePhotoLoader({ src: IK_ADMIN, width: 384 });
-  assert.equal(
-    url,
-    `${IK_ADMIN}?tr=ar-1-1%2Ccm-pad_resize%2Cbg-auto%2Cw-384%2Cf-webp%2Cq-80`
-  );
-});
-

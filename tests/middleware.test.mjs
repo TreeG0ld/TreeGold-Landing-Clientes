@@ -76,8 +76,8 @@ test("integración: /api/admin/products sin sesión -> 401 JSON", async () => {
   assert.equal(body.error, "No autorizado");
 });
 
-test("integración: /api/admin/cloudinary-signature sin sesión -> 401", async () => {
-  const res = await middleware(makeRequest("/api/admin/cloudinary-signature"));
+test("integración: /api/admin/imagekit-auth sin sesión -> 401", async () => {
+  const res = await middleware(makeRequest("/api/admin/imagekit-auth"));
   assert.equal(res.status, 401);
 });
 

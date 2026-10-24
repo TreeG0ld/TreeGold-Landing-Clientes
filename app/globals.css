@@ -130,6 +130,25 @@ html:has([data-admin-theme="dark"]) body {
   100% { transform: scale(1, 1); }
 }
 
+/* Estudio de fotos del panel (components/admin/PhotoStudio): cuadrícula de
+   tercios dentro del marco, que aparece suave solo mientras se arrastra o se
+   hace zoom (.is-moving). */
+.studio-crop-area::after {
+  --g: rgba(255, 255, 255, 0.28);
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to right, transparent calc(100% / 3 - 0.5px), var(--g) calc(100% / 3 - 0.5px), var(--g) calc(100% / 3 + 0.5px), transparent calc(100% / 3 + 0.5px), transparent calc(200% / 3 - 0.5px), var(--g) calc(200% / 3 - 0.5px), var(--g) calc(200% / 3 + 0.5px), transparent calc(200% / 3 + 0.5px)),
+    linear-gradient(to bottom, transparent calc(100% / 3 - 0.5px), var(--g) calc(100% / 3 - 0.5px), var(--g) calc(100% / 3 + 0.5px), transparent calc(100% / 3 + 0.5px), transparent calc(200% / 3 - 0.5px), var(--g) calc(200% / 3 - 0.5px), var(--g) calc(200% / 3 + 0.5px), transparent calc(200% / 3 + 0.5px));
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.studio-crop-area.is-moving::after {
+  opacity: 1;
+}
+
 @layer base {
   * {
     border-color: rgb(var(--color-border));
@@ -245,6 +264,20 @@ html:has([data-admin-theme="dark"]) body {
 
   .hairline {
     @apply h-px w-full bg-border;
+  }
+
+  /* Recuadro de las fotos de producto en las tarjetas: un borde finísimo en
+     tono cálido y una sombra suave, para que la tarjeta no se funda con el
+     fondo claro de la página (muchas fotos tienen fondo gris o blanco). Sin
+     margen interior: la foto sigue llenando el cuadro de borde a borde. Al
+     pasar el mouse la sombra crece un poco, como si la tarjeta se levantara. */
+  .card-photo {
+    border: 1px solid rgb(var(--color-primary) / 0.09);
+    box-shadow: 0 1px 2px rgb(28 25 23 / 0.04), 0 10px 28px -14px rgb(28 25 23 / 0.22);
+    transition: box-shadow 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .group:hover .card-photo {
+    box-shadow: 0 2px 4px rgb(28 25 23 / 0.05), 0 18px 40px -16px rgb(28 25 23 / 0.32);
   }
 }
 

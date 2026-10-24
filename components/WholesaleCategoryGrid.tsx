@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, LayoutGrid } from "lucide-react";
-import { isAdminPhoto, squarePhotoLoader } from "@/lib/imageLoader";
 import type { WholesaleCategoryTile } from "@/lib/wholesale";
 
 // Entrada del catálogo mayorista: una cuadrícula de categorías con foto en vez
@@ -31,17 +30,14 @@ export default function WholesaleCategoryGrid({
           className="cascade group block"
           style={{ "--i": i % 8 } as React.CSSProperties}
         >
-          <div className="relative aspect-square overflow-hidden rounded-2xl bg-white">
+          <div className="card-photo relative aspect-square overflow-hidden rounded-2xl bg-white">
             {t.image && (
               <Image
-                loader={squarePhotoLoader}
                 src={t.image}
                 alt=""
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                className={`${
-                  isAdminPhoto(t.image) ? "object-cover" : "object-contain p-4"
-                } transition-transform duration-500 ease-luxe group-hover:scale-105`}
+                className="object-cover transition-transform duration-500 ease-luxe group-hover:scale-105"
               />
             )}
           </div>

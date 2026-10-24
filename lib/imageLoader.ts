@@ -48,11 +48,9 @@ export default function imageLoader({ src, width, quality }: LoaderArgs): string
   if (src.includes("res.cloudinary.com") && src.includes("/upload/")) {
     // Fotos que NO necesitan el recorte de catálogo (limpieza de precio):
     //   - treegold/marca/  -> editoriales de marca (modelos, taller, banners).
-    //   - treegold/admin/  -> productos subidos desde el panel /admin. Toda
-    //     subida nueva pasa por /api/admin/cloudinary-signature, que fija esa
-    //     carpeta de forma fija (ver esa ruta) — así que cualquier foto que
-    //     caiga ahí es, por definición, una foto nueva ya encuadrada
-    //     correctamente. No hace falta marcar nada a mano: es automático.
+    //   - treegold/admin/  -> productos que se subían desde el panel /admin
+    //     cuando las fotos vivían en Cloudinary: ya venían bien encuadradas.
+    //     (Hoy el panel sube a ImageKit; esta rama solo atiende URLs viejas.)
     //   Todo lo demás (treegold/anillos, treegold/cadenas, ...) es el lote
     //   histórico importado del catálogo del proveedor, que sí trae la franja
     //   de precio y necesita el recorte + cuadrado de siempre.
@@ -87,47 +85,3 @@ export default function imageLoader({ src, width, quality }: LoaderArgs): string
   // --- Cualquier otra (locales en /public, etc.): se deja igual ---
   return src;
 }
-
-// ¿Es una foto subida desde el panel /admin? Son fotos tomadas en el local,
-// con su propio fondo: en las tarjetas llenan el recuadro (object-cover). Las
-// del catálogo del proveedor vienen recortadas sobre fondo blanco y se
-// muestran enteras con margen (object-contain), porque ahí el blanco no se
-// nota. Misma carpeta que reconoce el loader de arriba.
-export function isAdminPhoto(src: string): boolean {
-  return (
-    (src.includes("res.cloudinary.com") && src.includes("/treegold/admin/")) ||
-    (src.includes("ik.imagekit.io") && src.includes("/treegold/admin/"))
-  );
-}
-
-// Loader para fotos del /admin que van en un recuadro de proporción fija:
-// en vez de recortarlas para llenarlo (a la "Manilla Tio Rico" le cortaba los
-// lados), Cloudinary/ImageKit las COMPLETA hasta esa proporción rellenando con un
-// degradado del color de su propio borde (b_auto:border_gradient / bg-auto). Una foto con
-// fondo blanco se completa en blanco; una tomada en el local, con sus tonos.
-// La joya queda siempre entera y la foto llena el recuadro sin franjas
-// blancas. Las demás fotos siguen con el loader normal.
-function padToAspect(aspect: string) {
-  return ({ src, width, quality }: LoaderArgs): string => {
-    if (isAdminPhoto(src)) {
-      if (src.includes("ik.imagekit.io")) {
-        const ar = aspect.replace(":", "-");
-        const url = new URL(src);
-        url.searchParams.set(
-          "tr",
-          `ar-${ar},cm-pad_resize,bg-auto,w-${width},f-webp,q-${quality ?? 80}`
-        );
-        return url.toString();
-      }
-      return src.replace(
-        "/upload/",
-        `/upload/c_pad,ar_${aspect},b_auto:border_gradient,w_${width}/${FORMAT},q_auto:good/`
-      );
-    }
-    return imageLoader({ src, width, quality });
-  };
-}
-
-// Tarjetas de producto (aspect-[4/5]) y vistas ampliadas cuadradas.
-export const cardPhotoLoader = padToAspect("4:5");
-export const squarePhotoLoader = padToAspect("1:1");

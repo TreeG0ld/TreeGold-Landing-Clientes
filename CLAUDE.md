@@ -48,6 +48,8 @@ Variables de entorno relevantes (en `.env`, nunca commitear):
 - `WHOLESALE_SECRET` (el código de la URL `/mayoristas-<código>`).
 - `DATABASE_URL` / `DIRECT_URL` (Supabase Postgres, pooler vs conexión directa).
 - `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
+- `IMAGEKIT_URL_ENDPOINT`, `IMAGEKIT_PUBLIC_KEY`, `IMAGEKIT_PRIVATE_KEY` — las usa
+  `/api/admin/imagekit-auth` para firmar las subidas del panel (y los scripts de migración).
 - `WOMPI_PUBLIC_KEY`, `WOMPI_INTEGRITY_SECRET`, `WOMPI_EVENTS_SECRET` — las tres del mismo
   ambiente (pruebas o producción); el webhook ignora eventos del otro ambiente.
 
@@ -77,7 +79,7 @@ formularios a otros dominios, y una navegación normal no pasa por ninguna de la
 El stock (`Product.stock`) ahora importa: bloquea el pago cuando no alcanza. Hay que
 mantenerlo real desde `/admin`.
 
-## Imágenes (Cloudinary)
+## Imágenes (ImageKit, con Cloudinary de respaldo)
 
 `lib/imageLoader.ts` es el loader custom de `next/image` (configurado en `next.config.mjs`,
 `images.loader: "custom"`). Para fotos de Cloudinary recorta automáticamente la franja
@@ -102,9 +104,35 @@ las transformaciones regenera todas las copias** (el 5-oct-2026, al cambiar los 
 fotos del admin, se generaron 3.000 en un día): no tocarlo a la ligera, y no agregar anchos.
 `tests/imageLoader.test.mjs` fija las URLs exactas para que un cambio así no pase sin querer.
 
-La subida de imágenes desde `/admin` usa **upload firmado** directo del navegador a
-Cloudinary (`/api/admin/cloudinary-signature` genera la firma; solo un admin con sesión
-puede pedirla). No hay widget de Cloudinary ni dependencia `next-cloudinary` instalada.
+**Cuota de ImageKit (plan gratuito).** 20 GB de tráfico al mes y 3 GB de espacio fijo; no
+cuenta ni cobra transformaciones. Si se pasa, deja de servir fotos: vigilar tráfico y espacio.
+
+**Tarjetas cuadradas, sin relleno.** El 88% de las fotos de producto son cuadradas, así que
+las tarjetas (`ProductCard`, `WholesaleProductCard`, cuadros de categorías) son
+`aspect-square` con `object-cover`: la foto llena la tarjeta de borde a borde. El dueño
+rechazó tanto las franjas blancas como el relleno difuminado: no reintroducir rellenos ni
+márgenes. El marco fino y la sombra son la clase `.card-photo` (`app/globals.css`). Las
+vistas ampliadas (página del producto, ficha del mayorista) usan `object-contain` para
+mostrar la foto entera.
+
+**Subida de fotos desde `/admin`: estudio de recorte.** Toda foto pasa por
+`components/admin/PhotoStudio.tsx` (sobre `react-easy-crop`) antes de subirse: las nuevas
+al elegirlas o arrastrarlas, y las ya subidas con "Editar". Se recorta en el navegador, en
+cuadrado (`lib/photo-crop.ts`: dibujo en canvas, detección de bordes blancos para "Auto",
+foto completa con relleno difuminado para "Completa") y sale un WebP de ~250 KB en vez del
+original de 1–5 MB. `components/admin/ImageUploader.tsx` lo sube **directo del navegador a
+ImageKit** con una firma por foto de `/api/admin/imagekit-auth` (solo un admin con sesión
+puede pedirla; ImageKit rechaza un token reusado). El archivo se nombra con el producto,
+no con el nombre original (antes se colaban precios en la URL pública de la foto).
+- Fotos HEIC de iPhone: Chrome y Edge no las abren. El estudio lo detecta y ofrece
+  "Subir sin recortar" (ImageKit las convierte al mostrarlas).
+- Al reemplazar una foto, la vieja **sigue en ImageKit** ocupando espacio.
+- La CSP permite `blob:` en `img-src` para las vistas previas locales del estudio.
+
+**Precios en el formulario del panel.** `components/admin/PriceInput.tsx` muestra
+`$ 380.000` mientras se escribe, pero guarda y envía solo los dígitos (`lib/format.ts`:
+`priceDigits`, `formatPriceInput`). Importa: el servidor lee el precio con `Number()` y
+"380.000" lo leería como 380 pesos.
 
 ## Modo oscuro del panel `/admin`
 

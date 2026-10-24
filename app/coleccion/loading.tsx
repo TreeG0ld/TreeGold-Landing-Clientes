@@ -21,7 +21,7 @@ export default function ColeccionLoading() {
       <div className="grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4">
         {Array.from({ length: 8 }).map((_, i) => (
           <div key={i} className="cascade" style={{ "--i": i } as React.CSSProperties}>
-            <div className="skeleton aspect-[4/5] w-full rounded-2xl" />
+            <div className="skeleton aspect-square w-full rounded-2xl" />
             <div className="mt-4 space-y-2 px-1">
               <div className="skeleton h-5 w-3/4" />
               <div className="skeleton h-3 w-1/3" />

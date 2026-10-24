@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUploader from "@/components/admin/ImageUploader";
 import GlassSelect from "@/components/admin/GlassSelect";
+import PriceInput from "@/components/admin/PriceInput";
 
 export type CategoryOption = { id: string; name: string; slug: string };
 
@@ -244,24 +245,13 @@ export default function ProductForm({
           <label className="mb-1.5 block text-sm font-medium text-primary">
             Precio para Mayoristas
           </label>
-          <input
-            type="number"
-            value={values.wholesalePrice}
-            onChange={(e) => set("wholesalePrice", e.target.value)}
-            className="w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-accent"
-          />
+          <PriceInput value={values.wholesalePrice} onChange={(v) => set("wholesalePrice", v)} />
         </div>
         <div>
           <label className="mb-1.5 block text-sm font-medium text-primary">
             Precio de venta (tienda pública)
           </label>
-          <input
-            type="number"
-            value={values.retailPrice}
-            onChange={(e) => set("retailPrice", e.target.value)}
-            required
-            className="w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-accent"
-          />
+          <PriceInput value={values.retailPrice} onChange={(v) => set("retailPrice", v)} required />
         </div>
       </div>
 
@@ -365,12 +355,10 @@ export default function ProductForm({
             <label className="mb-1.5 block text-sm font-medium text-primary">
               Precio anterior (para mostrar el descuento)
             </label>
-            <input
-              type="number"
+            <PriceInput
               value={values.originalPrice}
-              onChange={(e) => set("originalPrice", e.target.value)}
+              onChange={(v) => set("originalPrice", v)}
               placeholder="Precio antes de la promoción"
-              className="w-full rounded-xl border border-border px-4 py-2.5 text-sm outline-none focus:border-accent"
             />
           </div>
         </div>
@@ -381,6 +369,7 @@ export default function ProductForm({
         <ImageUploader
           images={values.images}
           onChange={(images) => set("images", images)}
+          productName={values.name}
         />
       </div>
 
