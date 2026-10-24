@@ -3,7 +3,7 @@
 E-commerce de joyería (Next.js 15 App Router + TS, Tailwind, GSAP/Motion). La selección
 (carrito) de la tienda pública se paga en línea con **Wompi** o se envía como mensaje de
 WhatsApp; el catálogo mayorista sigue solo por WhatsApp. Datos en Postgres (Supabase) vía
-Prisma; imágenes en Cloudinary.
+Prisma; imágenes en ImageKit.
 
 ## Rutas principales
 
@@ -47,7 +47,6 @@ Variables de entorno relevantes (en `.env`, nunca commitear):
   `ADMIN_PASSWORD` ya no autentican nada; solo las usa el seed del admin.
 - `WHOLESALE_SECRET` (el código de la URL `/mayoristas-<código>`).
 - `DATABASE_URL` / `DIRECT_URL` (Supabase Postgres, pooler vs conexión directa).
-- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
 - `IMAGEKIT_URL_ENDPOINT`, `IMAGEKIT_PUBLIC_KEY`, `IMAGEKIT_PRIVATE_KEY` — las usa
   `/api/admin/imagekit-auth` para firmar las subidas del panel (y los scripts de migración).
 - `WOMPI_PUBLIC_KEY`, `WOMPI_INTEGRITY_SECRET`, `WOMPI_EVENTS_SECRET` — las tres del mismo
@@ -79,30 +78,25 @@ formularios a otros dominios, y una navegación normal no pasa por ninguna de la
 El stock (`Product.stock`) ahora importa: bloquea el pago cuando no alcanza. Hay que
 mantenerlo real desde `/admin`.
 
-## Imágenes (ImageKit, con Cloudinary de respaldo)
+## Imágenes (ImageKit)
 
-`lib/imageLoader.ts` es el loader custom de `next/image` (configurado en `next.config.mjs`,
-`images.loader: "custom"`). Para fotos de Cloudinary recorta automáticamente la franja
-inferior de la imagen original donde el catálogo del proveedor imprime el código y los
-precios (`c_crop,g_north,h_0.75`), hace `e_trim` + `c_pad` a cuadrado con fondo blanco, y
-sirve WebP a todos (`f_webp,fl_awebp`, no `f_auto`). Si en el futuro aparecen fotos con el precio todavía
-visible, es porque la franja de precio empieza más arriba del recorte actual — bajar el
-valor de `h_` (no subirlo).
+Las fotos viven en ImageKit (`https://ik.imagekit.io/jmbbfxnqu/`), en carpetas por
+categoría (`treegold/topos/`, `treegold/anillos/`…); las subidas del panel caen en
+`treegold/admin/` y las de marca en `treegold/marca/`. `lib/imageLoader.ts` es el loader
+custom de `next/image` (`images.loader: "custom"` en `next.config.mjs`): pide WebP al ancho
+justo (`?tr=w-…,f-webp,q-80,c-at_max`). `tests/imageLoader.test.mjs` fija esa URL: cambiar
+el texto de la transformación hace que ImageKit regenere todas las versiones.
+`next.config.mjs` tiene solo 7 anchos; no agregar más sin motivo. Las portadas de categorías
+mayoristas (Balinería, Herrajes) se fijan con `CATEGORY_TILE_IMAGE_OVERRIDES` en
+`lib/wholesale.ts` (reflejado en `lib/catalog.ts`).
 
-**Migración a ImageKit.** Las fotos viven ahora en ImageKit (`https://ik.imagekit.io/jmbbfxnqu/`)
-y `lib/imageLoader.ts` tiene una rama para ellas (`?tr=w-…,f-webp,q-…,c-at_max`); la rama de
-Cloudinary queda como respaldo para URLs antiguas. La CSP de `next.config.mjs` permite ambos
-dominios. Las portadas de categorías mayoristas (Balinería, Herrajes) se fijan con
-`CATEGORY_TILE_IMAGE_OVERRIDES` en `lib/wholesale.ts` (reflejado en `lib/catalog.ts`).
-Lo que sigue sobre Cloudinary es histórico, pero explica por qué las transformaciones no se tocan.
-
-**Cuota de Cloudinary (plan gratuito, 25 créditos en ventana móvil de 30 días).** En octubre
-de 2026 llegó al 126%: el 65% eran transformaciones, porque `f_auto` guardaba una copia por
-formato (WebP, JPEG XL para iPhone, original para bots) × cada ancho × cada loader. Por eso
-el formato es WebP fijo y `next.config.mjs` tiene solo 7 anchos. **Cualquier cambio al texto de
-las transformaciones regenera todas las copias** (el 5-oct-2026, al cambiar los loaders de
-fotos del admin, se generaron 3.000 en un día): no tocarlo a la ligera, y no agregar anchos.
-`tests/imageLoader.test.mjs` fija las URLs exactas para que un cambio así no pase sin querer.
+**Historia: Cloudinary.** Hasta octubre de 2026 las fotos estuvieron en Cloudinary, que se
+recortaba al vuelo la franja inferior donde el catálogo del proveedor imprime el código y el
+**precio de costo**. Su plan gratis llegó al 126% de la cuota (el 65% eran transformaciones),
+y se migró a ImageKit con `scripts/migrate-to-imagekit.mjs`, que descargó cada foto **ya
+recortada**: las fotos de ImageKit no traen esa franja y el loader no recorta nada. Ya no
+queda código ni dependencia de Cloudinary; solo 7 pedidos viejos (oct-2026) guardan en su
+foto una URL de Cloudinary.
 
 **Cuota de ImageKit (plan gratuito).** 20 GB de tráfico al mes y 3 GB de espacio fijo; no
 cuenta ni cobra transformaciones. Si se pasa, deja de servir fotos: vigilar tráfico y espacio.
@@ -166,10 +160,11 @@ cada SKU es un producto distinto.
 
 Scripts puntuales (no se ejecutan en CI ni en build). Patrón común: `PrismaPg` adapter +
 `DIRECT_URL` (conexión directa, no el pooler) para escrituras masivas, estilo
-`seed-productos.mjs`. Los archivos `price-correction-*`, `anillos-*` y `drive-titles-raw.json`
+`migrate-to-imagekit.mjs`. Los archivos `price-correction-*`, `anillos-*` y `drive-titles-raw.json`
 son el rastro de una corrección masiva de precios y tallas hecha a partir de fotos en
 Google Drive (ya aplicada a la base de datos) — quedan como referencia, no hace falta
-volver a correrlos salvo que se repita ese tipo de corrección.
+volver a correrlos salvo que se repita ese tipo de corrección. Lo mismo `migrate-to-imagekit.mjs`
+y `migrate-brand-images.mjs`: la migración de fotos de Cloudinary a ImageKit, ya hecha.
 
 ## Despliegue (producción)
 

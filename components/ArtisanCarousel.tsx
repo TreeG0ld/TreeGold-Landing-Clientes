@@ -1,8 +1,7 @@
 "use client";
 
 // Carrusel de fotos de la sección "El arte detrás de cada joya" (home).
-// Fotos editoriales de marca subidas a Cloudinary bajo treegold/marca/
-// (esa carpeta queda exenta del recorte de catálogo en lib/imageLoader.ts).
+// Fotos editoriales de marca, en ImageKit (treegold/marca/).
 // Pasa solo (autoplay) y también admite swipe/arrastre.
 
 import { useCallback, useEffect, useState } from "react";

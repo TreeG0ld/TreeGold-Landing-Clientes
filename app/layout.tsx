@@ -41,7 +41,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 // Imagen de la vista previa al compartir el enlace (WhatsApp, Facebook…).
 // Es la misma de los medios de pago del aviso de inicio: el dueño prefiere que
 // al compartir se vea que hay crédito con Addi y Sistecrédito antes que el
-// logo. Cloudinary la entrega en 1200x630, la proporción que esperan esas
+// logo. ImageKit la entrega en 1200x630, la proporción que esperan esas
 // plataformas, rellenando con negro (el fondo de la foto ya es negro, así que
 // no se nota) en vez de recortar: con recorte se perderían los globos de los
 // extremos.

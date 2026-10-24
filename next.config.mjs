@@ -31,8 +31,8 @@ const isDev = process.env.NODE_ENV === "development";
 //
 // Lo que SÍ aporta valor real aquí, y es la razón de poner la CSP igualmente:
 //   - connect-src: aunque entrara un script, no puede exfiltrar datos a un
-//     dominio ajeno (solo 'self' y api.cloudinary.com, el único fetch
-//     cross-origin del proyecto, en components/admin/ImageUploader.tsx).
+//     dominio ajeno (solo 'self' y upload.imagekit.io, la subida de fotos del
+//     panel en components/admin/ImageUploader.tsx).
 //   - base-uri 'self': impide secuestrar todas las URLs relativas de la página
 //     inyectando un <base href="https://malo/">.
 //   - object-src 'none': mata <object>/<embed>, vectores clásicos de plugins.
@@ -52,7 +52,7 @@ const isDev = process.env.NODE_ENV === "development";
 //
 // img-src necesita los hosts remotos porque el loader es custom
 // (images.loader, más abajo): no existe /_next/image y cada <img> pide la foto
-// directamente a Cloudinary o a Unsplash.
+// directamente a ImageKit o a Unsplash.
 const csp = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -80,8 +80,8 @@ const csp = [
   // google-analytics.com en img-src: cuando el navegador bloquea las peticiones
   // normales, gtag manda la medición como un pixel de 1x1.
   isDev
-    ? "img-src 'self' data: blob: https://res.cloudinary.com https://ik.imagekit.io https://images.unsplash.com https://*.google-analytics.com https://www.googletagmanager.com"
-    : "img-src 'self' blob: https://res.cloudinary.com https://ik.imagekit.io https://images.unsplash.com https://*.google-analytics.com https://www.googletagmanager.com",
+    ? "img-src 'self' data: blob: https://ik.imagekit.io https://images.unsplash.com https://*.google-analytics.com https://www.googletagmanager.com"
+    : "img-src 'self' blob: https://ik.imagekit.io https://images.unsplash.com https://*.google-analytics.com https://www.googletagmanager.com",
   // next/font auto-hospeda los .woff2 en /_next/static/media: no hace falta
   // fonts.gstatic.com ni fonts.googleapis.com.
   isDev ? "font-src 'self' data:" : "font-src 'self'",
@@ -90,8 +90,8 @@ const csp = [
   // www.google-analytics.com, también usa endpoints por región
   // (region1.google-analytics.com) y analytics.google.com.
   isDev
-    ? "connect-src 'self' ws: wss: https://api.cloudinary.com https://upload.imagekit.io https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com"
-    : "connect-src 'self' https://api.cloudinary.com https://upload.imagekit.io https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
+    ? "connect-src 'self' ws: wss: https://upload.imagekit.io https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com"
+    : "connect-src 'self' https://upload.imagekit.io https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
   "media-src 'none'",
   ...(isDev ? [] : ["worker-src 'none'"]),
   "manifest-src 'none'",
@@ -105,7 +105,7 @@ const csp = [
 // que cambia es que connect-src, frame-src, worker-src, manifest-src y
 // upgrade-insecure-requests dejan de ser meramente informativos. Verificado
 // contra el único fetch cross-origin real del sitio (ImageUploader ->
-// api.cloudinary.com, cubierto por connect-src) y contra que no hay ningún
+// upload.imagekit.io, cubierto por connect-src) y contra que no hay ningún
 // <iframe> ni Service Worker en el proyecto (frame-src/worker-src 'none').
 // Recomendado igual: probar `npm run build && npm start` contra /admin ->
 // subir una imagen, antes de dar por buena la fase 3 en producción real.
@@ -162,10 +162,9 @@ const nextConfig = {
     // grande. 750 se queda: es el ancho exacto de muchos celulares con
     // pantalla de alta densidad, y sin él saltaban a 828.
     // Octubre 2026: se quitaron también 64, 828 y 1080. Cada ancho es una
-    // copia más de cada foto guardada en Cloudinary (ver FORMAT en
-    // lib/imageLoader.ts), y esos eran los menos pedidos: el navegador toma el
-    // siguiente (128 o 1200), que casi siempre ya existe. No agregar anchos sin
-    // revisar antes la cuota de Cloudinary.
+    // versión más de cada foto que el servicio de imágenes genera y guarda
+    // (entonces Cloudinary, hoy ImageKit), y esos eran los menos pedidos: el
+    // navegador toma el siguiente (128 o 1200). No agregar anchos sin motivo.
     imageSizes: [128, 256, 384],
     deviceSizes: [640, 750, 1200, 1920],
   },

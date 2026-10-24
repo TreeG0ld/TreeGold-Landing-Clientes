@@ -1,13 +1,15 @@
-// Loader personalizado para next/image.
+// Loader personalizado para next/image (images.loader: "custom" en
+// next.config.mjs). Se aplica a TODOS los <Image> del sitio.
 //
-// Genera, a partir de la URL guardada en cada producto, una versión
-// optimizada al ancho exacto que el navegador necesita. Así nunca se
-// sirve la imagen original pesada: el catálogo carga miniaturas ligeras
-// y la página de producto carga alta resolución, todo desde el mismo
-// archivo original sin perder calidad.
+// Genera, a partir de la URL guardada en cada producto, una versión optimizada
+// al ancho exacto que el navegador necesita: el catálogo carga miniaturas
+// ligeras y la página de producto alta resolución, todo desde el mismo archivo
+// original y sin servir nunca el original pesado.
 //
-// Se aplica automáticamente a TODOS los <Image> del sitio, sin tener
-// que tocar cada componente.
+// Las fotos viven en ImageKit desde octubre de 2026 (antes en Cloudinary, que
+// se dejó por la cuota del plan gratis; ver CLAUDE.md). Las fotos del catálogo
+// del proveedor se migraron ya sin la franja de código y precio de costo que
+// traían impresa abajo, así que aquí no se recorta nada.
 
 type LoaderArgs = {
   src: string;
@@ -15,61 +17,17 @@ type LoaderArgs = {
   quality?: number;
 };
 
-// Formato de entrega: WebP para todos los navegadores, en vez de f_auto.
-// f_auto guardaba en Cloudinary una copia por formato (WebP para Chrome y
-// Android, JPEG XL para iPhone, el original para buscadores) de cada foto y
-// cada ancho, y eso llevó la cuenta gratuita al 126% de su cuota en octubre
-// de 2026 (las transformaciones eran el 65% del consumo). WebP se ve en todo
-// navegador actual (Safari desde iOS 14) y en el iPhone pesa casi lo mismo
-// que el JPEG XL.
-// Se escribe EXACTAMENTE "f_webp,fl_awebp" porque así nombra Cloudinary la
-// copia que f_auto generaba para Chrome: con este texto se reutilizan esas
-// copias en vez de crearlas de nuevo (comprobado).
-// OJO: cualquier cambio al texto de las transformaciones de este archivo
-// (formato, calidad, recorte, orden de los parámetros) obliga a Cloudinary a
-// rehacer TODAS las copias, y eso se paga en cuota. No tocarlo a la ligera.
-const FORMAT = "f_webp,fl_awebp";
-
 export default function imageLoader({ src, width, quality }: LoaderArgs): string {
-  // --- Cloudinary (almacenamiento definitivo de las fotos) ---
-  // Limpieza de la foto de catálogo (el original no se toca):
-  //   1) c_crop,g_north,h_0.75 -> quita el 25% inferior, donde el catálogo
-  //      imprime el código y los precios (así el cliente nunca ve el costo).
-  //      (antes era h_0.85, pero en varias fotos la franja de precio empieza
-  //      ~81% hacia abajo y quedaba parcialmente visible; 0.75 deja margen).
-  //   2) e_trim -> elimina el marco gris / espacio sobrante alrededor.
-  //   3) c_pad,ar_1:1,b_white -> deja la imagen cuadrada con fondo blanco
-  //      uniforme; el producto queda completo y centrado, sin distorsión.
-  //   4) optimización de entrega:
-  //      f_webp,fl_awebp -> WebP para todos (ver FORMAT, arriba)
-  //      q_auto:good -> calidad inteligente: pesa poco sin perder detalle
-  //      w_<width>   -> ancho que pide el navegador según el "sizes"
-  //      c_limit     -> nunca agranda más allá del original (cuida la calidad)
-  if (src.includes("res.cloudinary.com") && src.includes("/upload/")) {
-    // Fotos que NO necesitan el recorte de catálogo (limpieza de precio):
-    //   - treegold/marca/  -> editoriales de marca (modelos, taller, banners).
-    //   - treegold/admin/  -> productos que se subían desde el panel /admin
-    //     cuando las fotos vivían en Cloudinary: ya venían bien encuadradas.
-    //     (Hoy el panel sube a ImageKit; esta rama solo atiende URLs viejas.)
-    //   Todo lo demás (treegold/anillos, treegold/cadenas, ...) es el lote
-    //   histórico importado del catálogo del proveedor, que sí trae la franja
-    //   de precio y necesita el recorte + cuadrado de siempre.
-    if (src.includes("/treegold/marca/") || src.includes("/treegold/admin/")) {
-      const transforms = `${FORMAT},q_auto:good,w_${width},c_limit`;
-      return src.replace("/upload/", `/upload/${transforms}/`);
-    }
-    const transforms = `c_crop,g_north,h_0.75/e_trim/c_pad,ar_1:1,b_white/${FORMAT},q_auto:good,w_${width},c_limit`;
-    return src.replace("/upload/", `/upload/${transforms}/`);
-  }
-
-  // --- ImageKit (nuevo almacenamiento optimizado) ---
+  // --- ImageKit: WebP al ancho pedido; c-at_max nunca agranda más que el
+  // original. Cada ancho distinto es una versión más que ImageKit genera y
+  // guarda: no agregar anchos en next.config.mjs sin motivo. ---
   if (src.includes("ik.imagekit.io")) {
     const url = new URL(src);
     url.searchParams.set("tr", `w-${width},f-webp,q-${quality ?? 80},c-at_max`);
     return url.toString();
   }
 
-  // --- Unsplash (imágenes de ejemplo mientras subes las reales) ---
+  // --- Unsplash (imágenes de ejemplo) ---
   if (src.includes("images.unsplash.com")) {
     // Tope de 1600px: una imagen de fondo nunca necesita más ancho que eso,
     // aunque el navegador pida más por el pixel ratio de pantallas 4K/Retina.

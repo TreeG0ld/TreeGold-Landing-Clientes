@@ -4,7 +4,7 @@ import imageLoader from "@/lib/imageLoader";
 //
 // `from` es la foto del producto que el cliente está viendo. La burbuja usa
 // exactamente el archivo que esa foto ya descargó (`currentSrc`), así que
-// aparece al instante. Antes usaba la URL original de Cloudinary: el archivo
+// aparece al instante. Antes usaba la URL original de la foto: el archivo
 // crudo, a veces de varios MB, que casi nunca terminaba de bajar en los 0,85 s
 // del vuelo (la burbuja llegaba vacía) y que además venía SIN el recorte del
 // catálogo, con la franja de código y precio de costo del proveedor.
