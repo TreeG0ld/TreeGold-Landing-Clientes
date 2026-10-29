@@ -71,7 +71,14 @@ export default async function ProductosPage({
         />
       </form>
 
-      <ProductsTable products={products} />
+      <ProductsTable
+        products={products}
+        returnQuery={new URLSearchParams({
+          ...(q ? { q } : {}),
+          ...(categoryId ? { categoria: categoryId } : {}),
+          ...(page > 1 ? { page: String(page) } : {}),
+        }).toString()}
+      />
 
       {totalPages > 1 && (
         <div className="mt-6 flex items-center justify-center gap-2 text-sm">

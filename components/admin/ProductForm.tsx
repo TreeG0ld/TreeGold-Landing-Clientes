@@ -77,11 +77,16 @@ function sizeOptionsFor(categorySlug: string): string[] {
 export default function ProductForm({
   categories,
   initialValues,
+  returnQuery = "",
 }: {
   categories: CategoryOption[];
   initialValues?: ProductFormValues;
+  // Filtros y página del listado desde donde se abrió el producto: al guardar
+  // o cancelar se vuelve ahí, no al principio de la lista.
+  returnQuery?: string;
 }) {
   const router = useRouter();
+  const listUrl = returnQuery ? `/admin/productos?${returnQuery}` : "/admin/productos";
   const isEdit = Boolean(initialValues?.id);
   const [values, setValues] = useState<ProductFormValues>(
     initialValues ?? { ...EMPTY, categoryId: categories[0]?.id ?? "" }
@@ -180,7 +185,7 @@ export default function ProductForm({
       // volvía a "Crear producto" mientras la página cambiaba y parecía que no
       // había pasado nada. Sin `router.refresh()`: el listado es dinámico y la
       // navegación ya lo trae actualizado; el refresh lo pedía dos veces.
-      router.push("/admin/productos");
+      router.push(listUrl);
     } catch {
       setError("Error de conexión. Intenta de nuevo.");
       setSaving(false);
@@ -379,7 +384,7 @@ export default function ProductForm({
         <button type="submit" disabled={saving} className="btn-primary disabled:opacity-60">
           {saving ? "Guardando..." : isEdit ? "Guardar cambios" : "Crear producto"}
         </button>
-        <button type="button" onClick={() => router.push("/admin/productos")} className="btn-outline">
+        <button type="button" onClick={() => router.push(listUrl)} className="btn-outline">
           Cancelar
         </button>
       </div>
