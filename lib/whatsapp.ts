@@ -1,5 +1,6 @@
 import { site } from "./site";
 import { formatCOP } from "./format";
+import { unitPriceFor } from "./wholesale-rules";
 import type { SelectionItem } from "./store";
 
 // Los mensajes usan el formato nativo de WhatsApp: *texto* sale en negrita.
@@ -11,7 +12,8 @@ import type { SelectionItem } from "./store";
 function itemBlock(i: SelectionItem, idx: number): string {
   const lines = [`*${idx + 1}. ${i.name}*`, `   Ref: ${i.slug}`];
   if (i.size) lines.push(`   Talla: ${i.size}`);
-  lines.push(`   ${i.qty} × ${formatCOP(i.price)} = *${formatCOP(i.price * i.qty)}*`);
+  const unit = unitPriceFor(i, i.qty);
+  lines.push(`   ${i.qty} × ${formatCOP(unit)} = *${formatCOP(unit * i.qty)}*`);
   return lines.join("\n");
 }
 

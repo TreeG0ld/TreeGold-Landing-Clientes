@@ -8,6 +8,7 @@ import { useWholesaleSelection } from "@/lib/store";
 import WholesaleProductModal from "@/components/WholesaleProductModal";
 import type { WholesaleProduct } from "@/lib/wholesale";
 import { minQtyFor } from "@/lib/wholesale-rules";
+import TierPrices from "@/components/TierPrices";
 
 // Tarjeta del catálogo de mayoristas. Al tocarla NO navega a /producto/[slug]
 // (esa ruta pública muestra el precio de venta al detal): abre una ventana con
@@ -21,6 +22,10 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
   const enPedido = useWholesaleSelection((s) =>
     s.items.some((i) => i.slug === product.slug)
   );
+  // Cantidad ya pedida de esta referencia: marca su tramo de precio.
+  const qtyEnPedido = useWholesaleSelection(
+    (s) => s.items.find((i) => i.slug === product.slug)?.qty ?? 0
+  );
 
   // Sin tope de clics seguidos, al revés que en la tienda pública: un
   // distribuidor pide por cantidad y necesita sumar unidades rápido.
@@ -29,6 +34,7 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
       slug: product.slug,
       name: product.name,
       price: product.price,
+      tiers: product.tiers,
       image: product.images[0],
       minQty: minQtyFor(product.category),
     });
@@ -61,15 +67,22 @@ export default function WholesaleProductCard({ product }: { product: WholesalePr
           >
             {product.name}
           </h3>
-          <div className="shrink-0 text-right">
-            <span className="block whitespace-nowrap text-xs font-medium text-secondary sm:text-sm">
-              {formatCOP(product.price)}
-            </span>
-            <span className="block whitespace-nowrap text-[0.65rem] text-secondary/60 sm:text-xs">
-              Sugerido: {formatCOP(product.retailPrice)}
-            </span>
-          </div>
+          {/* Con tramos el precio va en una lista debajo del nombre; sin
+              tramos, el precio único de siempre a la derecha. */}
+          {!product.tiers && (
+            <div className="shrink-0 text-right">
+              <span className="block whitespace-nowrap text-xs font-medium text-secondary sm:text-sm">
+                {formatCOP(product.price)}
+              </span>
+              <span className="block whitespace-nowrap text-[0.65rem] text-secondary/60 sm:text-xs">
+                Sugerido: {formatCOP(product.retailPrice)}
+              </span>
+            </div>
+          )}
         </div>
+        {product.tiers && (
+          <TierPrices tiers={product.tiers} qty={qtyEnPedido} className="mt-2.5" />
+        )}
         {/* Código de referencia: el mismo "Ref:" que llega en el pedido de
             WhatsApp, para que el distribuidor lo pueda citar o buscar. Solo
             aquí: en la tienda pública el código no se muestra. */}

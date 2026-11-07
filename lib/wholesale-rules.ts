@@ -16,6 +16,58 @@ export function minQtyFor(categorySlug: string): number {
   return categorySlug === BALINES_CATEGORY ? BALINES_MIN_QTY : 1;
 }
 
+// Precios por tramo de cantidad (balines lisos). Cada tramo vale desde `min`
+// unidades de ESA referencia y toda la línea se cobra al precio del tramo en
+// que cae la cantidad. Una pieza sin tramos sigue con su precio único de
+// siempre (el de la base de datos).
+export type PriceTier = { min: number; price: number };
+
+// Cantidades donde empieza cada tramo: x12, x50, x100 y x500.
+const BALINES_TIER_MINS = [12, 50, 100, 500];
+
+// Precios por referencia, en el mismo orden que BALINES_TIER_MINS. Viven aquí y
+// no en la base de datos (igual que las demás reglas de la balinería); para
+// cambiarlos se edita esta tabla y se despliega.
+const BALINES_TIER_PRICES: Record<string, number[]> = {
+  BL3: [1800, 1500, 1300, 1100],
+  BL4: [2500, 2100, 1900, 1700],
+  BL5: [4300, 4000, 3800, 3500],
+  BL6: [5200, 4900, 4600, 4400],
+  BL8: [9500, 9300, 9000, 8800],
+};
+
+// Tramos de una referencia, o null si no tiene (precio único).
+export function tiersForSlug(slug: string): PriceTier[] | null {
+  const prices = BALINES_TIER_PRICES[slug];
+  return prices ? prices.map((price, i) => ({ min: BALINES_TIER_MINS[i], price })) : null;
+}
+
+// Tramo que le toca a una cantidad: el de mayor `min` que no la supera. Por
+// debajo del primer tramo (no debería pasar: el mínimo de venta es 12) se
+// usa el primero.
+export function tierFor(tiers: PriceTier[], qty: number): PriceTier {
+  let found = tiers[0];
+  for (const t of tiers) if (qty >= t.min) found = t;
+  return found;
+}
+
+// Precio unitario de una línea del pedido. Sin tramos, el precio fijo.
+export function unitPriceFor(item: { price: number; tiers?: PriceTier[] | null }, qty: number): number {
+  return item.tiers?.length ? tierFor(item.tiers, qty).price : item.price;
+}
+
+// Etiqueta de cada tramo para mostrar: "12–49 und", "500+ und".
+export function tierLabels(tiers: PriceTier[]): { label: string; min: number; price: number }[] {
+  return tiers.map((t, i) => {
+    const next = tiers[i + 1];
+    return {
+      min: t.min,
+      price: t.price,
+      label: next ? `${t.min}–${next.min - 1} und` : `${t.min}+ und`,
+    };
+  });
+}
+
 // Secciones de la categoría de balinería y cómo se reconoce cada una. El
 // tipo sale del NOMBRE de la pieza (no hay columna para esto en la base de
 // datos): se compara sin tildes ni mayúsculas y gana la PRIMERA regla que

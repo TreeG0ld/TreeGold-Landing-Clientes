@@ -2,11 +2,15 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { unitPriceFor, type PriceTier } from "@/lib/wholesale-rules";
 
 export type SelectionItem = {
   slug: string;
   name: string;
   price: number;
+  // Precios por tramo (balines lisos del catálogo mayorista): el precio
+  // unitario depende de la cantidad de la línea. Sin tramos se usa `price`.
+  tiers?: PriceTier[] | null;
   image: string;
   size?: string;
   qty: number;
@@ -82,7 +86,7 @@ function createSelectionStore(persistKey: string) {
       close: () => set({ isOpen: false }),
       toggle: () => set((s) => ({ isOpen: !s.isOpen })),
       count: () => get().items.reduce((n, i) => n + i.qty, 0),
-      total: () => get().items.reduce((n, i) => n + i.qty * i.price, 0),
+      total: () => get().items.reduce((n, i) => n + i.qty * unitPriceFor(i, i.qty), 0),
     }),
     {
       name: persistKey,

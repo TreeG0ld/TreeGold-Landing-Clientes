@@ -4,6 +4,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { matchesCode, matchesSearch, searchWords } from "@/lib/search-text";
+import { tiersForSlug, type PriceTier } from "@/lib/wholesale-rules";
 
 export type WholesaleProduct = {
   slug: string;
@@ -11,6 +12,8 @@ export type WholesaleProduct = {
   category: string;
   categoryName: string;
   price: number; // wholesalePrice (o retailPrice si no hay costo cargado)
+  // Precios por tramo de cantidad (balines lisos). null = precio único.
+  tiers: PriceTier[] | null;
   retailPrice: number; // precio sugerido de venta al público
   material: string;
   // Medida visible ("Talla 7", "45 cm"...). El distribuidor la necesita para
@@ -32,12 +35,15 @@ function toWholesaleProduct(p: {
   images: string[];
   category: { slug: string; name: string };
 }): WholesaleProduct {
+  const tiers = tiersForSlug(p.slug);
   return {
     slug: p.slug,
     name: p.name,
     category: p.category.slug,
     categoryName: p.category.name,
-    price: p.wholesalePrice ?? p.retailPrice,
+    // Con tramos, el precio "base" es el del primero (el de la compra mínima).
+    price: tiers ? tiers[0].price : p.wholesalePrice ?? p.retailPrice,
+    tiers,
     retailPrice: p.retailPrice,
     material: p.material ?? "",
     size: p.size ?? "",

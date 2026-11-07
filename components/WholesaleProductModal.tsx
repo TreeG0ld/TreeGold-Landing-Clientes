@@ -10,6 +10,7 @@ import { useWholesaleSelection } from "@/lib/store";
 import type { WholesaleProduct } from "@/lib/wholesale";
 import { minQtyFor } from "@/lib/wholesale-rules";
 import { lockScroll } from "@/lib/scroll-lock";
+import TierPrices from "@/components/TierPrices";
 
 // Vista ampliada de una pieza del catálogo mayorista. Es una ventana dentro de
 // la misma página y NO un enlace a /producto/[slug] a propósito: esa ruta es la
@@ -29,6 +30,10 @@ export default function WholesaleProductModal({
   const enPedido = useWholesaleSelection((s) =>
     s.items.some((i) => i.slug === product.slug)
   );
+  // Cantidad ya pedida: marca el tramo de precio que le toca.
+  const qtyEnPedido = useWholesaleSelection(
+    (s) => s.items.find((i) => i.slug === product.slug)?.qty ?? 0
+  );
 
   useEffect(() => lockScroll(), []);
 
@@ -43,6 +48,7 @@ export default function WholesaleProductModal({
       slug: product.slug,
       name: product.name,
       price: product.price,
+      tiers: product.tiers,
       image: product.images[0],
       minQty: minQtyFor(product.category),
     });
@@ -133,18 +139,29 @@ export default function WholesaleProductModal({
             </h2>
 
             <div className="mt-5 rounded-2xl border border-border p-4">
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="text-sm text-secondary">Tu costo</span>
-                <span className="font-prata text-3xl text-accent">
-                  {formatCOP(product.price)}
-                </span>
-              </div>
-              <div className="mt-2 flex items-baseline justify-between gap-3">
-                <span className="text-xs text-secondary/70">Precio sugerido de venta</span>
-                <span className="text-sm text-secondary">
-                  {formatCOP(product.retailPrice)}
-                </span>
-              </div>
+              {product.tiers ? (
+                <>
+                  <span className="mb-3 block text-sm text-secondary">
+                    Tu costo por cantidad
+                  </span>
+                  <TierPrices tiers={product.tiers} qty={qtyEnPedido} className="text-sm" />
+                </>
+              ) : (
+                <>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-sm text-secondary">Tu costo</span>
+                    <span className="font-prata text-3xl text-accent">
+                      {formatCOP(product.price)}
+                    </span>
+                  </div>
+                  <div className="mt-2 flex items-baseline justify-between gap-3">
+                    <span className="text-xs text-secondary/70">Precio sugerido de venta</span>
+                    <span className="text-sm text-secondary">
+                      {formatCOP(product.retailPrice)}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
 
             {detalles.length > 0 && (

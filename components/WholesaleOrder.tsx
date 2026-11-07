@@ -9,6 +9,7 @@ import { useWholesaleSelection } from "@/lib/store";
 import { formatCOP } from "@/lib/format";
 import { buildWholesaleSelectionLink } from "@/lib/whatsapp";
 import { lockScroll } from "@/lib/scroll-lock";
+import { unitPriceFor } from "@/lib/wholesale-rules";
 
 const MAX_QTY = 999;
 
@@ -80,7 +81,7 @@ export default function WholesaleOrder() {
     return lockScroll();
   }, [isOpen, items.length]);
 
-  const total = items.reduce((n, i) => n + i.qty * i.price, 0);
+  const total = items.reduce((n, i) => n + i.qty * unitPriceFor(i, i.qty), 0);
   const count = items.reduce((n, i) => n + i.qty, 0);
 
   if (!mounted || items.length === 0) return null;
@@ -164,7 +165,7 @@ export default function WholesaleOrder() {
                           </button>
                         </div>
                         <span className="mt-0.5 text-xs text-secondary/70">
-                          {formatCOP(i.price)} c/u
+                          {formatCOP(unitPriceFor(i, i.qty))} c/u
                           {(i.minQty ?? 1) > 1 && ` · mínimo ${i.minQty} u.`}
                         </span>
                         <div className="mt-auto flex items-center justify-between pt-2">
@@ -194,7 +195,7 @@ export default function WholesaleOrder() {
                             </button>
                           </div>
                           <span className="text-sm font-medium">
-                            {formatCOP(i.price * i.qty)}
+                            {formatCOP(unitPriceFor(i, i.qty) * i.qty)}
                           </span>
                         </div>
                       </div>
