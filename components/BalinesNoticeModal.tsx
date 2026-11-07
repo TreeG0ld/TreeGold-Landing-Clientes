@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { Sparkles } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import { lockScroll } from "@/lib/scroll-lock";
 import { BALINES_MIN_QTY, BALINES_SPECIAL_QTY } from "@/lib/wholesale-rules";
 import { buildGeneralLink } from "@/lib/whatsapp";
@@ -115,37 +115,39 @@ export default function BalinesNoticeModal() {
             <h2 id="balines-titulo" className="font-serif text-2xl leading-tight text-primary">
               Compra mínima de {BALINES_MIN_QTY} unidades
             </h2>
-            <p className="mx-auto mt-3 text-[0.8rem] leading-relaxed text-secondary">
-              Cada referencia se vende desde {BALINES_MIN_QTY} unidades. Al
-              agregarla a tu pedido entran {BALINES_MIN_QTY} de una vez, y desde
-              ahí puedes sumar de a una.
-            </p>
-
-            <div className="mt-5 rounded-2xl border border-accent/30 bg-accent/10 px-4 py-3.5 text-sm text-primary">
-              <p className="flex items-center justify-center gap-2">
-                <Sparkles className="h-4 w-4 shrink-0 text-accent" />
-                <span>
-                  <span className="font-medium">Precio especial</span> desde{" "}
-                  {BALINES_SPECIAL_QTY} unidades por referencia
-                </span>
+            {/* El descuento es lo que debe llamar la atención, sin caja de color:
+                una línea fina, el titular en la misma serif del título, y una
+                flecha que lleva la vista al botón de WhatsApp. */}
+            <div className="mt-6 border-t border-border pt-6">
+              {/* Se destacan dos cosas, en el dorado de la tienda (accent, el
+                  mismo del rótulo "Balinería e insumos", liso y sin
+                  degradado): el mínimo para el descuento y la palabra
+                  "descuento". El resto, en tamaño normal. */}
+              <p className="font-serif text-xl leading-snug text-primary">
+                Compras desde{" "}
+                <span className="text-2xl text-accent">{BALINES_SPECIAL_QTY} balines</span>,
+                <br />
+                obtienes <span className="text-[1.7rem] text-accent">descuento</span> aquí
               </p>
-              <p className="mt-1 text-[0.8rem] text-secondary">
-                Escríbenos y pide tu descuento.
-              </p>
+              <ArrowDown
+                aria-hidden
+                strokeWidth={2}
+                className="mx-auto mt-3 h-6 w-6 text-accent motion-safe:animate-bounce"
+              />
               <a
                 href={DISCOUNT_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2.5 inline-flex items-center gap-1.5 text-[0.8rem] font-medium text-[#1c8a47] underline-offset-4 transition-colors hover:underline"
+                className="mt-2 flex w-full items-center justify-center gap-2.5 rounded-full bg-[#1c8a47] px-4 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#1c8a47]/30 transition-colors hover:bg-[#17743b]"
               >
-                <WhatsAppIcon className="h-4 w-4" /> Pedir descuento por WhatsApp
+                <WhatsAppIcon className="h-5 w-5" /> Pedir descuento por WhatsApp
               </a>
             </div>
 
             <button
               ref={closeRef}
               onClick={cerrar}
-              className="btn-primary mt-6 w-full py-3"
+              className="btn-outline mt-3 w-full py-3"
             >
               Entendido
             </button>

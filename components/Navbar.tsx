@@ -13,7 +13,7 @@ import { lockScroll } from "@/lib/scroll-lock";
 
 const links = [
   { href: "/", label: "Inicio" },
-  { href: "/coleccion", label: "Colección" },
+  { href: "/coleccion", label: "Categorías" },
   { href: "/promociones", label: "Promociones" },
   { href: "/historia", label: "Historia" },
   { href: "/contacto", label: "Contacto" },
